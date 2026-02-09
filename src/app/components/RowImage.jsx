@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const RowImage = (props) => {
   return (
     <div className="container">
@@ -14,13 +16,13 @@ const RowImage = (props) => {
             props.imageCol
           }
         >
-          <img
+          <Image
             src={props.ImgAbout}
             className={props.ImgAboutClass}
             alt={props.imgAlt}
-            fetchpriority="high"
-            loading="eager"
-            data-no-lazy="1"
+            width={600}
+            height={400}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
           />
         </div>
         <div

@@ -1,16 +1,16 @@
+import Image from "next/image";
+
 const IconBox = (props) => {
   return (
     <div>
       <div className="box d-flex me-2">
         <div className="align-self-center"> 
-          <img
+          <Image
             src={props.iconUrl}
             alt={props.iconAlt}
             width={props.iconWidth}
+            height={props.iconWidth}
             className="me-2"
-            fetchpriority="high"
-            loading="eager"
-            data-no-lazy="1"
           />
         </div>
         <div className="align-self-center"> 

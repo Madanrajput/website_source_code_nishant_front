@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { logout } from '../../../store/slices/authSlice';
-import "../../globals.css";
+// import "../../globals.css";
 import { FaBars } from 'react-icons/fa6';
 
 const AuthHeader = ({setIsSidebarOpen}) => {

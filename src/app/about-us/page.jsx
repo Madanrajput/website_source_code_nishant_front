@@ -82,7 +82,7 @@ const AboutUs = () => {
               <div className="row justify-content-center">
                 <div className="col-lg-6">
                   <img
-                    src={formData.mid_image}
+                    src={formData.mid_image || ""}
                     className="w-100"
                     alt="About High Creation"
                   />

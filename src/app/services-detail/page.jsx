@@ -1,5 +1,4 @@
-import Image from "next/image";
-import { notFound } from "next/navigation"; // ✅ Add this
+import { notFound } from "next/navigation";
 import BackgroundImageWithHeading from "../components/BackgroundImageWithHeading";
 import MainLayout from "../layouts/MainLayout";
 import ServicesRowLeft from "../components/ServicesRowLeft";
@@ -7,45 +6,42 @@ import { defaultAltText } from "@/utils/helper";
 import api from "@/utils/api";
 import DOMPurify from "isomorphic-dompurify";
 
+// --- FIX: Dynamic Canonical Tag for Cities ---
 export async function generateMetadata({ searchParams }) {
   const baseUrl = "https://hcinterior.in";
-  const city = searchParams?.city || "delhi"; // Get city from query string or default to "delhi"
-  const canonicalUrl = `${baseUrl}/interior-designers-in-${city}`;
+  // Check if city exists and isn't "undefined" string
+  const city = searchParams?.city && searchParams.city !== "undefined" ? searchParams.city : "delhi";
+  
+  // Logic: If we have a specific city, point to that. Otherwise, point to main page.
+  // Note: Adjust the URL structure below if you use specific routes for cities (e.g. /interior-designers-in-noida)
+  const canonicalUrl = city && city !== 'delhi' 
+    ? `${baseUrl}/services-detail?city=${city}`
+    : `${baseUrl}/services-detail`;
 
   try {
     const response = await api.get(`cms-city/${city}`);
     const metaresult = response.data;
 
-    const metaTitle = metaresult?.seo_content?.meta_title ?? "My Page Title";
-
     return {
-      title: metaTitle,
-      description: metaresult?.seo_content?.meta_description ?? "Default description",
-      keywords: metaresult?.seo_content?.meta_keywords ?? "Default keywords",
+      title: metaresult?.seo_content?.meta_title ?? "Interior Design Services",
+      description: metaresult?.seo_content?.meta_description ?? "Best Interior Design Services",
+      keywords: metaresult?.seo_content?.meta_keywords ?? "",
       alternates: {
         canonical: canonicalUrl,
-      },
-      other: {
-        title: metaTitle,
       },
     };
   } catch (error) {
     return {
-      title: "Page Not Found",
+      title: "Services - High Creation Interior",
       alternates: {
-        canonical: `${baseUrl}/not-found`,
+        canonical: `${baseUrl}/services-detail`,
       },
     };
   }
 }
 
-
-
 const ServicesDetailPage = async ({ searchParams }) => {
-
-  // const city = params.city || "delhi";
-  const city = searchParams?.city || "delhi"; // Get city from query string or default to "delhi"
-
+  const city = searchParams?.city && searchParams.city !== "undefined" ? searchParams.city : "delhi";
 
   try {
     const response = await api.get(`cms-city/${city}`);
@@ -71,7 +67,8 @@ const ServicesDetailPage = async ({ searchParams }) => {
               <div className="mx-0 row justify-content-center">
                 <div className="col-lg-8 text-center">
                   <h3>{pageData?.main_title}</h3>
-                  <p dangerouslySetInnerHTML={{ __html: safeDescription }} />
+                  {/* Using div instead of p for HTML content to avoid nesting errors */}
+                  <div dangerouslySetInnerHTML={{ __html: safeDescription }} />
                   <div>
                     <img
                       src={pageData?.location_image ?? "/images/services/1-min.png"}
@@ -159,9 +156,7 @@ const ServicesDetailPage = async ({ searchParams }) => {
     );
   } catch (error) {
     console.error("API Error:", error);
-    throw error;
-
-    notFound(); // Shows 404 page
+    notFound(); 
   }
 };
 

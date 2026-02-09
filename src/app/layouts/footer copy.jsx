@@ -36,7 +36,7 @@ const Footer = () => {
           aria-label="Chat with us on WhatsApp"
         >
           <div>
-            <img src="/images/Whatsapp-icon.png" width={40} alt=""  fetchpriority="high"
+            <img src="/images/Whatsapp-icon.png" width={40} alt="WhatsApp"  fetchPriority="high"
   loading="eager"
   data-no-lazy="1" />
           </div>
@@ -57,7 +57,7 @@ const Footer = () => {
                         className=""
                         width={150}
                         height={150}
-                        fetchpriority="high"
+                        fetchPriority="high"
                         loading="eager"
                         data-no-lazy="1"
                       />

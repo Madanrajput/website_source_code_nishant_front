@@ -1,6 +1,6 @@
 import { IoIosCall } from "react-icons/io";
 import Toggle from "../components/Toggle";
-import "../globals.css";
+// import "../globals.css";
 const Header = () => {
   return (
     <>

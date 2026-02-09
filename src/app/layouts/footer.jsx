@@ -10,25 +10,33 @@ import api from "@/utils/api";
 import { useEffect, useState } from "react";
 
 const Footer = () => {
+  const [footerlink, setData] = useState([]);
+  useEffect(() => {
+    const fetchfooterlink = async () => {
+      try {
+        const response = await api.get("/footer-link");
+        setData(response.data);
+      } catch (err) {
+        console.error("Error fetching SEO data:", err);
+      }
+    };
 
- const [footerlink, setData] = useState([]);
-    useEffect(() => {
-      const fetchfooterlink = async () => {
-        try {
-          const response = await api.get("/footer-link");
-          setData(response.data);
-        } catch (err) {
-          console.error("Error fetching SEO data:", err);
-        }
-      };
-  
-      fetchfooterlink();
-    }, []);
+    fetchfooterlink();
+  }, []);
 
-    console.log('FooterLink', footerlink);
+  console.log("FooterLink", footerlink);
   return (
     <>
-      <div className="mt-4 ms-auto me-0" style={{ position: "fixed", top: "65%", right: "0", transform: "translateY(-50%)", zIndex: "9999" }}>
+      <div
+        className="mt-4 ms-auto me-0"
+        style={{
+          position: "fixed",
+          top: "65%",
+          right: "0",
+          transform: "translateY(-50%)",
+          zIndex: "9999",
+        }}
+      >
         <a
           href="https://api.whatsapp.com/send?phone=919560277787"
           className=""
@@ -36,9 +44,14 @@ const Footer = () => {
           aria-label="Chat with us on WhatsApp"
         >
           <div>
-            <img src="/images/Whatsapp-icon.png" width={40} alt=""  fetchpriority="high"
-  loading="eager"
-  data-no-lazy="1" />
+            <img
+              src="/images/Whatsapp-icon.png"
+              width={40}
+              alt=""
+              fetchpriority="high"
+              loading="eager"
+              data-no-lazy="1"
+            />
           </div>
         </a>
       </div>
@@ -52,7 +65,7 @@ const Footer = () => {
                     <a href="/">
                       {" "}
                       <img
-                       src="/images/new_hc_logo.png"
+                        src="/images/new_hc_logo.png"
                         alt="High Creation Interior Logo"
                         className=""
                         width={150}
@@ -80,15 +93,6 @@ const Footer = () => {
                       +91 9810503881
                     </a>
                   </div>
-                  {/* <h4 className="footer_heading">Download App On Mobile:</h4>
-                  <div className="pb-4 d-fle pb-lg-0">
-                    <img
-                      src="/images/gpay.PNG"
-                      className="me-3"
-                      alt="google-playstore"
-                    />
-                    <img src="/images/apple.PNG" alt="ois-store" />
-                  </div> */}
                 </div>
                 <div className="col-lg-2 col-md-3 col-6">
                   <h4 className="footer_heading">High creation</h4>
@@ -100,7 +104,7 @@ const Footer = () => {
                     </li>
                     <li className="footer_li">
                       <a href="/services/" className="text-black">
-                      Service area 
+                        Service area
                       </a>
                     </li>
                     <li className="footer_li">
@@ -143,59 +147,70 @@ const Footer = () => {
                 <div className="col-lg-3 ps-lg-4 col-md-3 col-6">
                   <h4 className="footer_heading">Gallery</h4>
                   <ul className="list-unstyled ps-0">
-                   
-                  {footerlink.map((query, index) => (
-  <li key={index} className="footer_li"> {/* Add key here */}
-    <a href={query.web_url} className="text-black">
-      {query.title}
-    </a>
-  </li>
-))}
-                     
+                    {footerlink.map((query, index) => (
+                      <li key={index} className="footer_li">
+                        {" "}
+                        {/* Add key here */}
+                        <a href={query.web_url} className="text-black">
+                          {query.title}
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                 </div>
                 <div className="col-lg-3 col-md-12 col-6">
                   <h4 className="footer_heading">Branch Office</h4>
                   <ul className="list-unstyled">
+                    {/* Noida H101 */}
                     <li className="footer_li pb-2">
-                      <span
-                        href="#"
+                      <a
+                        href="https://share.google/HP7ACwe10N8abGQHv"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-black"
                       >
                         H101, LGF, Sector-63, Noida, Uttar Pradesh- 201301
-                      </span>
+                      </a>
                     </li>
+                    {/* Noida H-56 */}
                     <li className="footer_li pb-2">
-                      <span
-                        href="#"
+                      <a
+                        href="https://share.google/y9omV2e5Ch6AfHlnB"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-black"
                       >
                         H-56, 1st Floor, Sector-63, Noida, Uttar Pradesh- 201301
-                      </span>
-                    </li>
-                    {/* <li className="footer_li pb-2">
-                      <a
-                        href="/https://maps.app.goo.gl/fgvUV2sVYxd3uPct9/"
-                        className="text-black"
-                      >
-                        17, Vikas Vihar, Mohanpuri, Meerut, Uttar Pradesh-
-                        250001
                       </a>
-                    </li> */}
+                    </li>
+                    {/* Gurugram */}
                     <li className="footer_li pb-2">
-                      <span
-                        href="#"
+                      <a
+                        href="https://share.google/suG5UqBggFOVNmJql"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-black"
                       >
-                        4th Floor, Jmd Galleria Mall, Unit Nos. 402, Sector-47 & 48, Sohna - Gurgaon Rd, Gurugram, Haryana 122001
-                      </span>
+                        4th Floor, Jmd Galleria Mall, Unit Nos. 402, Sector-47 &
+                        48, Sohna - Gurgaon Rd, Gurugram, Haryana 122001
+                      </a>
                     </li>
+                    {/* Faridabad - NEW ADDRESS */}
+                    <li className="footer_li pb-2">
+                      <a
+                        href="https://share.google/5foJQ0EoWNl5MoeNv"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-black"
+                      >
+                        1st Floor, Plot No 24, near old Faridabad Metro Station,
+                        Sector 20A, Faridabad, Haryana 121002
+                      </a>
+                    </li>
+
                     <h6>Workshop</h6>
                     <li className="footer_li pb-2">
-                      <span
-                        href="#"
-                        className="text-black"
-                      >
+                      <span className="text-black">
                         Plot No-3, Sorkha Village , Sector-115, Noida, Uttar
                         Pradesh- 201301
                       </span>
@@ -270,7 +285,7 @@ const Footer = () => {
               Designed By
               <a href="#" className="text-black">
                 {" "}
-             HC Interior
+                HC Interior
               </a>
             </p>
           </div>

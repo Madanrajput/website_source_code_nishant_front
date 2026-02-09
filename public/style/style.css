@@ -1,13 +1,10 @@
- @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Outfit:wght@400;600&display=swap');
-
-
-
 
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
   font-family: poppins;
+  font-family: var(--font-poppins), sans-serif;
 }
 /* @font-face {
   font-family: futura_font;
@@ -36,7 +33,8 @@ a {
 h4,
 h5,
 h6 {
-  font-family: poppins;
+  /* font-family: poppins; */
+  font-family: var(--font-poppins), sans-serif;
   font-weight: 600 !important;
 }
 
@@ -47,19 +45,22 @@ h5 {
 h1 {
   font-size: 50px;
   color: #171717;
-  font-family: 'Outfit', sans-serif;
+  /* font-family: 'Outfit', sans-serif; */
+  font-family: var(--font-outfit), sans-serif;
 }
 
 h2,
 h3 {
   font-size: 50px;
-  font-family: 'Outfit', sans-serif;
+  /* font-family: 'Outfit', sans-serif; */
+  font-family: var(--font-outfit), sans-serif;
   font-weight: 600 !important;
 }
 
 li {
   padding: 0 10px;
-  font-family: poppins;
+  /* font-family: poppins; */
+  font-family: var(--font-poppins), sans-serif;
   font-size: 15px;
 }
 /* body {
@@ -70,7 +71,8 @@ li {
 }
 
 .nav-link {
-  font-family: poppins !important;
+  /* font-family: poppins !important; */
+  font-family: var(--font-poppins), sans-serif !important;
   color: rgb(0, 0, 0) !important;
   font-size: 20px !important;
   padding-left: 0.8rem;
@@ -78,7 +80,8 @@ li {
 }
 
 .nav_item {
-  font-family: poppins !important;
+  /* font-family: poppins !important; */
+  font-family: var(--font-poppins), sans-serif !important;
   color: rgb(0, 0, 0) !important;
   font-size: 15px;
   padding-left: 0.8rem;
@@ -186,11 +189,11 @@ li {
   position: absolute;
 }
 
-.carousel_img {
+/* .carousel_img {
   width: 100% !important;
   height: auto !important;
   object-fit: cover;
-}
+} */
 
 .carousel-caption.d-md-block {
   position: absolute;
@@ -1714,9 +1717,9 @@ display: none;
     top: 100px;
   }
 
-  .carousel_img {
+  /* .carousel_img {
     height: 50vh;
-  }
+  } */
 
   .aboutBanner {
     height: 40vh;
@@ -1984,9 +1987,9 @@ display: none;
   .carousel-caption.d-md-block {
     top: 60px;
   }
-  .carousel_img {
+  /* .carousel_img {
     height: 50vh;
-  }
+  } */
   .aboutBanner {
     height: 40vh;
   }
@@ -2124,9 +2127,9 @@ display: none;
   top: 70px;
 }
 
-.counter_number {
+/* .counter_number {
   font-family: poppins !important;
-}
+} */
 
 .modal-content {
   width: 90%;
@@ -2528,9 +2531,9 @@ figure.image img {
   position: absolute;
   top: 70px;
 }
-.counter_number {
+/* .counter_number {
   font-family: poppins !important;
-}
+} */
 
 .modal-content {
   width: 90%;
@@ -3034,4 +3037,16 @@ table {
 
 .ck.ck-balloon-panel {
   z-index: 9999999 !important;
+}
+
+
+
+.responsive_banner_container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1920 / 850;
+}
+
+.responsive_banner_container img{
+  object-fit: contain !important;
 }

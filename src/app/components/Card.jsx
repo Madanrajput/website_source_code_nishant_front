@@ -1,4 +1,6 @@
 import "../../../public/style/style.css";
+import Image from "next/image";
+
 const Card = ({
     cardNameALl,
     imgSrc,
@@ -18,11 +20,7 @@ const Card = ({
         <div>
             <a href={cardLinkName}>
             <div className={cardNameALl}>
-                <img src={imgSrc} className={imgClass} alt={imgAlt}
-                fetchpriority="high"
-                loading="eager"
-                data-no-lazy="1"
-                 />
+                <Image src={imgSrc} className={imgClass} alt={imgAlt} width={400} height={300} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                 {/* {imgSrc ? <img src={imgSrc} className="offerimg" alt={imgAlt} /> : null} */}
                 <div className="px-3 pt-3 card-body">
                     <span>{spanTitle}</span>

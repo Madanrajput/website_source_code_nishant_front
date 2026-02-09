@@ -1,8 +1,10 @@
 "use client";
-import api from "@/utils/api";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // Optimized navigation for Next.js
+import api from "@/utils/api";
 
 const ContactUsPopUp = ({ onModalStateChange }) => {
+    const router = useRouter();
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
         fullName: "",
@@ -26,6 +28,11 @@ const ContactUsPopUp = ({ onModalStateChange }) => {
         setFormData((prevData) => ({ ...prevData, termsAndConditions: checked }));
     };
 
+    const handleClose = () => {
+        setShowModal(false);
+        if (onModalStateChange) onModalStateChange(false);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -34,7 +41,6 @@ const ContactUsPopUp = ({ onModalStateChange }) => {
             return;
         }
 
-        //db column names -  name, email, mobile, place, query
         const formRequestData = {
             name: formData.fullName,
             email: formData.email,
@@ -55,11 +61,14 @@ const ContactUsPopUp = ({ onModalStateChange }) => {
                     query: "",
                     termsAndConditions: false,
                 });
-                setTimeout(() => {
-                    window.location.href = "/thank-you";
-        
-                }, 300); // delay ~300ms
+                
+                // Close modal immediately on success
                 handleClose();
+
+                // Redirect using Next.js router after a short delay
+                setTimeout(() => {
+                    router.push("/thank-you");
+                }, 300);
             } else {
                 setSubmissionError("Failed to submit form. Please try again.");
             }
@@ -74,150 +83,139 @@ const ContactUsPopUp = ({ onModalStateChange }) => {
     };
 
     useEffect(() => {
+        // Trigger popup after 12 seconds
         const timer = setTimeout(() => {
             setShowModal(true);
-            onModalStateChange(true);
+            if (onModalStateChange) onModalStateChange(true);
         }, 12000);
 
         return () => clearTimeout(timer);
-    }, []);
+    }, [onModalStateChange]);
 
-    const handleClose = () => {
-        setShowModal(false);
-        onModalStateChange(false);
-
-      
-    };
+    // Don't render anything if modal is hidden (cleaner DOM)
+    if (!showModal) return null;
 
     return (
-        <>
-            {showModal && (
-                <div
-                    className="modal fade show"
-                    style={{ display: "block" }}
-                    data-bs-backdrop="static"
-                    data-bs-keyboard="false"
-                    tabIndex="-1"
-                    aria-labelledby="staticBackdropLabel"
-                    aria-hidden="true"
-                >
-                    <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-                        <div className="modal-content contact_form contact">
-                            <div className="modal-body">
-                                <h4 className="mb-3 text-black form_heading d-flex justify-content-between">
-                                    Let&apos;s Connect
-                                    <i
-                                        type="button"
-                                        className="btn-close fs-6"
-                                        onClick={handleClose}
-                                    ></i>
-                                </h4>
-                                <p>Get Your Dream Home Interior. Let Our experts help you</p>
-                                <form className="row" onSubmit={handleSubmit}>
-                                    {submissionMessage && (
-                                        <div className="text-center alert alert-success alert-dismissible fade show">
-                                            {submissionMessage}
-                                        </div>
-                                    )}
-                                    {submissionError && (
-                                        <div className="text-center alert alert-danger alert-dismissible fade show">
-                                            {submissionError}
-                                        </div>
-                                    )}
-                                    <div className="mb-3 col-md-6">
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            value={formData.fullName}
-                                            id="fullName"
-                                            name="fullName"
-                                            placeholder="Full Name"
-                                            required
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                    <div className="mb-3 col-md-6">
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="contact"
-                                            name="contact"
-                                            value={formData.contact}
-                                            placeholder="Contact No."
-                                            required
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-
-                                    <div className="mb-3 col-md-12">
-                                        <input
-                                            type="email"
-                                            className="form-control"
-                                            id="email"
-                                            name="email"
-                                            value={formData.email}
-                                            placeholder="Email"
-                                            required
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                    <div className="mb-3 col-md-12">
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="place"
-                                            name="place"
-                                            value={formData.place}
-                                            onChange={handleInputChange}
-                                            placeholder="Place"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3 col-md-12">
-                                        <textarea
-                                            className="form-control"
-                                            id="query"
-                                            name="query"
-                                            value={formData.query}
-                                            placeholder="Query"
-                                            rows="3"
-                                            onChange={handleInputChange}
-                                        ></textarea>
-                                    </div>
-                                    <div className="col-12">
-                                        <div className="form-check">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                value={formData.termsAndConditions}
-                                                id="termsAndConditions"
-                                                name="terms_and_conditions"
-                                                required
-                                                onChange={handleCheckboxChange}
-                                            />
-                                            <label
-                                                className="text-black form-check-label"
-                                                htmlFor="termsAndConditions"
-                                            >
-                                                Accept Terms & condition
-                                            </label>
-                                            <div className="text-black invalid-feedback">
-                                                You must agree before submitting.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="m-auto mt-3 col-12 d-flex justify-content-center">
-                                        <button className="px-5 btn know_more" type="submit">
-                                            SEND
-                                        </button>
-                                    </div>
-                                </form>
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }} // Added semi-transparent bg overlay
+            data-bs-backdrop="static"
+            data-bs-keyboard="false"
+            tabIndex="-1"
+            aria-labelledby="staticBackdropLabel"
+            aria-hidden="true"
+        >
+            <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                <div className="modal-content contact_form contact">
+                    <div className="modal-body">
+                        <h4 className="mb-3 text-black form_heading d-flex justify-content-between">
+                            Let&apos;s Connect
+                            <i
+                                type="button"
+                                className="btn-close fs-6"
+                                onClick={handleClose}
+                                aria-label="Close"
+                            ></i>
+                        </h4>
+                        <p>Get Your Dream Home Interior. Let Our experts help you</p>
+                        <form className="row" onSubmit={handleSubmit}>
+                            {submissionMessage && (
+                                <div className="text-center alert alert-success alert-dismissible fade show">
+                                    {submissionMessage}
+                                </div>
+                            )}
+                            {submissionError && (
+                                <div className="text-center alert alert-danger alert-dismissible fade show">
+                                    {submissionError}
+                                </div>
+                            )}
+                            
+                            {/* Form Fields */}
+                            <div className="mb-3 col-md-6">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="fullName"
+                                    value={formData.fullName}
+                                    onChange={handleInputChange}
+                                    placeholder="Full Name"
+                                    required
+                                />
                             </div>
-                        </div>
+                            <div className="mb-3 col-md-6">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="contact"
+                                    value={formData.contact}
+                                    onChange={handleInputChange}
+                                    placeholder="Contact No."
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3 col-md-12">
+                                <input
+                                    type="email"
+                                    className="form-control"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    placeholder="Email"
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3 col-md-12">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="place"
+                                    value={formData.place}
+                                    onChange={handleInputChange}
+                                    placeholder="Place"
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3 col-md-12">
+                                <textarea
+                                    className="form-control"
+                                    name="query"
+                                    value={formData.query}
+                                    onChange={handleInputChange}
+                                    placeholder="Query"
+                                    rows="3"
+                                ></textarea>
+                            </div>
+                            <div className="col-12">
+                                <div className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        name="terms_and_conditions"
+                                        id="termsAndConditions"
+                                        checked={formData.termsAndConditions}
+                                        onChange={handleCheckboxChange}
+                                        required
+                                    />
+                                    <label className="text-black form-check-label" htmlFor="termsAndConditions">
+                                        Accept Terms & Condition
+                                    </label>
+                                    {!formData.termsAndConditions && submissionError.includes("agree") && (
+                                        <div className="text-danger small">
+                                            You must agree before submitting.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="m-auto mt-3 col-12 d-flex justify-content-center">
+                                <button className="px-5 btn know_more" type="submit">
+                                    SEND
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            )}
-        </>
+            </div>
+        </div>
     );
 };
 

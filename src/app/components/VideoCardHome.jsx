@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import Image from "next/image"; // Import the optimized image component
+
 const VideoThumbnail = ({ videoUrl, imageUrl }) => {
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -19,27 +21,30 @@ const VideoThumbnail = ({ videoUrl, imageUrl }) => {
           className="video-frame"
         ></iframe>
       ) : (
-        <div
-          className="thumbnail"
-          style={{ backgroundImage: `url(${imageUrl})` }}
-        >
+        <div className="thumbnail-container">
+          {/* OPTIMIZATION: Use Next/Image instead of background-image */}
+          <Image 
+            src={imageUrl || "/images/default-thumbnail.jpg"} // Fallback if image is missing
+            alt="Video Thumbnail"
+            fill
+            className="thumbnail-img"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={true} // Loads immediately
+          />
+          
           <button onClick={handlePlay} className="play-button">
-            {/* ▶️ */}
-            <img src="/images/circle_play.png" width={40} alt="play"  fetchpriority="high"
-  loading="eager"
-  data-no-lazy="1" />
+            {/* Increased width to 80 to match live site feel */}
+            <Image 
+              src="/images/circle_play.png" 
+              width={80} 
+              height={80} 
+              alt="play" 
+            />
           </button>
         </div>
       )}
 
       <style jsx>{`
-        .video-frame {
-          width: 100%;
-          height: 85vh;
-          border: none;
-          background: transparent;
-        }
-
         .video-thumbnail {
           position: relative;
           width: 100%;
@@ -48,44 +53,46 @@ const VideoThumbnail = ({ videoUrl, imageUrl }) => {
           overflow: hidden;
           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
           height: 580px;
+          background-color: #f0f0f0; /* Light gray placeholder color */
         }
 
-        .thumbnail {
+        .video-frame {
+          width: 100%;
+          height: 100%;
+          border: none;
+          background: black;
+        }
+
+        .thumbnail-container {
           position: relative;
           width: 100%;
-          padding-top: 56.25%;
-          background-size: cover;
-          background-position: center;
+          height: 100%;
+        }
+
+        /* This ensures the image covers the area perfectly */
+        :global(.thumbnail-img) {
+          object-fit: cover;
         }
 
         .play-button {
           position: absolute;
-          top: 36%;
+          top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          font-size: 2rem;
-          background: rgba(255, 255, 255, 0.8);
+          background: transparent; /* Removed the white background */
           border: none;
-          border-radius: 50%;
-          width: 60px;
-          height: 60px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          padding: 0;
           cursor: pointer;
+          transition: transform 0.2s ease;
+          z-index: 10;
+        }
+
+        .play-button:hover {
+          transform: translate(-50%, -50%) scale(1.1); /* Slight zoom effect on hover */
         }
 
         @media screen and (max-width: 767px) {
-          .thumbnail {
-            height: 400px;
-          }
           .video-thumbnail {
-            height: 400px;
-          }
-          .play-button {
-            top: 45%;
-          }
-          .video-frame{
             height: 400px;
           }
         }

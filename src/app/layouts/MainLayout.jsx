@@ -1,14 +1,20 @@
+import dynamic from "next/dynamic";
 import Footer from "./footer";
 import Header from "./Header";
-import RootLayout from "../layout";
+
+const ContactUsPopUp = dynamic(() => import("../components/ContactUsPopUp"), { 
+  ssr: false, 
+});
+
 
 const MainLayout = ({ children }) => {
   return (
-    <RootLayout>
+    <>
       <Header />
       <main>{children}</main>
+      <ContactUsPopUp />
       <Footer />
-    </RootLayout>
+    </>
   );
 };
 

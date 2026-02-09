@@ -1,85 +1,138 @@
-"use client"
-import { useEffect, useState } from "react";
 import MainLayout from "../layouts/MainLayout";
-import { toast } from "react-toastify";
 import api from "@/utils/api";
 import { defaultAltText } from "@/utils/helper";
+import { notFound } from "next/navigation";
 
-const BlogDetail = () => {
-  const [blogDetails, setBlogDetails] = useState({});
-  const [loading, setLoading] = useState(true);
+/**
+ * 🔒 Slug Guard
+ * Blocks bots, invalid URLs, and legacy junk
+ */
+const isValidSlug = (slug) => {
+  if (!slug) return false;
+  if (slug === "undefined" || slug === "null") return false;
+  if (slug.includes(".")) return false; // blocks .env, .git, etc
+  return true;
+};
 
-  useEffect(() => {
-    const path = window.location.pathname;
-    const slug = path.split('/').pop();
-    const blogId = new URLSearchParams(window.location.search).get("id") ?? null;
-    const fetchContentManagerPages = async () => {
-      try {
-        const endpoint = blogId ? `/cms-blog/${blogId}` : `/cms-blog/blog-slug/${slug}`;
-        const response = await api.get(endpoint, {});
+const BASE_URL = "https://hcinterior.in";
 
-        if (response.data) {
-          setBlogDetails(response.data);
-          setLoading(false);
-        }
-      } catch (err) {
-        //redirect to the request page
-        window.location.href = window.location.origin + "/404";
-        toast.error(err.message ?? "Failed to fetch data. Please try again.");
-        setLoading(false);
-      }
+/**
+ * ✅ SERVER-SIDE METADATA (SEO + GSC SAFE)
+ */
+export async function generateMetadata({ params }) {
+  const slug = params.blog;
+
+  // 🚫 Invalid slug → no index, no API call
+  if (!isValidSlug(slug)) {
+    return {
+      title: "Not Found",
+      robots: "noindex, follow",
     };
+  }
 
-    fetchContentManagerPages();
-  }, []);
+  try {
+    const response = await api.get(`/cms-blog/blog-slug/${slug}`);
+    const blogDetails = response.data;
+
+    if (!blogDetails) {
+      return {
+        title: "Blog Not Found",
+        robots: "noindex, follow",
+      };
+    }
+
+    return {
+      title:
+        blogDetails?.seo_content?.meta_title ??
+        blogDetails?.title ??
+        "High Creation Interior Blog",
+
+      description:
+        blogDetails?.seo_content?.meta_description ?? "",
+
+      keywords:
+        blogDetails?.seo_content?.meta_keywords ?? "",
+
+      alternates: {
+        canonical: `${BASE_URL}/blog/${slug}`,
+      },
+
+      robots: "index, follow",
+    };
+  } catch (error) {
+    return {
+      title: "High Creation Interior",
+      robots: "noindex, follow",
+    };
+  }
+}
+
+/**
+ * ✅ BLOG PAGE (SERVER COMPONENT)
+ */
+const BlogDetail = async ({ params }) => {
+  const slug = params.blog;
+
+  // 🚫 Invalid slug → hard 404
+  if (!isValidSlug(slug)) {
+    notFound();
+  }
+
+  let blogDetails;
+
+  try {
+    const response = await api.get(`/cms-blog/blog-slug/${slug}`);
+    blogDetails = response.data;
+  } catch (error) {
+    console.error("Blog fetch error:", error);
+    notFound();
+  }
+
+  if (!blogDetails) {
+    notFound();
+  }
 
   return (
-    <div>
-      <head>
-        <title>{blogDetails?.seo_content?.meta_title ?? "My page title"}</title>
-        <meta name="description" content={blogDetails?.seo_content?.meta_description ?? "Default description"} />
-        <meta name="keywords" content={blogDetails?.seo_content?.meta_keywords ?? "Default keywords"} />
-        <link rel="canonical" href={blogDetails?.seo_content?.canonical_url} />
-        {blogDetails?.seo_content?.custom_code &&
-          (<script dangerouslySetInnerHTML={{ __html: blogDetails?.seo_content?.custom_code ?? "" }}></script>
-          )}
-      </head>
-      {/* {blogDetails?.seo_content?.custom_code && (
-        <div
+    <MainLayout>
+      {/* ✅ Controlled JSON-LD injection */}
+      {blogDetails?.seo_content?.custom_code && (
+        <script
+          type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: blogDetails.seo_content.custom_code,
           }}
         />
-      )} */}
-      <MainLayout>
-        <main>
-          <div className="blog_deatil">
-            <div className="container">
-              <div className="row my-5 justify-content-center mx-0">
-                <div className="col-lg-10">
-                  <h2 className="pb-3">
-                    {blogDetails?.title}
-                  </h2>
-                  <div className="blog-img">
-                    {blogDetails?.image && (
-                      <img
-                        src={blogDetails?.image}
-                        className="image_blog"
-                        alt={blogDetails?.title ?? defaultAltText}
-                      />
-                    )}
-                  </div>
-                  <div className="details py-4">
-                  <p dangerouslySetInnerHTML={{ __html: blogDetails?.description}}></p>
-                  </div>
+      )}
+
+      <main>
+        <div className="blog_detail">
+          <div className="container">
+            <div className="row my-5 justify-content-center mx-0">
+              <div className="col-lg-10">
+                <h1 className="pb-3">{blogDetails.title}</h1>
+
+                {blogDetails.image && (
+                  <img
+                    src={blogDetails.image}
+                    className="w-100 object-fit-cover"
+                    alt={blogDetails.title ?? defaultAltText}
+                  />
+                )}
+
+                <div className="details py-4">
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: blogDetails.description,
+                    }}
+                  />
                 </div>
               </div>
             </div>
           </div>
-          <hr />
-        </main>
-      </MainLayout>
-    </div>
+        </div>
+        <hr />
+      </main>
+    </MainLayout>
   );
 };
 

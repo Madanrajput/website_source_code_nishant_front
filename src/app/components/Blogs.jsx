@@ -1,27 +1,24 @@
+import Image from "next/image";
+
 const Blogs = (props) => {
   return (
     <>
       <div className={props.blogCard}>
         <div className="position-relative">
           <a href={props.blogImglink}>
-            <img
+            <Image
               src={props.imgSrcBlog}
               className={props.blogClassImg}
               height={220}
+              width={400}
               alt={props.blogImgALt}
-              fetchpriority="high"
-              loading="eager"
-              data-no-lazy="1"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </a>
           <div className="d-flex position-absolute justify-content-md-between justify-content-between w-100 px-3 align-items-end bottom-0 pb-2">
             <div>
               <a href={props.blogBtnHref} className="fs-6 text-white">
-                <img src="/images/user.png" width={20} alt="user"
-                fetchpriority="high"
-  loading="eager"
-  data-no-lazy="1"
-  /> {props?.writer_name ?? "High Creation"}
+                <Image src="/images/user.png" width={20} height={20} alt="user" /> {props?.writer_name ?? "High Creation"}
               </a>
             </div>
             {/* <div className="d-flex">

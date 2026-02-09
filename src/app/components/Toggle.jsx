@@ -75,13 +75,28 @@ const Toggle = () => {
             </a>
           </div>
           <div className="close">
-            <a
+            {/* <a
               href="javascript:void(0)"
               className="closebtn"
               onClick={closeSidebar}
             >
               <IoCloseCircleOutline className="" />
-            </a>
+            </a> */}
+            <button
+              type="button"
+              className="closebtn"
+              onClick={closeSidebar}
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                margin: 0,
+                cursor: "pointer",
+              }}
+              aria-label="Close sidebar"
+            >
+              <IoCloseCircleOutline className="" />
+            </button>
           </div>
         </div>
         <div style={{ padding: "10px", color: "white" }}>

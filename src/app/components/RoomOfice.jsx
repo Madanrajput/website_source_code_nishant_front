@@ -13,7 +13,7 @@ const RoomOfice = (props) => {
           src={props.imageRoom_Office}
           className={props.roomImg}
           alt={props.altImage}
-          fetchpriority="high"
+          fetchPriority="high"
           loading="eager"
           data-no-lazy="1"
         />

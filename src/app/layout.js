@@ -1,42 +1,59 @@
 // Remove 'use client' here to keep it a server component
-import AddBootstrap from "./common/AdBoostrap";
-import "./globals.css";
-import "../../public/style/style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "../../public/style/style.css";
+import "./globals.css";
 import ClientProvider from "../store/ClientProvider";
 import Script from "next/script";
-import { ToastContainer } from "react-toastify";
+import { Great_Vibes, Poppins, Outfit } from "next/font/google";
+import dynamic from "next/dynamic";
+import AddBootstrap from "./common/AdBoostrap";
 
-import "react-toastify/dist/ReactToastify.css";
+// const AddBootstrap = dynamic(() => import("./common/AdBoostrap"), {
+//   ssr: false,
+// });
+
+const LazyToast = dynamic(() => import("./common/LazyToast"), {
+  ssr: false,
+});
+
+
+const greatVibes = Great_Vibes({
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['400'],
+  variable: '--font-great-vibes',
+});
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['400', '500','600', '700', '800'],
+  variable: '--font-poppins',
+});
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['400', '600'],
+  variable: '--font-outfit',
+});
+
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+  rel="canonical"
+  href="https://hcinterior.in"
+/>
 
-        <link
-          rel="preload" 
-          as="style" 
-         
-          type="text/css"
-          charSet="UTF-8"
-          href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css"
-        />
-        <link
-        rel="preload" 
-        as="style" 
-          type="text/css"
-          href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css"
-        />
-        <link
-         rel="preload" 
-         as="style" 
-          href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"
-        />
-
-        {/* Google Tag Manager */}
-        <Script id="gtm" strategy="afterInteractive">
+        {/* Google Tag Manager - Keep afterInteractive for early tracking (needed for analytics) */}
+        <Script 
+          id="gtm" 
+          strategy="afterInteractive"
+        >
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
           j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -48,8 +65,8 @@ export default function RootLayout({ children }) {
           content="k0iGFVO_noqQ7H1uUsJXGeReQ5YhgKjfOOgoKkSsrAw"
         />
 
-        {/* Meta Pixel Code */}
-        <Script id="fb-pixel" strategy="afterInteractive">
+        {/* Meta Pixel Code - Loaded lazily to avoid blocking initial render */}
+        <Script id="fb-pixel" strategy="lazyOnload">
           {`!function(f,b,e,v,n,t,s)
           {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
           n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -66,16 +83,17 @@ export default function RootLayout({ children }) {
             height="1"
             width="1"
             style={{ display: "none" }}
+            alt="Facebook"
             src="https://www.facebook.com/tr?id=651426977052497&ev=PageView&noscript=1"
           />
         </noscript>
 
-        {/* Google Analytics */}
+        {/* Google Analytics - Loaded lazily to avoid blocking initial render */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-MJZK1MXG9E"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="ga" strategy="afterInteractive">
+        <Script id="ga" strategy="lazyOnload">
           {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
@@ -83,7 +101,7 @@ export default function RootLayout({ children }) {
           gtag('config', 'G-MJZK1MXG9E');`}
         </Script>
 
-        {/* FAQ Schema */}
+        {/* FAQ Schema - JSON-LD should be in head for SEO, but loaded lazily */}
         <Script id="faq-schema" type="application/ld+json" strategy="afterInteractive">
           {JSON.stringify({
             "@context": "https://schema.org/",
@@ -94,7 +112,7 @@ export default function RootLayout({ children }) {
                 "name": "Where do you provide services?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "We provide our interior design services across the NCR (National Capital Region) and surrounding areas. Our team is equipped to handle projects in Noida, Delhi, Gurgaon, Faridabad , Ghaziabad, Greater Noida and other nearby locations. Additionally, we are expanding to other cities, so we can also accommodate projects in select regions. Whether it’s a residential, commercial, or luxury project, we are dedicated to delivering exceptional design solutions wherever you are located. Let us know your location, and we’ll be happy to discuss how we can assist with your project!"
+                  "text": "We provide our interior design services across the NCR (National Capital Region) and surrounding areas. Our team is equipped to handle projects in Noida, Delhi, Gurgaon, Faridabad , Ghaziabad, Greater Noida and other nearby locations. Additionally, we are expanding to other cities, so we can also accommodate projects in select regions. Whether it's a residential, commercial, or luxury project, we are dedicated to delivering exceptional design solutions wherever you are located. Let us know your location, and we'll be happy to discuss how we can assist with your project!"
                 }
               },
               {
@@ -134,7 +152,7 @@ export default function RootLayout({ children }) {
                 "name": "How do I get started with an interior design project?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Starting your interior design project is a simple and seamless process. We begin with an initial consultation where we discuss your needs, preferences, and overall vision, gathering essential details about the project scope, budget, and timeline. Based on this discussion, we create a design brief that outlines key objectives, preferred styles, materials, and any specific requirements. Our team then develops initial design concepts, presenting layout ideas, color schemes, furniture selections, and materials for your feedback. Once the concept is approved, we refine and finalize the design, incorporating any requested changes and providing detailed plans or 3D renderings if needed. With the design set, we move into the execution phase, handling material procurement, project management, and installation to ensure a flawless transformation. Upon completion, we review the space with you to ensure it meets your expectations. Throughout the entire process, we provide expert guidance to make your experience smooth and enjoyable. Let’s get in touch and bring your vision to life!"
+                  "text": "Starting your interior design project is a simple and seamless process. We begin with an initial consultation where we discuss your needs, preferences, and overall vision, gathering essential details about the project scope, budget, and timeline. Based on this discussion, we create a design brief that outlines key objectives, preferred styles, materials, and any specific requirements. Our team then develops initial design concepts, presenting layout ideas, color schemes, furniture selections, and materials for your feedback. Once the concept is approved, we refine and finalize the design, incorporating any requested changes and providing detailed plans or 3D renderings if needed. With the design set, we move into the execution phase, handling material procurement, project management, and installation to ensure a flawless transformation. Upon completion, we review the space with you to ensure it meets your expectations. Throughout the entire process, we provide expert guidance to make your experience smooth and enjoyable. Let's get in touch and bring your vision to life!"
                 }
               }
               // Add other FAQ entries here
@@ -142,7 +160,7 @@ export default function RootLayout({ children }) {
           })}
         </Script>
 
-        {/* Organization Schema */}
+        {/* Organization Schema - JSON-LD for SEO, loaded lazily */}
         <Script
           id="org-schema"
           type="application/ld+json"
@@ -175,12 +193,12 @@ export default function RootLayout({ children }) {
           })}
         </Script>
       </head>
-      <body suppressHydrationWarning={false}>
-        <Script src="https://code.jquery.com/jquery-3.6.0.min.js" async strategy="afterInteractive" />
-        <Script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js" async strategy="afterInteractive" />
+      <body suppressHydrationWarning={false} className={`${greatVibes.variable} ${poppins.variable} ${outfit.variable}`}>
+        <Script src="https://code.jquery.com/jquery-3.6.0.min.js" strategy="lazyOnload" />
+        <Script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js" strategy="lazyOnload" />
         <AddBootstrap />
         <ClientProvider>{children}</ClientProvider>
-        <ToastContainer />
+        <LazyToast />
       </body>
     </html>
   );

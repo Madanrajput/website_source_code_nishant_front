@@ -13,29 +13,6 @@
   <priority>1.00</priority>
 </url>
 <url>
-<loc>https://hcinterior.in/interior-design-company</loc>
-<lastmod>2025-05-11T10:53:59+00:00</lastmod>
-<priority>0.64</priority>
-</url>
-
-<url>
-<loc>https://hcinterior.in/interior-designer-vs-contractor</loc>
-<lastmod>2025-05-11T10:53:59+00:00</lastmod>
-<priority>0.64</priority>
-</url>
-
-<url>
-<loc>https://hcinterior.in/interior-design-trends-2025</loc>
-<lastmod>2025-05-11T10:53:59+00:00</lastmod>
-<priority>0.64</priority>
-</url>
-
-<url>
-<loc>https://hcinterior.in/two-colour-combination-for-kitchen-laminates</loc>
-<lastmod>2025-05-20T11:53:59+00:00</lastmod>
-<priority>0.64</priority>
-</url>
-<url>
   <loc>https://hcinterior.in/design-idea</loc>
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
   <priority>0.80</priority>
@@ -180,11 +157,11 @@
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
   <priority>0.80</priority>
 </url>
-<url>
+<!-- <url>
   <loc>https://hcinterior.in/designer-choice/gallery?id=undefined</loc>
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
   <priority>0.80</priority>
-</url>
+</url> -->
 <url>
   <loc>https://hcinterior.in/designer-choice</loc>
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
@@ -240,11 +217,11 @@
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
   <priority>0.64</priority>
 </url>
-<url>
+<!-- <url>
   <loc>https://hcinterior.in/services-detail?city=undefined</loc>
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
   <priority>0.64</priority>
-</url>
+</url> -->
 <url>
   <loc>https://hcinterior.in/top-10-interior-designers-in-delhi/</loc>
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
@@ -280,11 +257,11 @@
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
   <priority>0.64</priority>
 </url>
-<url>
+<!-- <url>
   <loc>https://hcinterior.in/tips-to-create-a-modern-luxury-bedroom-interior-design/</loc>
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
   <priority>0.64</priority>
-</url>
+</url> -->
 <url>
   <loc>https://hcinterior.in/what-are-the-most-common-home-decor-items-in-2023/</loc>
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
@@ -410,25 +387,20 @@
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
   <priority>0.64</priority>
 </url>
-<url>
+<!-- <url>
   <loc>https://hcinterior.in/how-to-decorate-your-home-for-diwali-under-₹5000/</loc>
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
   <priority>0.64</priority>
-</url>
+</url> -->
 <url>
   <loc>https://hcinterior.in/types-of-modular-kitchen/</loc>
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
   <priority>0.64</priority>
 </url>
-<url>
+<!-- <url>
   <loc>https://hcinterior.in/what-we-offer</loc>
   <lastmod>2025-03-06T10:53:59+00:00</lastmod>
   <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://hcinterior.in/pooja-room-designs</loc>
-  <lastmod>2025-04-06T10:30:59+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
+</url> -->
 
 </urlset>
