@@ -215,6 +215,20 @@ const Footer = () => {
                         Pradesh- 201301
                       </span>
                     </li>
+                    {/* Gurugram - Sector 48 (NEW) */}
+<li className="footer_li pb-2">
+  <a
+    href="https://www.google.com/maps/search/?api=1&query=DDC+Arcade+Sector+48+Gurugram"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-black"
+  >
+    1st Floor, DDC Arcade, Plot No 1, Badshahpur Sohna Rd,
+    opposite Vipul Business Park, Main, Sector 48,
+    Gurugram, Haryana 122018
+  </a>
+</li>
+
                   </ul>
                 </div>
               </div>

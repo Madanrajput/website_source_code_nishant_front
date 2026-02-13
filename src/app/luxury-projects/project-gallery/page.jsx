@@ -1,106 +1,43 @@
-"use client";
-import GalleryDetail from "../../components/GalleryDetail";
-import MainLayout from "../../layouts/MainLayout";
-import { useHasMounted } from "@/utils/useHasMounted";
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import api from "@/utils/api";
-import { defaultAltText } from "@/utils/helper";
-const LuxuryProjectsGallery = () => {
-  const [portfolioData, setPortfolioData] = useState({});
-  const [loading, setLoading] = useState(true);
+import GalleryClient from "./GalleryClient";
+import { notFound } from "next/navigation";
 
-  useEffect(() => {
-    const fetchContentManagerPages = async () => {
-      const portfolioProjectId = new URLSearchParams(window.location.search).get("id") ?? null;
-      try {
-        const response = await api.get(`/portfolio-project/${portfolioProjectId}`, {});
+export const dynamic = "force-dynamic";
 
-        if (response.data) {
-          setPortfolioData(response.data);
-          setLoading(false);
-        }
-      } catch (err) {
-        toast.error(err.message ?? "Failed to fetch data. Please try again.");
-        setLoading(false);
-      }
+// --- SEO FIX ---
+export async function generateMetadata({ searchParams }) {
+  const id = searchParams?.id;
+  if (!id) return { title: "Luxury Projects Gallery" };
+
+  try {
+    const response = await api.get(`/portfolio-project/${id}`);
+    const data = response.data;
+    return {
+      title: data?.title || "Luxury Projects Gallery",
+      description: `Luxury interior design project: ${data?.title}`,
+      alternates: {
+        canonical: `/luxury-projects/project-gallery?id=${id}`,
+      },
     };
+  } catch (error) {
+    return { title: "Luxury Projects Gallery", robots: "noindex" };
+  }
+}
 
-    fetchContentManagerPages();
-  }, []);
+// --- SERVER COMPONENT ---
+export default async function LuxuryProjectsPage({ searchParams }) {
+  const id = searchParams?.id;
+  if (!id) return notFound();
 
-  const images = portfolioData?.child_images ?? [];
-  return (
-    <div>
-          {loading ? (
-        <div className="loader-container">
-          <div className="spinner">
-            <img src="https://raw.githubusercontent.com/Codelessly/FlutterLoadingGIFs/master/packages/cupertino_activity_indicator_large.gif" /> 
-          </div>
-        </div>
-      ) : (
-      <MainLayout>
-        <main>
-          <section className="container my-5">
-            <div className="row g-4 mx-0">
-              <h4 className="ps-3 mt-3">{portfolioData?.title ?? "Luxury Projects Gallery"}</h4>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={portfolioData?.child_images?.[0]?.image ?? "/images/detail-img/1.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images}
-                />
-              </div>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={portfolioData?.child_images?.[1]?.image ?? "/images/detail-img/6.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images}
-                />
-              </div>
-              <div className="col-lg-12">
-                <GalleryDetail
-                  imgGalUrl={portfolioData?.child_images?.[2]?.image ?? "/images/detail-img/3.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img2"
-                  images={images}
-                />
-              </div>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={portfolioData?.child_images?.[3]?.image ?? "/images/detail-img/4.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images}
-                />
-              </div>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={portfolioData?.child_images?.[4]?.image ?? "/images/detail-img/5.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images}
-                />
-              </div>
-              <div className="col-lg-12">
-                <GalleryDetail
-                  imgGalUrl={portfolioData?.child_images?.[5]?.image ?? "/images/detail-img/6.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img2"
-                  images={images}
-                />
-              </div>
-            </div>
-          </section>
-          <hr />
-        </main>
-      </MainLayout>
-    )}
-    
-    </div>
-  );
-};
+  let portfolioData = null;
+  try {
+    const response = await api.get(`/portfolio-project/${id}`);
+    portfolioData = response.data;
+  } catch (err) {
+    if (err.response?.status === 404) return notFound();
+  }
 
-export default LuxuryProjectsGallery;
+  if (!portfolioData) return notFound();
+
+  return <GalleryClient portfolioData={portfolioData} />;
+}

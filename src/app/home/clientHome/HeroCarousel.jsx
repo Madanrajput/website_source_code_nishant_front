@@ -22,9 +22,7 @@ export default function HeroCarousel({ bannerData }) {
             const isFirstSlide = index === 0;
 
             return (
-              <div className={`carousel-item ${isFirstSlide ? "active" : ""}`} key={index}>
-                
-                
+              <div className={`carousel-item ${isFirstSlide ? "active" : ""}`} key={index}>                
                 <div 
                   className="responsive_banner_container"
                   style={{ 

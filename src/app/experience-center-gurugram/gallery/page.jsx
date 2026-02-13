@@ -1,111 +1,45 @@
-"use client";
-import GalleryDetail from "../../components/GalleryDetail";
-import MainLayout from "../../layouts/MainLayout";
-import { useHasMounted } from "@/utils/useHasMounted";
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import api from "@/utils/api";
-import { defaultAltText } from "@/utils/helper";
-const ResidentialProjectsGallery = () => {
-  const [galleryData, setGalleryData] = useState({});
-  const [loading, setLoading] = useState(true);
+import GalleryClient from "./GalleryClient";
+import { notFound } from "next/navigation";
 
-  useEffect(() => {
-    const fetchContentManagerPages = async () => {
-      const galleryId = new URLSearchParams(window.location.search).get("id") ?? null;
-      try {
-        const response = await api.get(`/cms-parent-child/by-id/${galleryId}`, {});
+export const dynamic = "force-dynamic";
 
-        if (response.data) {
-          setGalleryData(response.data);
-          setLoading(false);
-        }
-      } catch (err) {
-        toast.error(err.message ?? "Failed to fetch data. Please try again.");
-        setLoading(false);
-      }
-    };
+// --- SEO FIX ---
+export async function generateMetadata({ searchParams }) {
+  const id = searchParams?.id;
+  if (!id) return { title: "Gurugram Experience Center" };
 
-    fetchContentManagerPages();
-  }, []);
-
-
-  return (
-    <div>
-          {loading ? (
-        <div className="loader-container">
-          <div className="spinner">
-            <img src="https://raw.githubusercontent.com/Codelessly/FlutterLoadingGIFs/master/packages/cupertino_activity_indicator_large.gif" /> 
-          </div>
-        </div>
-      ) : (
-      <MainLayout>
-        <main>
-          <section className="container my-5">
-            <div className="row g-4 mx-0">
-              <h4 className="ps-3 mt-3">{galleryData?.child_content?.title ?? "Ready to go Gallery"}</h4>
-
-              {galleryData.child_images?.map((item, index) => (
-  <div key={index} className="col-lg-6">
-    <GalleryDetail
-      imgGalUrl={item.image ?? `/images/detail-img/${index + 1}.webp`} // Unique fallback image
-      imgGalAlt={defaultAltText}
-      imgGalImgClass="w-100 detail_gal_img"
-      images={galleryData.child_images} // Pass full images array
-    />
-  </div>
-))}
-              {/* <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={galleryData?.child_images?.[0]?.image ?? "/images/detail-img/1.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                />
-              </div>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={galleryData?.child_images?.[1]?.image ?? "/images/detail-img/6.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                />
-              </div>
-              <div className="col-lg-12">
-                <GalleryDetail
-                  imgGalUrl={galleryData?.child_images?.[2]?.image ?? "/images/detail-img/3.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img2"
-                />
-              </div>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={galleryData?.child_images?.[3]?.image ?? "/images/detail-img/4.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                />
-              </div>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={galleryData?.child_images?.[4]?.image ?? "/images/detail-img/5.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                />
-              </div>
-              <div className="col-lg-12">
-                <GalleryDetail
-                  imgGalUrl={galleryData?.child_images?.[5]?.image ?? "/images/detail-img/6.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img2"
-                />
-              </div> */}
-            </div>
-          </section>
-          <hr />
-        </main>
-      </MainLayout>
-    )}
+  try {
+    const response = await api.get(`/cms-parent-child/by-id/${id}`);
+    const data = response.data;
+    const title = data?.child_content?.title || "Gurugram Gallery";
     
-    </div>
-  );
-};
+    return {
+      title: title,
+      description: `Explore our ${title} at High Creation Interior Gurugram.`,
+      alternates: {
+        canonical: `/experience-center-gurugram/gallery?id=${id}`,
+      },
+    };
+  } catch (error) {
+    return { title: "Gurugram Experience Center", robots: "noindex" };
+  }
+}
 
-export default ResidentialProjectsGallery;
+// --- SERVER COMPONENT ---
+export default async function GurugramGalleryPage({ searchParams }) {
+  const id = searchParams?.id;
+  if (!id) return notFound();
+
+  let galleryData = null;
+  try {
+    const response = await api.get(`/cms-parent-child/by-id/${id}`);
+    galleryData = response.data;
+  } catch (err) {
+    if (err.response?.status === 404) return notFound();
+  }
+
+  if (!galleryData) return notFound();
+
+  return <GalleryClient galleryData={galleryData} />;
+}

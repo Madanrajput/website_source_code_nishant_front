@@ -9,6 +9,17 @@ import Script from "next/script"; // ✅ Import Next.js Script
 //   title: "terms - My Website",
 //   description: "Learn more about our company, team, and values.",
 // };
+
+// --- SEO FIX: Force Google to Index this page ---
+export const metadata = {
+  title: "Thank You | High Creation Interior",
+  description: "Thank you for contacting High Creation Interior. We will get back to you shortly.",
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
 const Terms = () => {
   const [pageData, setPageData] = useState("");
   const [loading, setLoading] = useState(false);

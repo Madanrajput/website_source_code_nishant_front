@@ -1,9 +1,10 @@
 import { Suspense } from "react";
-import api from "@/utils/api";
 import HeroCarousel from "./clientHome/HeroCarousel";
 import HomeContent from "./HomeContent"; 
 
-// --- METADATA ---
+// --- OPTIMIZATION: ISR Configuration ---
+export const revalidate = 60; // Regenerate page every 60 seconds
+
 export const metadata = {
   title: "Top Interior Designers In Delhi NCR For Home",
   description: "Home interior designers in Delhi NCR - Elevate your living space with best interior design company in Noida & Delhi NCR. Book free consultation today",
@@ -36,11 +37,28 @@ const jsonLd = {
   ]
 };
 
-// 1. Fetch ONLY the banner (Fastest possible fetch)
+// --- HELPER: Native Fetch for Next.js Caching ---
 async function getBannerData() {
   try {
-    const bannerRes = await api.get("/cms-content/homepage_banner");
-    return bannerRes.data?.json_content || [];
+    // Determine Base URL directly
+    const baseURL = process.env.NODE_ENV === "development" 
+      ? process.env.NEXT_PUBLIC_API_DEV_URL 
+      : process.env.NEXT_PUBLIC_API_BASE_URL;
+
+    // Use native fetch for better ISR support
+    // const res = await fetch(`${baseURL}/cms-content/homepage_banner`, {
+    //   next: { revalidate: 60 } 
+    // });
+    const res = await fetch(`${baseURL}/cms-content/homepage_banner`, {
+      cache: "no-store", 
+    });
+
+    if (!res.ok) {
+        throw new Error(`Failed to fetch banner: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data?.json_content || [];
   } catch (err) {
     console.error("Banner Fetch Error:", err);
     return [];
@@ -48,7 +66,6 @@ async function getBannerData() {
 }
 
 export default async function Home() {
-  // Fetch banner data on the server
   const bannerData = await getBannerData();
 
   return (
@@ -58,11 +75,10 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       
-      {/* 1. Hero Carousel - Renders Immediately (Low LCP) */}
+      {/* 1. Hero Carousel */}
       <HeroCarousel bannerData={bannerData} />
 
-      {/* 2. The Rest of the Page - Streams in later */}
-      {/* ENABLE SUSPENSE: This allows the Banner to show while the heavy content loads in the background */}
+      {/* 2. The Rest of the Page */}
       <Suspense fallback={<div className="py-5 text-center">Loading Content...</div>}>
         <HomeContent />
       </Suspense>

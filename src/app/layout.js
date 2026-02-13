@@ -8,10 +8,6 @@ import { Great_Vibes, Poppins, Outfit } from "next/font/google";
 import dynamic from "next/dynamic";
 import AddBootstrap from "./common/AdBoostrap";
 
-// const AddBootstrap = dynamic(() => import("./common/AdBoostrap"), {
-//   ssr: false,
-// });
-
 const LazyToast = dynamic(() => import("./common/LazyToast"), {
   ssr: false,
 });
@@ -38,16 +34,33 @@ const outfit = Outfit({
   variable: '--font-outfit',
 });
 
+export const metadata = {
+  metadataBase: new URL('https://hcinterior.in'),
+  title: {
+    default: "High Creation Interior",
+    template: "%s | High Creation Interior",
+  },
+  description: "Best Interior Designers in Delhi NCR",
+  alternates: {
+    canonical: './',
+  },
+  // Move verification here
+  verification: {
+    google: 'k0iGFVO_noqQ7H1uUsJXGeReQ5YhgKjfOOgoKkSsrAw',
+  },
+};
+
+// Note: For Next.js 14+, Viewport is a separate export
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link
-  rel="canonical"
-  href="https://hcinterior.in"
-/>
+        {/* <meta name="viewport" content="width=device-width, initial-scale=1.0" /> */}
 
         {/* Google Tag Manager - Keep afterInteractive for early tracking (needed for analytics) */}
         <Script 
@@ -60,10 +73,10 @@ export default function RootLayout({ children }) {
           'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
           })(window,document,'script','dataLayer','GTM-PRVJK9N');`}
         </Script>
-        <meta
+        {/* <meta
           name="google-site-verification"
           content="k0iGFVO_noqQ7H1uUsJXGeReQ5YhgKjfOOgoKkSsrAw"
-        />
+        /> */}
 
         {/* Meta Pixel Code - Loaded lazily to avoid blocking initial render */}
         <Script id="fb-pixel" strategy="lazyOnload">

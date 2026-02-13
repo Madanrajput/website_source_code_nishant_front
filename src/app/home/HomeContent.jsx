@@ -1,4 +1,3 @@
-import api from "@/utils/api";
 import dynamic from "next/dynamic";
 import { format, isValid, parseISO } from "date-fns";
 import Image from "next/image";
@@ -22,26 +21,39 @@ const SliderCard = dynamic(() => import("../components/SliderCard"));
 const VideoTestimonialSlider = dynamic(() => import("../components/VideoTestimonialSlider"));
 const CounterRow = dynamic(() => import("../components/CounterRow"));
 const Blogs = dynamic(() => import("../components/Blogs"));
-// const ContactUsPopUp = dynamic(() => import("../components/ContactUsPopUp"), { 
-//   ssr: false, 
-//   loading: () => null 
-// });
 
-// --- DATA FETCHING ---
+// --- DATA FETCHING WITH FETCH (FIXED) ---
 async function getRemainingData() {
+  const baseURL = process.env.NODE_ENV === "development" 
+      ? process.env.NEXT_PUBLIC_API_DEV_URL 
+      : process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  // Helper to fetch with caching
+  const fetchData = async (endpoint) => {
+      try {
+          const res = await fetch(`${baseURL}${endpoint}`, { next: { revalidate: 60 } });
+          if (!res.ok) return [];
+          const json = await res.json();
+          return json; // Adjust based on if your API returns data directly or inside a key
+      } catch (e) {
+          console.error(`Error fetching ${endpoint}:`, e);
+          return [];
+      }
+  };
+
   try {
-    const [designRes, galleryRes, contentRes, blogRes] = await Promise.allSettled([
-      api.get("/cms-parent-child/designer_choice"),
-      api.get("/cms-parent-child/h3d_gallery"),
-      api.get("/cms-content/home_page_content_what_we_are"),
-      api.get("/cms-blog"),
+    const [designIdea, h3d_gallery, contentData, blogsData] = await Promise.all([
+      fetchData("/cms-parent-child/designer_choice"),
+      fetchData("/cms-parent-child/h3d_gallery"),
+      fetchData("/cms-content/home_page_content_what_we_are"),
+      fetchData("/cms-blog"),
     ]);
 
     return {
-      designIdea: designRes.status === "fulfilled" ? designRes.value.data : [],
-      h3d_gallery: galleryRes.status === "fulfilled" ? galleryRes.value.data : [],
-      content: contentRes.status === "fulfilled" ? contentRes.value.data : [],
-      blogs: blogRes.status === "fulfilled" ? blogRes.value.data.slice(0, 3) : [],
+      designIdea: designIdea || [],
+      h3d_gallery: h3d_gallery || [],
+      content: contentData || [], 
+      blogs: Array.isArray(blogsData) ? blogsData.slice(0, 3) : [],
     };
   } catch (err) {
     console.error("Server Fetch Error (Remaining Data):", err);
@@ -57,8 +69,11 @@ const formatDate = (dateString) => {
 export default async function HomeContent() {
   const { designIdea, h3d_gallery, content, blogs } = await getRemainingData();
 
+  // Sort Descending (Newest First)
   const sortedDesignIdea = [...designIdea].sort((a, b) => b.id - a.id);
-  const staticRecords = sortedDesignIdea.slice(-5);
+  
+  // FIX: Take the First 5 (Newest)
+  const staticRecords = sortedDesignIdea.slice(0, 5); 
 
   const workProcessConfig = [
     {
@@ -107,7 +122,7 @@ export default async function HomeContent() {
         />
       </section>
 
-      {/* 3. Explore What We Offer - OPTIMIZATION: Removed LazySection for better LCP & CLS */}
+      {/* 3. Explore What We Offer */}
       <div className="my-5 oofer_card">
           <div className="container">
             <div className="mx-0 row g-4">
@@ -133,21 +148,18 @@ export default async function HomeContent() {
           </div>
         </div>
 
-      {/* 4. The Way We Work - OPTIMIZATION: Removed LazySection for stability */}
+      {/* 4. The Way We Work */}
       <div className="way_wework">
           <div className="container">
             <h3 className="text-center font_about">The Way <span className="font_stylish">We Work</span></h3>
             <div className="mx-0 row justify-content-center g-lg-0">
               {workProcessConfig.map((step) => (
                 <Fragment key={step.id}>
-                  {/* Column 1: The Number Box */}
                   <div className={step.col1Class}>
                     <div className={step.boxClass}>
                       <h3 className="box_heading">{step.number}</h3>
                     </div>
                   </div>
-
-                  {/* Column 2: The Content Box */}
                   <div className={step.col2Class}>
                     <div className={step.dataBoxClass}>
                       <div className="px-3 px-lg-4 py-4">
@@ -174,7 +186,7 @@ export default async function HomeContent() {
           </div>
         </div>
 
-      {/* 5. Video Section - KEEP LAZY (Heavy Iframe) */}
+      {/* 5. Video Section */}
       <LazySection placeholderHeight="500px">
         <div className="container my-5 video">
           <div className="row mx-0">
@@ -187,7 +199,7 @@ export default async function HomeContent() {
         </div>
       </LazySection>
 
-      {/* Design Idea - KEEP LAZY (Large Background Image) */}
+      {/* Design Idea */}
       <LazySection placeholderHeight="700px">
         <div className="pt-5 my-5 designidea" style={{ backgroundImage: `url(${content[1]?.json_content?.image})` }}>
           <div className="container">
@@ -204,7 +216,7 @@ export default async function HomeContent() {
         </div>
       </LazySection>
 
-      {/* Ready To Go - Slider (Heavy JS) */}
+      {/* Ready To Go */}
       <LazySection placeholderHeight="400px">
         <section className="my-5">
           <div className="container">
@@ -387,9 +399,6 @@ export default async function HomeContent() {
       </LazySection>
 
       <hr />
-      
-      {/* Popup */}
-      {/* <ContactUsPopUp /> */}
     </>
   );
 }

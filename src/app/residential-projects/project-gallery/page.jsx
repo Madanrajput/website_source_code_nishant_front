@@ -1,106 +1,56 @@
-"use client";
-import GalleryDetail from "../../components/GalleryDetail";
-import MainLayout from "../../layouts/MainLayout";
-import { useHasMounted } from "@/utils/useHasMounted";
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import api from "@/utils/api";
-import { defaultAltText } from "@/utils/helper";
-const ResidentialProjectsGallery = () => {
-  const [portfolioData, setPortfolioData] = useState({});
-  const [loading, setLoading] = useState(true);
+import GalleryClient from "./GalleryClient";
+import { notFound } from "next/navigation";
 
-  useEffect(() => {
-    const fetchContentManagerPages = async () => {
-      const portfolioProjectId = new URLSearchParams(window.location.search).get("id") ?? null;
-      try {
-        const response = await api.get(`/portfolio-project/${portfolioProjectId}`, {});
+// Force dynamic rendering because we rely on searchParams (e.g. ?id=123)
+export const dynamic = "force-dynamic";
 
-        if (response.data) {
-          setPortfolioData(response.data);
-          setLoading(false);
-        }
-      } catch (err) {
-        toast.error(err.message ?? "Failed to fetch data. Please try again.");
-        setLoading(false);
-      }
-    };
+// --- SEO FIX: Generate Metadata on the Server ---
+export async function generateMetadata({ searchParams }) {
+  const id = searchParams?.id;
+  
+  if (!id) return { title: "Residential Gallery" };
 
-    fetchContentManagerPages();
-  }, []);
-
-  const images = portfolioData?.child_images ?? [];
-  return (
-    <div>
-          {loading ? (
-        <div className="loader-container">
-          <div className="spinner">
-            <img src="https://raw.githubusercontent.com/Codelessly/FlutterLoadingGIFs/master/packages/cupertino_activity_indicator_large.gif" /> 
-          </div>
-        </div>
-      ) : (
-      <MainLayout>
-        <main>
-          <section className="container my-5">
-            <div className="row g-4 mx-0">
-              <h4 className="ps-3 mt-3">{portfolioData?.title ?? "Residentail Projects Gallery"}</h4>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={portfolioData?.child_images?.[0]?.image ?? "/images/detail-img/1.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images}
-                />
-              </div>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={portfolioData?.child_images?.[1]?.image ?? "/images/detail-img/6.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images}
-                />
-              </div>
-              <div className="col-lg-12">
-                <GalleryDetail
-                  imgGalUrl={portfolioData?.child_images?.[2]?.image ?? "/images/detail-img/3.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img2"
-                  images={images}
-                />
-              </div>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={portfolioData?.child_images?.[3]?.image ?? "/images/detail-img/4.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images}
-                />
-              </div>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={portfolioData?.child_images?.[4]?.image ?? "/images/detail-img/5.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images}
-                />
-              </div>
-              <div className="col-lg-12">
-                <GalleryDetail
-                  imgGalUrl={portfolioData?.child_images?.[5]?.image ?? "/images/detail-img/6.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img2"
-                  images={images}
-                />
-              </div>
-            </div>
-          </section>
-          <hr />
-        </main>
-      </MainLayout>
-  )}
+  try {
+    const response = await api.get(`/portfolio-project/${id}`);
+    const data = response.data;
     
-    </div>
-  );
-};
+    return {
+      title: data?.title || "Residential Gallery",
+      description: data?.title ? `View our ${data.title} project gallery.` : "Residential interior design project.",
+      alternates: {
+        // CRITICAL FIX: This tells Google this ID is a unique page
+        canonical: `/residential-projects/project-gallery?id=${id}`,
+      },
+    };
+  } catch (error) {
+    return {
+      title: "Residential Gallery",
+      robots: "noindex", // Don't index if the project doesn't exist
+    };
+  }
+}
 
-export default ResidentialProjectsGallery;
+// --- SERVER COMPONENT ---
+export default async function ResidentialProjectsGallery({ searchParams }) {
+  const id = searchParams?.id;
+
+  if (!id) {
+    // Ideally redirect or show 404 if no ID
+    return notFound();
+  }
+
+  let portfolioData = null;
+
+  try {
+    // Fetch data on the server (Faster than Client-Side)
+    const response = await api.get(`/portfolio-project/${id}`);
+    portfolioData = response.data;
+  } catch (err) {
+    console.error("Gallery Fetch Error:", err);
+    // You can choose to throw notFound() here if you want strict 404s
+  }
+
+  // Pass the data to the Client Component
+  return <GalleryClient portfolioData={portfolioData} />;
+}

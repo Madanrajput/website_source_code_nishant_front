@@ -1,81 +1,65 @@
-"use client";
-import GalleryDetail from "../../components/GalleryDetail";
-import MainLayout from "../../layouts/MainLayout";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import api from "@/utils/api";
-import { defaultAltText } from "@/utils/helper";
+import GalleryClient from "./GalleryClient";
+import { notFound } from "next/navigation";
 
-const ResidentialProjectsGallery = () => {
-  const [galleryData, setGalleryData] = useState({});
-  const [loading, setLoading] = useState(true);
+// Force dynamic because we use searchParams (?id=...)
+export const dynamic = "force-dynamic";
 
-  useEffect(() => {
-    const fetchContentManagerPages = async () => {
-      const galleryId = new URLSearchParams(window.location.search).get("id") ?? null;
-      try {
-        const response = await api.get(`/cms-parent-child/by-id/${galleryId}`, {});
-        if (response.data) {
-          setGalleryData(response.data);
-          setLoading(false);
-        }
-      } catch (err) {
-        toast.error(err.message ?? "Failed to fetch data. Please try again.");
-        setLoading(false);
-      }
+// --- 1. SEO FIX: Generate Metadata on Server ---
+export async function generateMetadata({ searchParams }) {
+  const galleryId = searchParams?.id;
+
+  if (!galleryId) return { title: "Experience Center Gallery" };
+
+  try {
+    // Note: Using the specific API endpoint you provided
+    const response = await api.get(`/cms-parent-child/by-id/${galleryId}`);
+    const data = response.data;
+    const title = data?.child_content?.title || "Experience Center Gallery";
+
+    return {
+      title: title,
+      description: `View the ${title} gallery at High Creation Interior.`,
+      alternates: {
+        // CRITICAL FIX: Explicitly tells Google "This ID is the unique page"
+        canonical: `/experience-center/gallery?id=${galleryId}`,
+      },
+      openGraph: {
+        title: title,
+        images: [data?.child_images?.[0]?.image || "/images/new_hc_logo.png"],
+      },
     };
+  } catch (error) {
+    return {
+      title: "Experience Center Gallery",
+      robots: "noindex", // Don't index broken pages
+    };
+  }
+}
 
-    fetchContentManagerPages();
-  }, []);
+// --- 2. SERVER COMPONENT ---
+export default async function ExperienceCenterGalleryPage({ searchParams }) {
+  const galleryId = searchParams?.id;
 
-  const images = galleryData?.child_images ?? [];
+  if (!galleryId) {
+    return notFound();
+  }
 
-  return (
-    <div>
-          {loading ? (
-        <div className="loader-container">
-          <div className="spinner">
-            <img src="https://raw.githubusercontent.com/Codelessly/FlutterLoadingGIFs/master/packages/cupertino_activity_indicator_large.gif" /> 
-          </div>
-        </div>
-      ) : (
-      <MainLayout>
-        <main>
-          <section className="container my-5">
-            <div className="row g-4 mx-0">
-              <h4 className="ps-3 mt-3">{galleryData?.child_content?.title ?? "Gallery"}</h4>
+  let galleryData = null;
 
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={images[0]?.image ?? "/images/detail-img/1.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images} // Pass all images here
-                />
-              </div>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={images[1]?.image ?? "/images/detail-img/6.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images} // Pass all images here
-                />
-              </div>
-              <div className="col-lg-12">
-                <GalleryDetail
-                  imgGalUrl={images[2]?.image ?? "/images/detail-img/3.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img2"
-                  images={images} // Pass all images here
-                />
-              </div>
-            </div>
-          </section>
-        </main>
-      </MainLayout>
-       )}
-    </div>
-  );
-};
+  try {
+    // Fetch data on the server (Faster & SEO Friendly)
+    const response = await api.get(`/cms-parent-child/by-id/${galleryId}`);
+    galleryData = response.data;
+  } catch (err) {
+    console.error("Experience Gallery Fetch Error:", err);
+    // If API fails, we can either show 404 or a fallback. 
+    // Usually 404 is better for SEO if content is missing.
+    if (err.response?.status === 404) return notFound();
+  }
 
-export default ResidentialProjectsGallery;
+  if (!galleryData) return notFound();
+
+  // Pass data to Client Component for rendering
+  return <GalleryClient galleryData={galleryData} />;
+}
