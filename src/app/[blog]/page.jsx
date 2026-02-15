@@ -1,7 +1,7 @@
 import MainLayout from "../layouts/MainLayout";
-import api from "@/utils/api";
 import { defaultAltText } from "@/utils/helper";
 import { notFound } from "next/navigation";
+import Image from "next/image"; // OPTIMIZATION: Use Next.js Image
 
 /**
  * 🔒 Slug Guard
@@ -15,6 +15,25 @@ const isValidSlug = (slug) => {
 };
 
 const BASE_URL = "https://hcinterior.in";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://apidev.hcinterior.in";
+
+/**
+ * --- HELPER: Cached Fetch for Blogs ---
+ * Replaces Axios with native fetch for ISR (Incremental Static Regeneration)
+ */
+async function getBlogData(slug) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/cms-blog/blog-slug/${slug}`, {
+      next: { revalidate: 60 }, // OPTIMIZATION: Cache content on server for 60s
+    });
+
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    console.error("Blog Fetch Error:", error);
+    return null;
+  }
+}
 
 /**
  * ✅ SERVER-SIDE METADATA (SEO + GSC SAFE)
@@ -30,41 +49,33 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  try {
-    const response = await api.get(`/cms-blog/blog-slug/${slug}`);
-    const blogDetails = response.data;
+  const blogDetails = await getBlogData(slug);
 
-    if (!blogDetails) {
-      return {
-        title: "Blog Not Found",
-        robots: "noindex, follow",
-      };
-    }
-
+  if (!blogDetails) {
     return {
-      title:
-        blogDetails?.seo_content?.meta_title ??
-        blogDetails?.title ??
-        "High Creation Interior Blog",
-
-      description:
-        blogDetails?.seo_content?.meta_description ?? "",
-
-      keywords:
-        blogDetails?.seo_content?.meta_keywords ?? "",
-
-      alternates: {
-        canonical: `${BASE_URL}/blog/${slug}`,
-      },
-
-      robots: "index, follow",
-    };
-  } catch (error) {
-    return {
-      title: "High Creation Interior",
+      title: "Blog Not Found",
       robots: "noindex, follow",
     };
   }
+
+  return {
+    title:
+      blogDetails?.seo_content?.meta_title ??
+      blogDetails?.title ??
+      "High Creation Interior Blog",
+
+    description:
+      blogDetails?.seo_content?.meta_description ?? "",
+
+    keywords:
+      blogDetails?.seo_content?.meta_keywords ?? "",
+
+    alternates: {
+      canonical: `${BASE_URL}/${slug}`, // Ensure this matches your final URL structure
+    },
+
+    robots: "index, follow",
+  };
 }
 
 /**
@@ -78,15 +89,7 @@ const BlogDetail = async ({ params }) => {
     notFound();
   }
 
-  let blogDetails;
-
-  try {
-    const response = await api.get(`/cms-blog/blog-slug/${slug}`);
-    blogDetails = response.data;
-  } catch (error) {
-    console.error("Blog fetch error:", error);
-    notFound();
-  }
+  const blogDetails = await getBlogData(slug);
 
   if (!blogDetails) {
     notFound();
@@ -111,15 +114,26 @@ const BlogDetail = async ({ params }) => {
               <div className="col-lg-10">
                 <h1 className="pb-3">{blogDetails.title}</h1>
 
+                {/* OPTIMIZATION: High Priority Main Image */}
+                {/* This fixes "Largest Contentful Paint" (LCP) issues */}
                 {blogDetails.image && (
-                  <img
-                    src={blogDetails.image}
-                    className="w-100 object-fit-cover"
-                    alt={blogDetails.title ?? defaultAltText}
-                  />
+                  <div className="position-relative w-100 mb-4" style={{ minHeight: '300px' }}>
+                    <Image
+                      src={blogDetails.image}
+                      alt={blogDetails.title ?? defaultAltText}
+                      width={1200}
+                      height={600}
+                      className="w-100 h-auto object-fit-cover rounded"
+                      priority={true} // Load this IMMEDIATELY
+                      sizes="(max-width: 768px) 100vw, 1200px"
+                      style={{ maxWidth: "100%", height: "auto" }}
+                    />
+                  </div>
                 )}
 
                 <div className="details py-4">
+                  {/* Note: We do NOT use LazySection here because Google needs 
+                      to read this text immediately for SEO ranking. */}
                   <div
                     dangerouslySetInnerHTML={{
                       __html: blogDetails.description,

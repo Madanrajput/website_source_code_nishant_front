@@ -73,7 +73,8 @@ export default async function HomeContent() {
   const sortedDesignIdea = [...designIdea].sort((a, b) => b.id - a.id);
   
   // FIX: Take the First 5 (Newest)
-  const staticRecords = sortedDesignIdea.slice(0, 5); 
+  // const staticRecords = sortedDesignIdea.slice(0, 5); 
+  const staticRecords = sortedDesignIdea.slice(-5);
 
   const workProcessConfig = [
     {

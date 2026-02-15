@@ -3,86 +3,124 @@ import BackgroundImageWithHeading from "../components/BackgroundImageWithHeading
 import MainLayout from "../layouts/MainLayout";
 import ServicesRowLeft from "../components/ServicesRowLeft";
 import { defaultAltText } from "@/utils/helper";
-import api from "@/utils/api";
+import Image from "next/image"; 
 import DOMPurify from "isomorphic-dompurify";
+// 1. IMPORT LAZYSECTION
+import LazySection from "../home/clientHome/LazySection";
 
-// --- FIX: Dynamic Canonical Tag for Cities ---
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://apidev.hcinterior.in";
+
+const cityUrlMap = {
+  "noida": "/interior-designers-in-noida",
+  "greater_noida": "/interior-designers-in-greater-noida",
+  "delhi": "/interior-designers-in-delhi",
+  "gurugram": "/interior-designers-in-gurgaon",
+  "faridabad": "/best-interior-designers-in-faridabad",
+  "ghaziabad": "/interior-designers-in-ghaziabad",
+  "manesar": "/interior-designers-in-manesar",
+  "dwarka": "/interior-designers-in-dwarka",
+};
+
+async function getCityData(city) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/cms-city/${city}`, {
+      next: { revalidate: 60 }, 
+    });
+
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    console.error("City Fetch Error:", error);
+    return null;
+  }
+}
+
 export async function generateMetadata({ searchParams }) {
   const baseUrl = "https://hcinterior.in";
-  // Check if city exists and isn't "undefined" string
   const city = searchParams?.city && searchParams.city !== "undefined" ? searchParams.city : "delhi";
   
-  // Logic: If we have a specific city, point to that. Otherwise, point to main page.
-  // Note: Adjust the URL structure below if you use specific routes for cities (e.g. /interior-designers-in-noida)
-  const canonicalUrl = city && city !== 'delhi' 
-    ? `${baseUrl}/services-detail?city=${city}`
-    : `${baseUrl}/services-detail`;
+  let canonicalPath = "/services-detail";
+  
+  if (city && city !== 'delhi') {
+    if (cityUrlMap[city]) {
+      canonicalPath = cityUrlMap[city]; 
+    } else {
+      canonicalPath = `/services-detail?city=${city}`;
+    }
+  }
 
-  try {
-    const response = await api.get(`cms-city/${city}`);
-    const metaresult = response.data;
+  const pageData = await getCityData(city);
 
-    return {
-      title: metaresult?.seo_content?.meta_title ?? "Interior Design Services",
-      description: metaresult?.seo_content?.meta_description ?? "Best Interior Design Services",
-      keywords: metaresult?.seo_content?.meta_keywords ?? "",
-      alternates: {
-        canonical: canonicalUrl,
-      },
-    };
-  } catch (error) {
-    return {
+  if (!pageData) {
+     return {
       title: "Services - High Creation Interior",
-      alternates: {
-        canonical: `${baseUrl}/services-detail`,
-      },
+      alternates: { canonical: `${baseUrl}/services-detail` },
     };
   }
+
+  return {
+    title: pageData?.seo_content?.meta_title ?? "Interior Design Services",
+    description: pageData?.seo_content?.meta_description ?? "Best Interior Design Services",
+    keywords: pageData?.seo_content?.meta_keywords ?? "",
+    alternates: {
+      canonical: `${baseUrl}${canonicalPath}`,
+    },
+  };
 }
 
 const ServicesDetailPage = async ({ searchParams }) => {
   const city = searchParams?.city && searchParams.city !== "undefined" ? searchParams.city : "delhi";
 
-  try {
-    const response = await api.get(`cms-city/${city}`);
-    const pageData = response.data;
+  const pageData = await getCityData(city);
 
-    const safeDescription = pageData?.main_description
-      ? DOMPurify.sanitize(pageData.main_description)
-      : "";
+  if (!pageData) {
+    console.error(`Failed to load data for city: ${city}`);
+    notFound(); 
+  }
 
-    return (
-      <MainLayout>
-        <main>
-          <BackgroundImageWithHeading
-            sectionBgImages={"contact_wrapper services"}
-            sectionBgHeading={pageData?.main_title}
-            secBgHeadingClass="sec_bgheading_lass"
-            sectionBgDescription=""
-            secBgDesClass={"text-center bg-transparent"}
-          />
+  const safeDescription = pageData?.main_description
+    ? DOMPurify.sanitize(pageData.main_description)
+    : "";
 
-          <section className="my-5 mb-0">
-            <div className="container">
-              <div className="mx-0 row justify-content-center">
-                <div className="col-lg-8 text-center">
-                  <h3>{pageData?.main_title}</h3>
-                  {/* Using div instead of p for HTML content to avoid nesting errors */}
-                  <div dangerouslySetInnerHTML={{ __html: safeDescription }} />
-                  <div>
-                    <img
+  return (
+    <MainLayout>
+      <main>
+        {/* --- SECTION 1: HERO (Keep Eager for LCP) --- */}
+        <BackgroundImageWithHeading
+          sectionBgImages={"contact_wrapper services"}
+          sectionBgHeading={pageData?.main_title}
+          secBgHeadingClass="sec_bgheading_lass"
+          sectionBgDescription=""
+          secBgDesClass={"text-center bg-transparent"}
+        />
+
+        {/* --- SECTION 2: INTRO (Keep Eager) --- */}
+        <section className="my-5 mb-0">
+          <div className="container">
+            <div className="mx-0 row justify-content-center">
+              <div className="col-lg-8 text-center">
+                <h3>{pageData?.main_title}</h3>
+                <div dangerouslySetInnerHTML={{ __html: safeDescription }} />
+                
+                <div className="pt-0 pt-lg-5 w-100 position-relative">
+                   <Image
                       src={pageData?.location_image ?? "/images/services/1-min.png"}
-                      height={500}
-                      width={700}
                       alt={pageData?.main_title ?? defaultAltText}
-                      className="pt-0 pt-lg-5 w-100 object-fit-contain"
-                    />
-                  </div>
+                      width={700}
+                      height={500}
+                      className="object-fit-contain w-100 h-auto"
+                      style={{ maxWidth: "100%", height: "auto" }}
+                      priority={true} 
+                   />
                 </div>
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
+        {/* --- SECTION 3: SIDE CONTENT (Lazy Load) --- */}
+        {/* This is definitely below the fold, so we lazy load it to speed up initial page load */}
+        <LazySection placeholderHeight="500px">
           <ServicesRowLeft
             column1="col-lg-6"
             ServicesImgUrl={pageData?.side_image ?? "/images/services/2-min.png"}
@@ -94,70 +132,81 @@ const ServicesDetailPage = async ({ searchParams }) => {
             textBtnServices="Get a free consultation"
             linkBtnServices="/contact"
           />
-            <section className="pb-3">
-            <div className="container">
-              <div className="mx-0 row g-4 justify-content-center">
-                <div className="col-lg-10 col-11">
-                  <div className="mx-0 row g-4 justify-content-center">
-                    <div className="col-lg-4 col-md-6 col-12">
-                      <div className="interior_inner_card">
-                        <img
-                          src="/images/interior/icon1.png"
-                          className="w-100 object-fit-contain"
-                          height={150}
-                          alt="team"
-                        />
-                        <div className="pt-3 text-center card-body">
-                          <h4 className="px-4 py-3 text-center card-title card_Services_heading">
-                            India&apos;s only full home warranty* up to 10-yrs
-                            for products & services
-                          </h4>
+        </LazySection>
+        
+        {/* --- SECTION 4: ICONS / WARRANTY (Lazy Load) --- */}
+        {/* This is near the footer, so we can safely lazy load it */}
+        <LazySection placeholderHeight="300px">
+          <section className="pb-3">
+              <div className="container">
+                <div className="mx-0 row g-4 justify-content-center">
+                  <div className="col-lg-10 col-11">
+                    <div className="mx-0 row g-4 justify-content-center">
+                      <div className="col-lg-4 col-md-6 col-12">
+                        <div className="interior_inner_card">
+                          <div style={{ position: 'relative', height: '150px', width: '100%' }}>
+                              <Image
+                              src="/images/interior/icon1.png"
+                              className="object-fit-contain"
+                              fill
+                              alt="Warranty Icon"
+                              sizes="(max-width: 768px) 100vw, 33vw"
+                              />
+                          </div>
+                          <div className="pt-3 text-center card-body">
+                            <h4 className="px-4 py-3 text-center card-title card_Services_heading">
+                              India&apos;s only full home warranty* up to 10-yrs
+                              for products & services
+                            </h4>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="col-lg-4 col-md-6 col-12">
-                      <div className="interior_inner_card">
-                        <img
-                          src="/images/interior/icon2.png"
-                          className="w-100 object-fit-contain"
-                          height={150}
-                          alt="team"
-                        />
-                        <div className="pt-3 text-center card-body">
-                          <h4 className="px-4 py-3 text-center card-title card_Services_heading">
-                            146 quality checks to give your home the best
-                          </h4>
+                      <div className="col-lg-4 col-md-6 col-12">
+                        <div className="interior_inner_card">
+                           <div style={{ position: 'relative', height: '150px', width: '100%' }}>
+                              <Image
+                              src="/images/interior/icon2.png"
+                              className="object-fit-contain"
+                              fill
+                              alt="Quality Check Icon"
+                              sizes="(max-width: 768px) 100vw, 33vw"
+                              />
+                          </div>
+                          <div className="pt-3 text-center card-body">
+                            <h4 className="px-4 py-3 text-center card-title card_Services_heading">
+                              146 quality checks to give your home the best
+                            </h4>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="col-lg-4 col-md-6 col-12">
-                      <div className="interior_inner_card">
-                        <img
-                          src="/images/interior/icon3.png"
-                          className="w-100 object-fit-contain"
-                          height={150}
-                          alt="team"
-                        />
-                        <div className="pt-3 text-center card-body">
-                          <h4 className="px-4 py-3 text-center card-title card_Services_heading">
-                            45-day installation swift kitchens, wardrobes &
-                            storage
-                          </h4>
+                      <div className="col-lg-4 col-md-6 col-12">
+                        <div className="interior_inner_card">
+                          <div style={{ position: 'relative', height: '150px', width: '100%' }}>
+                              <Image
+                              src="/images/interior/icon3.png"
+                              className="object-fit-contain"
+                              fill
+                              alt="Swift Installation Icon"
+                              sizes="(max-width: 768px) 100vw, 33vw"
+                              />
+                          </div>
+                          <div className="pt-3 text-center card-body">
+                            <h4 className="px-4 py-3 text-center card-title card_Services_heading">
+                              45-day installation swift kitchens, wardrobes &
+                              storage
+                            </h4>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </section>
-        </main>
-      </MainLayout>
-    );
-  } catch (error) {
-    console.error("API Error:", error);
-    notFound(); 
-  }
+            </section>
+        </LazySection>
+      </main>
+    </MainLayout>
+  );
 };
 
 export default ServicesDetailPage;

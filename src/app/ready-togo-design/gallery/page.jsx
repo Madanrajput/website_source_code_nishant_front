@@ -1,105 +1,108 @@
-"use client";
 import GalleryDetail from "../../components/GalleryDetail";
 import MainLayout from "../../layouts/MainLayout";
-import { useHasMounted } from "@/utils/useHasMounted";
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import api from "@/utils/api";
 import { defaultAltText } from "@/utils/helper";
-const ResidentialProjectsGallery = () => {
-  const [galleryData, setGalleryData] = useState({});
-  const [loading, setLoading] = useState(true);
+import { notFound } from "next/navigation";
 
-  useEffect(() => {
-    const fetchContentManagerPages = async () => {
-      const galleryId = new URLSearchParams(window.location.search).get("id") ?? null;
-      try {
-        const response = await api.get(`/cms-parent-child/by-id/${galleryId}`, {});
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://apidev.hcinterior.in";
+const BASE_URL = "https://hcinterior.in";
 
-        if (response.data) {
-          setGalleryData(response.data);
-          setLoading(false);
-        }
-      } catch (err) {
-        toast.error(err.message ?? "Failed to fetch data. Please try again.");
-        setLoading(false);
-      }
-    };
+async function getGalleryData(id) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/cms-parent-child/by-id/${id}`, {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    console.error("Gallery Fetch Error:", error);
+    return null;
+  }
+}
 
-    fetchContentManagerPages();
-  }, []);
+export async function generateMetadata({ searchParams }) {
+  const id = searchParams?.id;
+  const canonicalUrl = id 
+    ? `${BASE_URL}/ready-togo-design/gallery?id=${id}` 
+    : `${BASE_URL}/ready-togo-design/gallery`;
+
+  return {
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
+}
+
+const ResidentialProjectsGallery = async ({ searchParams }) => {
+  const id = searchParams?.id;
+  
+  if (!id) return notFound();
+
+  const galleryData = await getGalleryData(id);
+
+  if (!galleryData) return notFound();
 
   const images = galleryData?.child_images ?? [];
+  const title = galleryData?.child_content?.title ?? "Ready to go Gallery";
+
   return (
-    <div>
-          {loading ? (
-        <div className="loader-container">
-          <div className="spinner">
-            <img src="https://raw.githubusercontent.com/Codelessly/FlutterLoadingGIFs/master/packages/cupertino_activity_indicator_large.gif" /> 
-          </div>
-        </div>
-      ) : (
-      <MainLayout>
-        <main>
-          <section className="container my-5">
-            <div className="row g-4 mx-0">
-              <h4 className="ps-3 mt-3">{galleryData?.child_content?.title ?? "Ready to go Gallery"}</h4>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={galleryData?.child_images?.[0]?.image ?? "/images/detail-img/1.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images} // Pass all images here
-                />
-              </div>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={galleryData?.child_images?.[1]?.image ?? "/images/detail-img/6.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images} // Pass all images here
-                />
-              </div>
-              <div className="col-lg-12">
-                <GalleryDetail
-                  imgGalUrl={galleryData?.child_images?.[2]?.image ?? "/images/detail-img/3.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img2"
-                  images={images} // Pass all images here
-                />
-              </div>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={galleryData?.child_images?.[3]?.image ?? "/images/detail-img/4.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images} // Pass all images here
-                />
-              </div>
-              <div className="col-lg-6">
-                <GalleryDetail
-                  imgGalUrl={galleryData?.child_images?.[4]?.image ?? "/images/detail-img/5.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img"
-                  images={images} // Pass all images here
-                />
-              </div>
-              <div className="col-lg-12">
-                <GalleryDetail
-                  imgGalUrl={galleryData?.child_images?.[5]?.image ?? "/images/detail-img/6.webp"}
-                  imgGalAlt={defaultAltText}
-                  imgGalImgClass="w-100 detail_gal_img2"
-                  images={images} // Pass all images here
-                />
-              </div>
+    <MainLayout>
+      <main>
+        <section className="container my-5">
+          <div className="row g-4 mx-0">
+            <h4 className="ps-3 mt-3">{title}</h4>
+            <div className="col-lg-6">
+              <GalleryDetail
+                imgGalUrl={images[0]?.image ?? "/images/detail-img/1.webp"}
+                imgGalAlt={defaultAltText}
+                imgGalImgClass="w-100 detail_gal_img"
+                images={images} 
+              />
             </div>
-          </section>
-          <hr />
-        </main>
-      </MainLayout>
-      )}
-    
-    </div>
+            <div className="col-lg-6">
+              <GalleryDetail
+                imgGalUrl={images[1]?.image ?? "/images/detail-img/6.webp"}
+                imgGalAlt={defaultAltText}
+                imgGalImgClass="w-100 detail_gal_img"
+                images={images} 
+              />
+            </div>
+            <div className="col-lg-12">
+              <GalleryDetail
+                imgGalUrl={images[2]?.image ?? "/images/detail-img/3.webp"}
+                imgGalAlt={defaultAltText}
+                imgGalImgClass="w-100 detail_gal_img2"
+                images={images} 
+              />
+            </div>
+            <div className="col-lg-6">
+              <GalleryDetail
+                imgGalUrl={images[3]?.image ?? "/images/detail-img/4.webp"}
+                imgGalAlt={defaultAltText}
+                imgGalImgClass="w-100 detail_gal_img"
+                images={images} 
+              />
+            </div>
+            <div className="col-lg-6">
+              <GalleryDetail
+                imgGalUrl={images[4]?.image ?? "/images/detail-img/5.webp"}
+                imgGalAlt={defaultAltText}
+                imgGalImgClass="w-100 detail_gal_img"
+                images={images} 
+              />
+            </div>
+            <div className="col-lg-12">
+              <GalleryDetail
+                imgGalUrl={images[5]?.image ?? "/images/detail-img/6.webp"}
+                imgGalAlt={defaultAltText}
+                imgGalImgClass="w-100 detail_gal_img2"
+                images={images} 
+              />
+            </div>
+          </div>
+        </section>
+        <hr />
+      </main>
+    </MainLayout>
   );
 };
 
