@@ -1,76 +1,114 @@
-"use client";
-import { useCallback, useEffect, useState } from "react";
-import WallpaperCard from "../components/WallpaperCard";
 import MainLayout from "../layouts/MainLayout";
-import api from "@/utils/api";
-import { toast } from "react-toastify";
+import WallpaperCard from "../components/WallpaperCard";
 import { defaultAltText } from "@/utils/helper";
 
-const ReadyToGoDesign = () => {
-  const [exclusiveDesignData, setExclusiveDesignData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+// --- CONFIGURATION ---
+export const revalidate = 60; // Regenerate page every 60 seconds
 
-  const fetchContentManagerPages = useCallback(async () => {
-    try {
-      const response = await api.get(
-        `/cms-parent-child/ready_to_go_design`,
-        {}
-      );
+// --- HELPER: Base URL Logic ---
+const getBaseUrl = () => {
+  return process.env.NODE_ENV === "development"
+    ? process.env.NEXT_PUBLIC_API_DEV_URL
+    : process.env.NEXT_PUBLIC_API_BASE_URL;
+};
 
-      if (response.status === 200) {
-        setExclusiveDesignData(response.data);
-      }
-    } catch (err) {
-      setError(
-        err.message ?? "Failed to load ready to go design. Please try again."
-      );
-      toast.error(err.message || "Failed to fetch data. Please try again.");
-      setLoading(false);
+// --- HELPER: Fetch Ready To Go Design Data ---
+async function getReadyToGoDesignData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-parent-child/ready_to_go_design`, {
+      // cache handled by page revalidate
+    });
+
+    if (!res.ok) {
+      console.error(`Failed to fetch ready-to-go design data: ${res.status}`);
+      return [];
     }
-  }, []);
 
-  useEffect(() => {
-    fetchContentManagerPages();
-  }, [fetchContentManagerPages]);
+    return await res.json();
+  } catch (err) {
+    console.error("Ready To Go Design Data Fetch Error:", err);
+    return [];
+  }
+}
+
+// --- HELPER: Fetch SEO Data ---
+async function getSeoData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/seo-tag`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) return null;
+
+    const allTags = await res.json();
+
+    // Match the specific page URL for Ready To Go Design
+    if (Array.isArray(allTags)) {
+      return allTags.find(
+        (tag) =>
+          tag.page_name === "https://hcinterior.in/ready-togo-design" ||
+          tag.page_name?.endsWith("/ready-togo-design")
+      );
+    }
+    return null;
+  } catch (err) {
+    console.error("SEO Fetch Error:", err);
+    return null;
+  }
+}
+
+// --- DYNAMIC METADATA GENERATION ---
+export async function generateMetadata() {
+  const seoData = await getSeoData();
+
+  const defaultTitle = "Ready To Go Interior Design : High Creation Interior";
+  const defaultDesc =
+    "Explore our Ready-To-Go Interior Design solutions, offering stylish, pre-designed spaces that blend functionality and aesthetics for a hassle-free transformation.";
+  const defaultCanonical = "https://hcinterior.in/ready-togo-design";
+
+  return {
+    title: seoData?.title || defaultTitle,
+    description: seoData?.meta_description || defaultDesc,
+    alternates: {
+      canonical: seoData?.page_name || defaultCanonical,
+    },
+    openGraph: {
+      title: seoData?.title || defaultTitle,
+      description: seoData?.meta_description || defaultDesc,
+      url: seoData?.page_name || defaultCanonical,
+      type: "website",
+    },
+  };
+}
+
+// --- MAIN SERVER COMPONENT ---
+export default async function ReadyToGoDesign() {
+  const exclusiveDesignData = await getReadyToGoDesignData();
 
   return (
-    <div>
-      <head>
-        <title>Ready To Go Interior Design : High Creation Interior	</title>
-        <meta
-          name="description"
-          content="Explore our Ready-To-Go Interior Design solutions, offering stylish, pre-designed spaces that blend functionality and aesthetics for a hassle-free transformation.	"
-        />
-
-<link rel="canonical" href="https://hcinterior.in/ready-togo-design" />	
-      </head>
-
-      <MainLayout>
-        <main>
-          <section className="container my-5">
-            <div className="text-center mb-5 mx-0 row">
-              <h1 className="pb-3">Ready To Go Design</h1>
-              <p className="px-lg-5 team_description">
-                Ready-To-Go Interior Design solutions, crafted to bring you
-                beautifully designed spaces with ease. These pre-designed setups
-                combine style and practicality, giving your home or office a
-                fresh, modern look without the stress of planning. Whether
-                you’re updating a single room or transforming an entire space,
-                our solutions are tailored to meet your needs. Each design is
-                thoughtfully created to balance aesthetics with functionality,
-                ensuring a space that’s both visually appealing and practical.
-                Let us take the hassle out of interior design so you can enjoy a
-                seamless transformation that reflects your taste and lifestyle.
-              </p>
-            </div>
-            <div className="row g-4 mx-0">
-              {error && (
-                <div className="alert alert-danger" role="alert">
-                  {error}
-                </div>
-              )}
-              {exclusiveDesignData?.map((design, index) => (
+    <MainLayout>
+      <main>
+        <section className="container my-5">
+          <div className="text-center mb-5 mx-0 row">
+            <h1 className="pb-3">Ready To Go Design</h1>
+            <p className="px-lg-5 team_description">
+              Ready-To-Go Interior Design solutions, crafted to bring you
+              beautifully designed spaces with ease. These pre-designed setups
+              combine style and practicality, giving your home or office a
+              fresh, modern look without the stress of planning. Whether you’re
+              updating a single room or transforming an entire space, our
+              solutions are tailored to meet your needs. Each design is
+              thoughtfully created to balance aesthetics with functionality,
+              ensuring a space that’s both visually appealing and practical. Let
+              us take the hassle out of interior design so you can enjoy a
+              seamless transformation that reflects your taste and lifestyle.
+            </p>
+          </div>
+          <div className="row g-4 mx-0">
+            {exclusiveDesignData && exclusiveDesignData.length > 0 ? (
+              exclusiveDesignData.map((design, index) => (
                 <div key={index} className="col-lg-6 col-md-6 col-12">
                   <WallpaperCard
                     linkTagWallpaper={`/ready-togo-design/gallery?id=${design?.id}`}
@@ -89,14 +127,16 @@ const ReadyToGoDesign = () => {
                     btnHrefWallpaper={`/ready-togo-design/gallery?id=${design?.id}`}
                   />
                 </div>
-              ))}
-            </div>
-          </section>
-          <hr />
-        </main>
-      </MainLayout>
-    </div>
+              ))
+            ) : (
+              <div className="col-12 text-center">
+                <p>Loading designs...</p>
+              </div>
+            )}
+          </div>
+        </section>
+        <hr />
+      </main>
+    </MainLayout>
   );
-};
-
-export default ReadyToGoDesign;
+}
