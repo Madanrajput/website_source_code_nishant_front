@@ -5,17 +5,51 @@ import {
   FaLinkedin,
   FaTwitter,
 } from "react-icons/fa";
-import axios from "axios"; // Import axios for API calls
+// import axios from "axios"; // Not used, removing to clean up
 import api from "@/utils/api";
 import { useEffect, useState } from "react";
 
 const Footer = () => {
   const [footerlink, setData] = useState([]);
+  
   useEffect(() => {
     const fetchfooterlink = async () => {
       try {
         const response = await api.get("/footer-link");
-        setData(response.data);
+        
+        // 👇 --- NEW SORTING LOGIC START ---
+        // List of city names in the order you want them to appear
+        const priorityOrder = [
+          "Noida", 
+          "Ghaziabad", 
+          "Greater Noida", 
+          "Delhi", 
+          "Dwarka", 
+          "Faridabad", 
+          "Gurugram", 
+          "Manesar"
+        ];
+
+        // Sort based on whether the Title includes the city name
+        const sortedLinks = response.data.sort((a, b) => {
+          // Find the index of the city name inside the priority list
+          const indexA = priorityOrder.findIndex(city => 
+            a.title.toLowerCase().includes(city.toLowerCase())
+          );
+          const indexB = priorityOrder.findIndex(city => 
+            b.title.toLowerCase().includes(city.toLowerCase())
+          );
+          
+          // If a link title doesn't match any city, put it at the end
+          const safeIndexA = indexA === -1 ? 999 : indexA;
+          const safeIndexB = indexB === -1 ? 999 : indexB;
+          
+          return safeIndexA - safeIndexB;
+        });
+
+        setData(sortedLinks);
+        // 👆 --- NEW SORTING LOGIC END ---
+
       } catch (err) {
         console.error("Error fetching SEO data:", err);
       }
@@ -24,7 +58,7 @@ const Footer = () => {
     fetchfooterlink();
   }, []);
 
-  console.log("FooterLink", footerlink);
+  // console.log("FooterLink", footerlink);
   return (
     <>
       <div
@@ -215,20 +249,6 @@ const Footer = () => {
                         Pradesh- 201301
                       </span>
                     </li>
-                    {/* Gurugram - Sector 48 (NEW) */}
-<li className="footer_li pb-2">
-  <a
-    href="https://www.google.com/maps/search/?api=1&query=DDC+Arcade+Sector+48+Gurugram"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="text-black"
-  >
-    1st Floor, DDC Arcade, Plot No 1, Badshahpur Sohna Rd,
-    opposite Vipul Business Park, Main, Sector 48,
-    Gurugram, Haryana 122018
-  </a>
-</li>
-
                   </ul>
                 </div>
               </div>

@@ -14,7 +14,7 @@ export async function generateMetadata({ searchParams }) {
     : `https://hcinterior.in/blog?page=${page}`;
 
   return {
-    title: "Latest News And Updates - High Creation Interior",
+    title: "Latest News And Updates",
     description: "Latest News & Updates From High Creation Interior In Noida. Discover interior design blogs.",
     alternates: {
       canonical: canonicalUrl,

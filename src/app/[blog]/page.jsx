@@ -62,7 +62,7 @@ export async function generateMetadata({ params }) {
     title:
       blogDetails?.seo_content?.meta_title ??
       blogDetails?.title ??
-      "High Creation Interior Blog",
+      "Latest News and Blog",
 
     description:
       blogDetails?.seo_content?.meta_description ?? "",
