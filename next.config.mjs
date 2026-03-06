@@ -12,7 +12,7 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60,
   },
-   compress: true,
+  compress: true,
   
   // Optimize JavaScript bundles
   swcMinify: true, // Use SWC for faster minification
@@ -24,8 +24,47 @@ const nextConfig = {
       'date-fns', // Tree-shake date-fns to only import used functions
     ],
   },
-  async rewrites() {
 
+  // 👇 --- NEW REDIRECTS ADDED HERE --- 👇
+  async redirects() {
+    return [
+      {
+        source: '/refer-earn',
+        destination: '/refer-and-earn',
+        statusCode: 301, // 301 permanent redirect
+      },
+      {
+        source: '/CONTACT-US',
+        destination: '/contact',
+        statusCode: 301, // 301 permanent redirect
+      },
+
+      {
+        source: '/services-detail/faridabad',
+        destination: '/best-interior-designers-in-faridabad',
+        statusCode: 301,
+      },
+      {
+        source: '/services-detail/gurugram',
+        destination: '/interior-designers-in-gurgaon',
+        statusCode: 301,
+      },
+      {
+        source: '/services-detail/greater_noida', // In case the old URL used the underscore
+        destination: '/interior-designers-in-greater-noida',
+        statusCode: 301,
+      },
+      // 2. Generic catch-all for the rest (noida, delhi, ghaziabad, manesar, dwarka)
+      {
+        source: '/services-detail/:city',
+        destination: '/interior-designers-in-:city',
+        statusCode: 301,
+      },
+    ];
+  },
+  // 👆 -------------------------------- 👆
+
+  async rewrites() {
     // Define city routes
     const citiesRoutes = [
       { source: '/interior-designers-in-noida', destination: '/services-detail?city=noida', },
@@ -42,7 +81,6 @@ const nextConfig = {
     const combinedRoutes = [...citiesRoutes];
 
     return combinedRoutes;
-
   },
 };
 
