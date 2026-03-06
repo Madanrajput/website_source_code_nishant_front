@@ -107,6 +107,12 @@ function AuthSidebar() {
                             CMS
                         </a>
                         <ul className="dropdown-menu dropdown-menu-dark">
+                        <li className="nav-item">
+                        <a className={`nav-link ${isActive('/cms/pages')}`} href="/cms/pages">
+                            <FaFileAlt className={`dashboard_icon pe-2 ${isIconActive('/cms/pages')}`} />
+                            Create Page
+                        </a>
+                    </li>
                             <li>
                                 <a className={`${isActive('/cms/design-gallery')}`} href="/cms/design-gallery">
                                     Design Gallery

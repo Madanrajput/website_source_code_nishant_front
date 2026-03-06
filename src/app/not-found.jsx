@@ -1,4 +1,5 @@
 // Use client is optional, but good if you add interactivity later
+import Link from "next/link";
 import MainLayout from "./layouts/MainLayout";
 
 export const metadata = {
@@ -8,29 +9,28 @@ export const metadata = {
 
 export default function NotFound() {
   return (
-    <div>
-      <MainLayout>
-        <main>
-         <section className="text-center">
-           {/* Link wrapper to go home if image is clicked */}
-           <a href="/">
-             <img 
-                src="/images/four.png" 
-                className="w-100 object-fit-cover" 
-                height={500} 
-                alt="404 Page Not Found" 
-                style={{ maxHeight: '80vh', objectFit: 'contain' }}
-             />
-           </a>
-           <div className="my-4">
-             <h3>Page Not Found</h3>
-             <p>We can&apos;t seem to find the page you&apos;re looking for.</p>
-             <a href="/" className="btn know_more">Go Back Home</a>
-           </div>
-         </section>
-          <hr className="mt-5" />
-        </main>
-      </MainLayout>
-    </div>
+    <MainLayout>
+      <div 
+        className="container d-flex flex-column justify-content-center align-items-center text-center" 
+        style={{ minHeight: "60vh", padding: "50px 15px" }}
+      >
+        <h1 
+          className="display-1 fw-bold" 
+          style={{ color: "#ff914d", fontSize: "6rem" }}
+        >
+          404
+        </h1>
+        <h2 className="mb-3 text-dark fw-bold">Oops! Page Not Found</h2>
+        <p className="mb-5 text-muted" style={{ maxWidth: "500px" }}>
+          The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+        </p>
+        <Link 
+          href="/" 
+          className="know_more px-4 py-2 text-decoration-none"
+        >
+          Go Back to Homepage
+        </Link>
+      </div>
+    </MainLayout>
   );
 }

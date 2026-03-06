@@ -217,7 +217,7 @@ const Footer = () => {
                         H-56, 1st Floor, Sector-63, Noida, Uttar Pradesh- 201301
                       </a>
                     </li>
-                    {/* Gurugram */}
+                    {/* Gurugram 1 */}
                     <li className="footer_li pb-2">
                       <a
                         href="https://share.google/suG5UqBggFOVNmJql"
@@ -229,7 +229,18 @@ const Footer = () => {
                         48, Sohna - Gurgaon Rd, Gurugram, Haryana 122001
                       </a>
                     </li>
-                    {/* Faridabad - NEW ADDRESS */}
+                    {/* Gurugram 2 - NEW ADDRESS */}
+                    <li className="footer_li pb-2">
+                      <a
+                        href="https://www.google.com/maps/search/?api=1&query=DDC+Arcade,+1st+Floor,+Plot+No+1+Main,+Sector+48+Road,+Badshahpur+Sohna+Rd,+Opposite+Vipul+Business+Park,+Gurugram,+Haryana+122018"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-black"
+                      >
+                        DDC Arcade, 1st Floor, Plot No 1 Main, Sector 48 Road, Badshahpur Sohna Rd, Opposite Vipul Business Park, Gurugram, Haryana 122018
+                      </a>
+                    </li>
+                    {/* Faridabad */}
                     <li className="footer_li pb-2">
                       <a
                         href="https://share.google/5foJQ0EoWNl5MoeNv"

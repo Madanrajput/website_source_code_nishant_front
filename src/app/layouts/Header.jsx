@@ -37,6 +37,62 @@ const Header = () => {
                   id="navbarSupportedContent"
                 >
                   <ul className="m-auto mb-2 text-center navbar-nav mb-lg-0 ms-0">
+                    
+                    {/* --- SERVICES DROPDOWN --- */}
+                    <li className="nav-item dropdown">
+                      <a
+                        className="nav-link dropdown-toggle"
+                        href="#"
+                        role="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                      >
+                        Services
+                      </a>
+                      <ul className="dropdown-menu">
+                        <li>
+                          <a className="dropdown-item" href="/interior-designers-in-noida">
+                            Interior Designers In Noida
+                          </a>
+                        </li>
+                        <li>
+                          <a className="dropdown-item" href="/interior-designers-in-ghaziabad">
+                            Interior Designers in Ghaziabad
+                          </a>
+                        </li>
+                        <li>
+                          <a className="dropdown-item" href="/interior-designers-in-greater-noida">
+                            Interior Designers in Greater Noida
+                          </a>
+                        </li>
+                        <li>
+                          <a className="dropdown-item" href="/interior-designers-in-delhi">
+                            Interior Designers in Delhi
+                          </a>
+                        </li>
+                        <li>
+                          <a className="dropdown-item" href="/interior-designers-in-dwarka">
+                            Interior Designers in Dwarka
+                          </a>
+                        </li>
+                        <li>
+                          <a className="dropdown-item" href="/interior-designers-in-faridabad">
+                            Interior Designers in Faridabad
+                          </a>
+                        </li>
+                        <li>
+                          <a className="dropdown-item" href="/interior-designers-in-gurgaon">
+                            Interior Designers in Gurugram
+                          </a>
+                        </li>
+                        <li>
+                          <a className="dropdown-item" href="/interior-designers-in-manesar">
+                            Interior Designers In Manesar
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+
                     <li className="nav-item dropdown">
                       <a
                         className="nav-link dropdown-toggle"
@@ -109,6 +165,8 @@ const Header = () => {
                           Experience Center Gurugram
                           </a>
                         </li>
+                        {/* --- ADDED FARIDABAD HERE --- */}
+                       
                       </ul>
                     </li>
 
