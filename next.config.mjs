@@ -60,6 +60,7 @@ const nextConfig = {
         destination: '/interior-designers-in-:city',
         statusCode: 301,
       },
+      
     ];
   },
   // 👆 -------------------------------- 👆

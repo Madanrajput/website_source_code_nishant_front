@@ -35,35 +35,80 @@ async function getCityData(city) {
   }
 }
 
+// export async function generateMetadata({ searchParams }) {
+//   const baseUrl = "https://hcinterior.in";
+//   const city = searchParams?.city && searchParams.city !== "undefined" ? searchParams.city : "delhi";
+  
+//   let canonicalPath = "/services-detail";
+  
+//   if (city && city !== 'delhi') {
+//     if (cityUrlMap[city]) {
+//       canonicalPath = cityUrlMap[city]; 
+//     } else {
+//       canonicalPath = `/services-detail?city=${city}`;
+//     }
+//   }
+
+//   const pageData = await getCityData(city);
+
+//   if (!pageData) {
+//      return {
+//       title: "Services - High Creation Interior",
+//       alternates: { canonical: `${baseUrl}/services-detail` },
+//     };
+//   }
+
+//   return {
+//     title: pageData?.seo_content?.meta_title ?? "Interior Design Services",
+//     description: pageData?.seo_content?.meta_description ?? "Best Interior Design Services",
+//     keywords: pageData?.seo_content?.meta_keywords ?? "",
+//     alternates: {
+//       canonical: `${baseUrl}${canonicalPath}`,
+//     },
+//   };
+// }
+
 export async function generateMetadata({ searchParams }) {
   const baseUrl = "https://hcinterior.in";
+  // Get city from params, default to delhi
   const city = searchParams?.city && searchParams.city !== "undefined" ? searchParams.city : "delhi";
   
-  let canonicalPath = "/services-detail";
-  
-  if (city && city !== 'delhi') {
-    if (cityUrlMap[city]) {
-      canonicalPath = cityUrlMap[city]; 
-    } else {
-      canonicalPath = `/services-detail?city=${city}`;
-    }
-  }
-
+  // Fetch CMS Data
   const pageData = await getCityData(city);
 
+  // 1. Prioritize canonical URL straight from your CMS API if it exists
+  let canonicalUrl = pageData?.page_name || pageData?.seo_content?.page_name || pageData?.seo_content?.canonical_url;
+
+  // 2. If CMS doesn't have it, fallback to your hardcoded map
+  if (!canonicalUrl) {
+    let canonicalPath = "/services-detail";
+    
+    // FIX: Removed the "city !== 'delhi'" restriction so Delhi maps correctly
+    if (city) {
+      if (cityUrlMap[city]) {
+        canonicalPath = cityUrlMap[city]; 
+      } else {
+        canonicalPath = `/services-detail?city=${city}`;
+      }
+    }
+    canonicalUrl = `${baseUrl}${canonicalPath}`;
+  }
+
+  // Handle 404/Missing Data case
   if (!pageData) {
      return {
       title: "Services - High Creation Interior",
-      alternates: { canonical: `${baseUrl}/services-detail` },
+      alternates: { canonical: canonicalUrl },
     };
   }
 
+  // Return final metadata
   return {
     title: pageData?.seo_content?.meta_title ?? "Interior Design Services",
     description: pageData?.seo_content?.meta_description ?? "Best Interior Design Services",
     keywords: pageData?.seo_content?.meta_keywords ?? "",
     alternates: {
-      canonical: `${baseUrl}${canonicalPath}`,
+      canonical: canonicalUrl, // Now securely assigns the correct Delhi URL
     },
   };
 }

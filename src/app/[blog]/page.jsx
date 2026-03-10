@@ -226,6 +226,14 @@ export async function generateMetadata({ params }) {
     return { title: "Not Found", robots: "noindex, follow" };
   }
 
+  // FIX: Look for 'page_name' first based on your API structure, 
+  // then check 'seo_content.page_name', then fallback to URL/slug.
+  const canonicalUrl = 
+    data?.page_name || 
+    data?.seo_content?.page_name || 
+    data?.seo_content?.canonical_url || 
+    `${BASE_URL}/${slug}`;
+
   return {
     title:
       data?.seo_content?.meta_title ??
@@ -239,7 +247,7 @@ export async function generateMetadata({ params }) {
       data?.seo_content?.meta_keywords ?? "",
 
     alternates: {
-      canonical: data?.seo_content?.canonical_url || `${BASE_URL}/${slug}`, 
+      canonical: canonicalUrl, 
     },
 
     robots: "index, follow",

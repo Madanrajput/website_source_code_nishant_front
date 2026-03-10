@@ -20,7 +20,8 @@ export function middleware(request) {
     "23": "/top-10-interior-design-companies-in-noida",
     "31": "/10-best-stunning-bathroom-cabinet-designs-for-small-space-elevate-your-bathroom-aesthetics",
     "26": "/home-interior-design-company-in-delhi-ncr",
-    "18": "/how-to-arrange-plants-in-living-room"
+    "18": "/how-to-arrange-plants-in-living-room",
+    "9": "/top-10-interior-designers-in-delhi"
   };
 
   if (pathname === "/blog-detail" && searchParams.has("id")) {
