@@ -332,7 +332,7 @@ const CmsPages = () => {
                     {block.type === 'testimonial' && (
                         <blockquote className="blockquote text-center">
                             {/* <p className="mb-2">"{block.data.review || 'Review text'}"</p> */}
-                            <p className="mb-2">
+                           <p className="mb-2">
   &quot;{block.data.review || 'Review text'}&quot;
 </p>
                             <footer className="blockquote-footer">{block.data.client_name || 'Client Name'} <cite>{block.data.designation}</cite></footer>

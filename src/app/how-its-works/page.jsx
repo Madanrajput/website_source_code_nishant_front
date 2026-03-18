@@ -1,7 +1,8 @@
 import BackgroundImageWithHeading from "../components/BackgroundImageWithHeading";
-import ServicesRightRow from "../components/ServicesRightRow";
-import ServicesRowLeft from "../components/ServicesRowLeft";
+import ServicesRightOriginal from "../components/ServicesRightOriginal";
+import ServicesLeftOriginal from "../components/ServicesLeftOriginal";
 import MainLayout from "../layouts/MainLayout";
+// import ServicesRightOriginal from "../components/ServicesRightOriginal";
 export const metadata = {
   title: "How High Creation Interior Work",
   description: "How High Creation Interior Works For Residential Projects. Want to know more about work contact us today.",
@@ -30,7 +31,7 @@ const HowItsWork = () => {
             secBgDesClass={"text-center bg-transparent"}
           />
           <div id="one">
-          <ServicesRowLeft
+          <ServicesLeftOriginal
           
             column2={
               "col-lg-4 col-md-4 col-12 d-flex align-items-center justify-content-center"
@@ -50,7 +51,7 @@ Get the first design cut of your dream interior to visualize your space better."
           </div>
 
           <div id="two">
-          <ServicesRightRow
+          <ServicesRightOriginal
             sectionServices={"services_sec_wrapper2"}
             colum1={
               "col-lg-4 col-md-4 col-12 d-flex align-items-center justify-content-center"
@@ -70,7 +71,7 @@ It also allows us to identify any on-site challenges in advance. A well-measured
            </div>
 
            <div id="three">
-          <ServicesRowLeft
+          <ServicesLeftOriginal
             column2={
               "col-lg-4 col-md-4 col-12 d-flex align-items-center justify-content-center"
             }
@@ -91,7 +92,7 @@ Final approval is taken before moving ahead with execution.
 
 
               <div id="four">
-          <ServicesRightRow
+          <ServicesRightOriginal
             sectionServices={"services_sec_wrapper2"}
             colum1={
               "col-lg-4 col-md-4 col-12 d-flex align-items-center justify-content-center"
@@ -116,7 +117,7 @@ This helps ensure smooth execution and builds trust throughout the project.
 </div>
 
 <div id="five">
-          <ServicesRowLeft
+          <ServicesLeftOriginal
             column2={
               "col-lg-4 col-md-4 col-12 d-flex align-items-center justify-content-center"
             }

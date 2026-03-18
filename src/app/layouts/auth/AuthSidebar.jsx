@@ -113,6 +113,12 @@ function AuthSidebar() {
                             Create Page
                         </a>
                     </li>
+                    <li className="nav-item">
+                                <a className={`nav-link ${isActive('/cms/redirects')}`} href="/cms/redirects">
+                                    <FaFileAlt className={`dashboard_icon pe-2 ${isIconActive('/cms/redirects')}`} />
+                                    Redirect Management
+                                </a>
+                            </li>
                             <li>
                                 <a className={`${isActive('/cms/design-gallery')}`} href="/cms/design-gallery">
                                     Design Gallery

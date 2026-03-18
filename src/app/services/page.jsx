@@ -1,8 +1,9 @@
 import MainLayout from "../layouts/MainLayout";
 import BackgroundImageRow from "../components/BackgroundImageRow";
-import ServicesRowLeft from "../components/ServicesRowLeft";
+import ServicesLeftOriginal from "../components/ServicesLeftOriginal"; // Updated import
 import ServicesRightRow from "../components/ServicesRightRow";
 import { defaultAltText } from "@/utils/helper";
+import ServicesRightOriginal from "../components/ServicesRightOriginal";
 
 // --- CONFIGURATION ---
 export const revalidate = 60; // Regenerate page every 60 seconds
@@ -160,7 +161,6 @@ export default async function Services() {
 
             // --- URL ROUTING LOGIC ---
             const cityValue = service?.city_type?.toLowerCase().trim() || "";
-            // let citySlug = cityValue.replace(/\s+/g, '-');
             let citySlug = cityValue.replace(/[\s_]+/g, '-');
             
             // Redirect Gurugram to Gurgaon
@@ -173,7 +173,7 @@ export default async function Services() {
             // Render Left Row for Even indices (0, 2, 4...)
             if (index % 2 === 0) {
               return (
-                <ServicesRowLeft
+                <ServicesLeftOriginal
                   key={service.id || index}
                   column1={"col-lg-6 d-flex align-items-center"}
                   ServicesImgUrl={service?.location_image ?? fallbackImg}
@@ -190,7 +190,7 @@ export default async function Services() {
             // Render Right Row for Odd indices (1, 3, 5...)
             else {
               return (
-                <ServicesRightRow
+                <ServicesRightOriginal
                   key={service.id || index}
                   sectionServices={"services_sec_wrapper1"}
                   colum1="col-lg-6"
