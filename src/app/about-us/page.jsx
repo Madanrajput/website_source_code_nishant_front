@@ -1,3 +1,4 @@
+import { getPageSEO } from "@/utils/getSEO";
 import BackgroundImageRow from "../components/BackgroundImageRow";
 import MainLayout from "../layouts/MainLayout";
 
@@ -29,56 +30,60 @@ async function getAboutUsContent() {
 }
 
 // --- HELPER: Fetch SEO Data ---
-async function getSeoData() {
-  try {
-    const baseURL = getBaseUrl();
-    const res = await fetch(`${baseURL}/seo-tag`, {
-      next: { revalidate: 60 } 
-    });
+// async function getSeoData() {
+//   try {
+//     const baseURL = getBaseUrl();
+//     const res = await fetch(`${baseURL}/seo-tag`, {
+//       next: { revalidate: 60 } 
+//     });
 
-    if (!res.ok) return null;
+//     if (!res.ok) return null;
 
-    const allTags = await res.json();
+//     const allTags = await res.json();
     
-    // --- FIX IS HERE ---
-    // The API returns 'page_name' as a full URL (e.g., https://hcinterior.in/about-us)
-    // We strictly check if the URL ends with "/about-us" to be safe.
-    if (Array.isArray(allTags)) {
-        return allTags.find(tag => 
-            tag.page_name === "https://hcinterior.in/about-us" || 
-            tag.page_name?.endsWith("/about-us")
-        );
-    }
-    return null;
-  } catch (err) {
-    console.error("SEO Fetch Error:", err);
-    return null;
-  }
-}
+//     // --- FIX IS HERE ---
+//     // The API returns 'page_name' as a full URL (e.g., https://hcinterior.in/about-us)
+//     // We strictly check if the URL ends with "/about-us" to be safe.
+//     if (Array.isArray(allTags)) {
+//         return allTags.find(tag => 
+//             tag.page_name === "https://hcinterior.in/about-us" || 
+//             tag.page_name?.endsWith("/about-us")
+//         );
+//     }
+//     return null;
+//   } catch (err) {
+//     console.error("SEO Fetch Error:", err);
+//     return null;
+//   }
+// }
 
-// --- DYNAMIC METADATA GENERATION ---
-export async function generateMetadata() {
-  const seoData = await getSeoData();
+// // --- DYNAMIC METADATA GENERATION ---
+// export async function generateMetadata() {
+//   const seoData = await getSeoData();
   
-  const defaultTitle = "About Us | End To End Interior Design - High Creation Interior";
-  const defaultDesc = "High Creation Interior delivering top notch interior design services in Noida & Delhi NCR | 8+ Years of experience | 1000+ Projects Done";
-  const defaultCanonical = "https://hcinterior.in/about-us";
+//   const defaultTitle = "About Us | End To End Interior Design - High Creation Interior";
+//   const defaultDesc = "High Creation Interior delivering top notch interior design services in Noida & Delhi NCR | 8+ Years of experience | 1000+ Projects Done";
+//   const defaultCanonical = "https://hcinterior.in/about-us";
 
-  return {
-    title: seoData?.title || defaultTitle,
-    description: seoData?.meta_description || defaultDesc,
-    alternates: {
-      // We use page_name because it contains the clean URL "https://hcinterior.in/about-us"
-      // The 'meta_can_tag' field in your API has HTML tags (<link...>) which we cannot use directly here.
-      canonical: seoData?.page_name || defaultCanonical, 
-    },
-    openGraph: {
-      title: seoData?.title || defaultTitle,
-      description: seoData?.meta_description || defaultDesc,
-      url: seoData?.page_name || defaultCanonical,
-      type: "website",
-    },
-  };
+//   return {
+//     title: seoData?.title || defaultTitle,
+//     description: seoData?.meta_description || defaultDesc,
+//     alternates: {
+//       // We use page_name because it contains the clean URL "https://hcinterior.in/about-us"
+//       // The 'meta_can_tag' field in your API has HTML tags (<link...>) which we cannot use directly here.
+//       canonical: seoData?.page_name || defaultCanonical, 
+//     },
+//     openGraph: {
+//       title: seoData?.title || defaultTitle,
+//       description: seoData?.meta_description || defaultDesc,
+//       url: seoData?.page_name || defaultCanonical,
+//       type: "website",
+//     },
+//   };
+// }
+
+export async function generateMetadata() {
+  return await getPageSEO("https://hcinterior.in/about-us"); 
 }
 
 // --- MAIN SERVER COMPONENT ---

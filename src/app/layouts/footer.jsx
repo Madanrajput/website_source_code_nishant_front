@@ -119,12 +119,13 @@ const Footer = () => {
                   <div>
                     <h6 className="pt-3">FOR QUERY</h6>
                     <p className="mb-0">
-                      <a href="callto:+19810506301" className="text_mail">
-                        +91 9810506301
+                      <a href="callto:+18527750562" className="text_mail">
+                        +91 8527750562
+                        
                       </a>
                     </p>
-                    <a href="callto:+19810503881" className="text_mail">
-                      +91 9810503881
+                    <a href="callto:+17070701373" className="text_mail">
+                      +91 7070701373
                     </a>
                   </div>
                 </div>

@@ -52,7 +52,7 @@ const CounterRow = (props) => {
                   end={props.counterEnd3}
                   duration={props.counterDuration3}
                   suffix={props.counterSuffix3}
-                  label={`Home\nRenovations`}
+                  label={`Staff`}
                 />
 
                 <CounterBlock

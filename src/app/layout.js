@@ -38,7 +38,7 @@ export const metadata = {
   metadataBase: new URL('https://hcinterior.in'),
   title: {
     default: "High Creation Interior",
-    template: "%s | High Creation Interior",
+    template: "%s ",
   },
   description: "Best Interior Designers in Delhi NCR",
   alternates: {
@@ -54,6 +54,8 @@ export const metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 5, // Important for accessibility
+  userScalable: true,
 };
 
 export default function RootLayout({ children }) {
