@@ -114,6 +114,11 @@ const Header = () => {
                           Experience Center Gurugram
                           </a>
                         </li>
+                        <li>
+                          <a className="dropdown-item" href="/experience-center-faridabad/">
+                          Experience Center Faridabad
+                          </a>
+                        </li>
                       </ul>
                     </li>
 
@@ -217,6 +222,12 @@ const Header = () => {
                         <li>
                           <a className="dropdown-item" href="/interior-designers-in-manesar">
                             Interior Designers In Manesar
+                          </a>
+                        </li>
+
+                        <li>
+                          <a className="dropdown-item" href="/interior-designer-in-sohna-gurgaon">
+                            Interior Designers in Sohna
                           </a>
                         </li>
                       </ul>

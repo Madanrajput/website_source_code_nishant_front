@@ -1029,7 +1029,19 @@ const DynamicRootPage = async ({ params }) => {
                   
                   {/* 🌟 1. PAGE TITLE */}
                   <h1 className="mb-4 fw-bold">{pageData.title}</h1>
-
+                  {pageData.show_author_date && (
+                      <div className="author-date-block text-muted mb-4 fst-italic border-bottom pb-3 fs-6">
+                          <i className="bi bi-person-circle me-2"></i>
+                          {pageData.writer_name ? `By ${pageData.writer_name}` : "By Author"} 
+                          &nbsp; &nbsp; • &nbsp; &nbsp; 
+                          <i className="bi bi-calendar3 me-2"></i>
+                          {new Date(pageData.created_at || Date.now()).toLocaleDateString('en-US', { 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric' 
+                          })}
+                      </div>
+                  )}
                   {/* 🌟 2. MAIN CKEDITOR CONTENT */}
                   <div className="details py-4">
                     <div dangerouslySetInnerHTML={{ __html: pageData.content }} />

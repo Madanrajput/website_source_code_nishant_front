@@ -165,6 +165,11 @@ function AuthSidebar() {
                                 </a>
                             </li>
                             <li>
+                                <a className={`${isActive('/cms/experience-center-faridabad')}`} href="/cms/experience-center-faridabad">
+                                    Experience Center Faridabad
+                                </a>
+                            </li>
+                            <li>
                                 <a className={`${isActive('/cms/reallife-portfolio')}`} href="/cms/reallife-portfolio">
                                     Real Time 3d
                                 </a>

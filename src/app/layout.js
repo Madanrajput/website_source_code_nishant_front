@@ -36,10 +36,7 @@ const outfit = Outfit({
 
 export const metadata = {
   metadataBase: new URL('https://hcinterior.in'),
-  title: {
-    default: "High Creation Interior",
-    template: "%s ",
-  },
+  title: "High Creation Interior",
   description: "Best Interior Designers in Delhi NCR",
   alternates: {
     canonical: './',

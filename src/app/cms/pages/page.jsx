@@ -11,6 +11,7 @@ const CKEditorComponent = dynamic(() => import('@/app/components/CKEditorCompone
 const initialFormState = {
     title: "",
     writer_name: "",
+    show_author_date: false,
     content: "",
     status: "Draft",
     faqs: [],
@@ -65,9 +66,14 @@ const CmsPages = () => {
     }, [fetchPages]);
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target;
+        setFormData((prev) => ({ 
+            ...prev, 
+            [name]: type === 'checkbox' ? checked : value 
+        }));
     };
+
+
 
     const setContentData = (data) => setFormData((prev) => ({ ...prev, content: data }));
 
@@ -190,6 +196,7 @@ const CmsPages = () => {
         setFormData({
             title: item.title, 
             writer_name: item.writer_name || "", 
+            show_author_date: item.show_author_date || false,
             content: item.content || "", 
             status: item.status || "Draft",
             faqs: item.faqs || [], 
@@ -320,8 +327,12 @@ const CmsPages = () => {
             </div>
             
             <h1 className="mb-4">{formData.title || "Page Title"}</h1>
-            {formData.writer_name && <p className="text-muted mb-4">By {formData.writer_name}</p>}
-            
+            {/* {formData.writer_name && <p className="text-muted mb-4">By {formData.writer_name}</p>} */}
+            {formData.show_author_date && (
+                <div className="text-muted mb-4 fst-italic border-bottom pb-3">
+                    {formData.writer_name ? `By ${formData.writer_name}` : "By Author"} &nbsp;•&nbsp; {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </div>
+            )}            
             {/* Main Content */}
             <div className="ck-content mb-5" dangerouslySetInnerHTML={{ __html: formData.content || "<p class='text-muted'>Main content will appear here...</p>" }}></div>
 
@@ -377,6 +388,27 @@ const CmsPages = () => {
                     <div className="col-md-6"><label className="form-label fw-bold">Page Title *</label><input type="text" className="form-control form-control-lg" name="title" value={formData.title} onChange={handleInputChange} required /></div>
                     <div className="col-md-3"><label className="form-label fw-bold">Author Name</label><input type="text" className="form-control form-control-lg" name="writer_name" value={formData.writer_name} onChange={handleInputChange} /></div>
                     <div className="col-md-3"><label className="form-label fw-bold">Status</label><select className="form-select form-select-lg" name="status" value={formData.status} onChange={handleInputChange}><option value="Draft">Draft</option><option value="Published">Published</option></select></div>
+              
+                    <div className="col-md-12 mt-3">
+                        <div className="form-check form-switch fs-5 bg-light p-3 rounded border">
+                            <input 
+                                className="form-check-input ms-0 me-3 shadow-sm" 
+                                type="checkbox" 
+                                role="switch" 
+                                name="show_author_date" 
+                                id="showAuthorDate" 
+                                checked={formData.show_author_date} 
+                                onChange={handleInputChange} 
+                                style={{cursor: 'pointer'}} 
+                            />
+                            <label className="form-check-label fs-6 mt-1" htmlFor="showAuthorDate" style={{cursor: 'pointer'}}>
+                                <strong>Display Author & Date on Page</strong> 
+                                <small className="text-muted d-block" style={{fontSize: '0.8rem'}}>If checked the writer&apos;s name and publication date will be shown below the main title.
+                                </small>
+                            </label>
+                        </div>
+                    </div>
+              
                     <div className="col-md-12 mt-4"><label className="form-label fw-bold">Main Content</label><div className="border rounded"><CKEditorComponent pageData={formData.content} setPageData={setContentData} /></div></div>
                 </div>
             )}
