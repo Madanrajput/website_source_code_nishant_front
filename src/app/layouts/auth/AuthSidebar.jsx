@@ -6,6 +6,7 @@ import { IoMdContacts, IoIosSettings, IoMdLogOut } from "react-icons/io";
 import { useDispatch, useSelector } from 'react-redux';
 import { usePathname, useRouter } from 'next/navigation';
 import { logout } from '../../../store/slices/authSlice';
+import Link from 'next/link';
 
 function AuthSidebar() {
     const { user } = useSelector((state) => state.auth);
@@ -119,6 +120,17 @@ function AuthSidebar() {
                                     Redirect Management
                                 </a>
                             </li>
+                            
+                    <li className="nav-item">
+    <Link href="/cms/media-library" className="nav-link text-white">
+        <i className="bi bi-images me-2"></i> Media Library
+    </Link>
+</li>
+<li className="nav-item">
+    <Link href="/cms/site-setting" className="nav-link text-white">
+        <i className="bi bi-images me-2"></i> Site Settings
+    </Link>
+</li>
                             <li>
                                 <a className={`${isActive('/cms/design-gallery')}`} href="/cms/design-gallery">
                                     Design Gallery

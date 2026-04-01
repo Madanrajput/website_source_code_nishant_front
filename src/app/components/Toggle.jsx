@@ -352,6 +352,14 @@ const Toggle = () => {
                           Interior Designers In Manesar
                         </a>
                       </li>
+                      <li className="footer_li">
+                        <a
+                          href="/interior-designer-in-sohna-gurgaon"
+                          className="offcanvas_anchor"
+                        >
+                          Interior Designers In Sohna
+                        </a>
+                      </li>
                     </ul>
                   </div>
                 </div>
