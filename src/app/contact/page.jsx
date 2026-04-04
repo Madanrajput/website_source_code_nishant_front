@@ -44,7 +44,7 @@ export async function generateMetadata() {
 
   const defaultTitle = "Book Free Consultation With High Creation Interior Noida";
   const defaultDesc =
-    "Make a call on +91 98105 03881 for top notch interior designing services in Noida. Address : H-56, 1st Floor, Sector-63, Noida, Uttar Pradesh- 201301";
+    "Make a call on +91 7070701373 for top notch interior designing services in Noida. Address : H-56, 1st Floor, Sector-63, Noida, Uttar Pradesh- 201301";
   const defaultCanonical = "https://hcinterior.in/contact";
 
   return {
@@ -93,8 +93,8 @@ export default function Contact() {
                   </p>
                   <p className="text-white">
                     For Inquiry :{" "}
-                    <a href="tel:9810506301" className="text-white">
-                      +91-9810506301
+                    <a href="tel:7070701373" className="text-white">
+                      +91 7070701373
                     </a>
                   </p>
                   <p className="text-white">
@@ -123,6 +123,7 @@ export default function Contact() {
           <div className="row mx-0">
             <div className="col-lg-6">
               <h2 className="pb-4">Explore us on Map</h2>
+              
               <h5>Branch Office</h5>
               <p>
                 <b>H101, LGF, Sector-63, Noida, Uttar Pradesh- 201301</b>
@@ -130,13 +131,24 @@ export default function Contact() {
               <p>
                 <b>H-56, 1st Floor, Sector-63, Noida, Uttar Pradesh- 201301</b>
               </p>
-              {/* <p>17, Vikas Vihar, Mohanpuri, Meerut, Uttar Pradesh- 250001</p> */}
               <p>
                 <b>
                   4th Floor, Jmd Galleria Mall, Unit Nos. 402, Sector-47 & 48,
                   Sohna - Gurgaon Rd, Gurugram, Haryana 122001
                 </b>
               </p>
+              <p>
+                <b>
+                  DDC Arcade, 1st Floor, Plot No 1 Main, Sector 48 Road, Badshahpur Sohna Rd, Opposite Vipul Business Park, Gurugram, Haryana 122018
+                </b>
+              </p>
+              <p>
+                <b>
+                  1st Floor, Plot No 24, near old Faridabad Metro Station,
+                  Sector 20A, Faridabad, Haryana 121002
+                </b>
+              </p>
+
               <h5 className="pt-2">Workshop</h5>
               <p>
                 <b>
@@ -148,6 +160,7 @@ export default function Contact() {
             <div className="col-lg-6">
               <div className="">
                 <div className="rounded map">
+                  {/* Restored the original Iframe */}
                   <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.086690960129!2d77.3736059745727!3d28.62716378432606!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce935de2f5987%3A0x4333ffee08ad5270!2sHigh%20Creation%20Interior%20-%20Best%20Home%20And%20Office%20Interior%20Designer%20In%20Noida!5e0!3m2!1sen!2sin!4v1727021310878!5m2!1sen!2sin"
                     width="100%"

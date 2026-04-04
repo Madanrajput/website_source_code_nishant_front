@@ -4,6 +4,18 @@ import { notFound } from "next/navigation";
 import Image from "next/image"; 
 import { headers } from "next/headers"; 
 
+// Import react-icons
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaTwitter,
+  FaLinkedin,
+  FaPinterest,
+  FaYoutube,
+  FaUserCircle,
+  FaCalendarAlt
+} from "react-icons/fa";
+
 // Import our automated schema generators
 import { 
   generateOrganizationSchema, 
@@ -192,12 +204,14 @@ const DynamicRootPage = async ({ params }) => {
   let siteSettings = null;
   try {
     const timestamp = new Date().getTime();
-    const setRes = await fetch(`${API_BASE_URL}/site-settings?t=${timestamp}`, { 
+    const setRes = await fetch(`${API_BASE_URL}/site-settings`, { 
         cache: "no-store",
         headers: { 'Cache-Control': 'no-cache' }
     });
     if (setRes.ok) {
-        siteSettings = await setRes.json();
+        const rawSettings = await setRes.json();
+        // Fallback to extract correctly whether it returns an array or object
+        siteSettings = Array.isArray(rawSettings) ? rawSettings[0] : rawSettings;
     }
   } catch (e) { 
       console.error("Settings fetch failed", e); 
@@ -232,6 +246,31 @@ const DynamicRootPage = async ({ params }) => {
           }}
         />
       )}
+
+      {/* ✅ INJECTED STYLES FOR SOCIAL MEDIA ICONS */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .social-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          background-color: #f1f5f9;
+          color: #475569;
+          text-decoration: none;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .social-btn:hover {
+          transform: translateY(-4px);
+        }
+        .social-btn.fb:hover { background-color: #1877F2; color: white; box-shadow: 0 6px 12px rgba(24, 119, 242, 0.3); }
+        .social-btn.ig:hover { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); color: white; box-shadow: 0 6px 12px rgba(214, 36, 159, 0.3); }
+        .social-btn.tw:hover { background-color: #000000; color: white; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); }
+        .social-btn.in:hover { background-color: #0A66C2; color: white; box-shadow: 0 6px 12px rgba(10, 102, 194, 0.3); }
+        .social-btn.pi:hover { background-color: #E60023; color: white; box-shadow: 0 6px 12px rgba(230, 0, 35, 0.3); }
+        .social-btn.yt:hover { background-color: #FF0000; color: white; box-shadow: 0 6px 12px rgba(255, 0, 0, 0.3); }
+      `}} />
 
       <main>
         {/* =========================================
@@ -289,11 +328,11 @@ const DynamicRootPage = async ({ params }) => {
                       <div className="author-date-social-block d-flex flex-wrap justify-content-between align-items-center border-bottom pb-3 mb-4">
                           
                           {/* Left Side: Author and Date */}
-                          <div className="text-muted fst-italic fs-6 mb-2 mb-md-0">
-                              <i className="bi bi-person-circle me-2"></i>
+                          <div className="text-muted fst-italic fs-6 mb-3 mb-md-0 d-flex align-items-center">
+                              <FaUserCircle className="me-2" size={18} />
                               {pageData.writer_name ? `By ${pageData.writer_name}` : "By Author"} 
-                              &nbsp; &nbsp; • &nbsp; &nbsp; 
-                              <i className="bi bi-calendar3 me-2"></i>
+                              <span className="mx-3">•</span> 
+                              <FaCalendarAlt className="me-2" size={16} />
                               {new Date(pageData.created_at || Date.now()).toLocaleDateString('en-US', { 
                                   year: 'numeric', 
                                   month: 'long', 
@@ -301,36 +340,36 @@ const DynamicRootPage = async ({ params }) => {
                               })}
                           </div>
 
-                          {/* Right Side: Dynamic Social Media Icons */}
-                          <div className="social-links d-flex gap-3 fs-5">
+                          {/* Right Side: Dynamic Social Media Icons with Branded Styling */}
+                          <div className="social-links d-flex gap-2">
                               {siteSettings?.facebook_url && (
-                                  <a href={siteSettings.facebook_url} target="_blank" rel="noopener noreferrer" className="text-secondary hover-primary transition-all" aria-label="Facebook">
-                                      <i className="bi bi-facebook"></i>
+                                  <a href={siteSettings.facebook_url} target="_blank" rel="noopener noreferrer" className="social-btn fb" aria-label="Facebook">
+                                      <FaFacebookF size={18} />
                                   </a>
                               )}
                               {siteSettings?.instagram_url && (
-                                  <a href={siteSettings.instagram_url} target="_blank" rel="noopener noreferrer" className="text-secondary hover-primary transition-all" aria-label="Instagram">
-                                      <i className="bi bi-instagram"></i>
+                                  <a href={siteSettings.instagram_url} target="_blank" rel="noopener noreferrer" className="social-btn ig" aria-label="Instagram">
+                                      <FaInstagram size={18} />
                                   </a>
                               )}
                               {siteSettings?.twitter_url && (
-                                  <a href={siteSettings.twitter_url} target="_blank" rel="noopener noreferrer" className="text-secondary hover-primary transition-all" aria-label="X (Twitter)">
-                                      <i className="bi bi-twitter-x"></i>
+                                  <a href={siteSettings.twitter_url} target="_blank" rel="noopener noreferrer" className="social-btn tw" aria-label="X (Twitter)">
+                                      <FaTwitter size={18} />
                                   </a>
                               )}
                               {siteSettings?.linkedin_url && (
-                                  <a href={siteSettings.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-secondary hover-primary transition-all" aria-label="LinkedIn">
-                                      <i className="bi bi-linkedin"></i>
+                                  <a href={siteSettings.linkedin_url} target="_blank" rel="noopener noreferrer" className="social-btn in" aria-label="LinkedIn">
+                                      <FaLinkedin size={18} />
                                   </a>
                               )}
                               {siteSettings?.pinterest_url && (
-                                  <a href={siteSettings.pinterest_url} target="_blank" rel="noopener noreferrer" className="text-secondary hover-primary transition-all" aria-label="Pinterest">
-                                      <i className="bi bi-pinterest"></i>
+                                  <a href={siteSettings.pinterest_url} target="_blank" rel="noopener noreferrer" className="social-btn pi" aria-label="Pinterest">
+                                      <FaPinterest size={18} />
                                   </a>
                               )}
                               {siteSettings?.youtube_url && (
-                                  <a href={siteSettings.youtube_url} target="_blank" rel="noopener noreferrer" className="text-secondary hover-primary transition-all" aria-label="YouTube">
-                                      <i className="bi bi-youtube"></i>
+                                  <a href={siteSettings.youtube_url} target="_blank" rel="noopener noreferrer" className="social-btn yt" aria-label="YouTube">
+                                      <FaYoutube size={18} />
                                   </a>
                               )}
                           </div>

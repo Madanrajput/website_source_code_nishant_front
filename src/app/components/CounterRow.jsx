@@ -63,7 +63,7 @@ const CounterRow = (props) => {
                 />
               </div>
 
-              <p className="team_description">{props.descriptionCounter}</p>
+              <p className="team_description text-start">{props.descriptionCounter}</p>
 
               <div className="mt-3 mt-lg-5 d-flex justify-content-end">
                 {props.btnLink && (

@@ -68,15 +68,38 @@ export const generateBreadcrumbSchema = (slug, title) => {
 /**
  * Generates Automated FAQ Schema based on CMS Data
  */
+// export const generateFAQSchema = (faqsArray) => {
+//     if (!faqsArray || faqsArray.length === 0) return null;
+
+//     const faqItems = faqsArray.map(faq => ({
+//         "@type": "Question",
+//         "name": faq.question,
+//         "acceptedAnswer": {
+//             "@type": "Answer",
+//             "text": faq.answer
+//         }
+//     }));
+
+//     return {
+//         "@context": "https://schema.org",
+//         "@type": "FAQPage",
+//         "mainEntity": faqItems
+//     };
+// };
+
+/**
+ * Generates Automated FAQ Schema based on CMS Data
+ */
 export const generateFAQSchema = (faqsArray) => {
     if (!faqsArray || faqsArray.length === 0) return null;
 
     const faqItems = faqsArray.map(faq => ({
         "@type": "Question",
-        "name": faq.question,
+        // Map to the actual data structure used in the page
+        "name": faq?.json_content?.title || faq?.question || "FAQ",
         "acceptedAnswer": {
             "@type": "Answer",
-            "text": faq.answer
+            "text": faq?.json_content?.description || faq?.answer || ""
         }
     }));
 
