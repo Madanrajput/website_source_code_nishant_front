@@ -10,6 +10,8 @@ import Link from 'next/link';
 
 function AuthSidebar() {
     const { user } = useSelector((state) => state.auth);
+    console.log("User role" , user?.role)
+    const isAdmin = user?.role === "Admin";
     const dispatch = useDispatch();
     const router = useRouter();
     const pathname = usePathname();
@@ -50,6 +52,14 @@ function AuthSidebar() {
                             Blogs
                         </a>
                     </li> */}
+                    {isAdmin && 
+<li className="menu-item">
+            <Link href="/cms/team-management" className={`menu-link ${pathname === '/cms/team-management' ? 'active' : ''}`}>
+                <i className="menu-icon tf-icons bi bi-people-fill"></i>
+                <div data-i18n="Team">Team Management</div>
+            </Link>
+        </li>
+}
                     <li className="nav-item">
                         <a className={`nav-link ${isActive('/estimator-for-home/setup')}`} href="/estimator-for-home/setup">
                             <FaCalculator className={`dashboard_icon pe-2 ${isIconActive('/estimator-for-home/setup')}`} />

@@ -20,7 +20,11 @@ const initialFormState = {
 };
 
 const CmsPages = () => {
-    const authToken = useSelector((state) => state.auth.authToken);
+    // 🌟 FIX: Grab the token and user role correctly from Redux
+    const user = useSelector((state) => state.auth.user);
+    const authToken = user?.token;
+    const isAdmin = user?.role?.toLowerCase() === "admin";
+
     const [pagesList, setPagesList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('content'); // 'content', 'faqs', 'accordions', 'blocks', 'preview'
@@ -47,7 +51,6 @@ const CmsPages = () => {
     const fetchPages = useCallback(async () => {
         setLoading(true);
         try {
-            // Check Redux first, fallback to localStorage if Redux state is delayed
             const token = authToken || (typeof window !== "undefined" ? localStorage.getItem("token") : "");
             const response = await api.get("/cms-pages", { 
                 headers: { Authorization: `Bearer ${token}` } 
@@ -72,8 +75,6 @@ const CmsPages = () => {
             [name]: type === 'checkbox' ? checked : value 
         }));
     };
-
-
 
     const setContentData = (data) => setFormData((prev) => ({ ...prev, content: data }));
 
@@ -193,16 +194,41 @@ const CmsPages = () => {
     const handleEditClick = (item) => {
         setSelectedId(item.id);
         setActiveTab('content');
+
+        // 🌟 WORKFLOW: Auto-downgrade status if Editor edits a Published page
+        let defaultStatus = item.status || "Draft";
+        if (!isAdmin && defaultStatus === "Published") {
+            defaultStatus = "Pending Approval";
+            toast.info("Editing a live page will change its status to Pending Approval.");
+        }
+
         setFormData({
             title: item.title, 
             writer_name: item.writer_name || "", 
             show_author_date: item.show_author_date || false,
             content: item.content || "", 
-            status: item.status || "Draft",
+            status: defaultStatus,
             faqs: item.faqs || [], 
             accordions: item.accordions || [], 
             content_blocks: item.content_blocks || []
         });
+    };
+
+    // 🌟 WORKFLOW: Quick Approve feature for Admins
+    const quickApproveHandler = async (id) => {
+        try {
+            const token = authToken || localStorage.getItem("token");
+            const response = await api.patch(`/cms-pages/${id}`, 
+                { status: "Published" }, 
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            if (response.status === 200) { 
+                fetchPages(); 
+                toast.success("Page Approved and Published!"); 
+            }
+        } catch (error) { 
+            toast.error("Failed to approve page."); 
+        }
     };
 
     const handleManageSeoContentClick = (id, item) => {
@@ -327,7 +353,6 @@ const CmsPages = () => {
             </div>
             
             <h1 className="mb-4">{formData.title || "Page Title"}</h1>
-            {/* {formData.writer_name && <p className="text-muted mb-4">By {formData.writer_name}</p>} */}
             {formData.show_author_date && (
                 <div className="text-muted mb-4 fst-italic border-bottom pb-3">
                     {formData.writer_name ? `By ${formData.writer_name}` : "By Author"} &nbsp;•&nbsp; {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -342,7 +367,6 @@ const CmsPages = () => {
                 <div key={idx} className="mb-4 p-3 border rounded bg-light">
                     {block.type === 'testimonial' && (
                         <blockquote className="blockquote text-center">
-                            {/* <p className="mb-2">"{block.data.review || 'Review text'}"</p> */}
                            <p className="mb-2">
   &quot;{block.data.review || 'Review text'}&quot;
 </p>
@@ -387,7 +411,16 @@ const CmsPages = () => {
                 <div className="row g-3 bg-white p-4 rounded shadow-sm border">
                     <div className="col-md-6"><label className="form-label fw-bold">Page Title *</label><input type="text" className="form-control form-control-lg" name="title" value={formData.title} onChange={handleInputChange} required /></div>
                     <div className="col-md-3"><label className="form-label fw-bold">Author Name</label><input type="text" className="form-control form-control-lg" name="writer_name" value={formData.writer_name} onChange={handleInputChange} /></div>
-                    <div className="col-md-3"><label className="form-label fw-bold">Status</label><select className="form-select form-select-lg" name="status" value={formData.status} onChange={handleInputChange}><option value="Draft">Draft</option><option value="Published">Published</option></select></div>
+                    
+                    <div className="col-md-3">
+                        <label className="form-label fw-bold">Status</label>
+                        <select className="form-select form-select-lg" name="status" value={formData.status} onChange={handleInputChange}>
+                            <option value="Draft">Draft</option>
+                            <option value="Pending Approval">Pending Approval</option>
+                            {/* 🌟 ONLY ADMINS CAN PUBLISH DIRECTLY */}
+                            {isAdmin && <option value="Published">Published</option>}
+                        </select>
+                    </div>
               
                     <div className="col-md-12 mt-3">
                         <div className="form-check form-switch fs-5 bg-light p-3 rounded border">
@@ -404,7 +437,7 @@ const CmsPages = () => {
                             <label className="form-check-label fs-6 mt-1" htmlFor="showAuthorDate" style={{cursor: 'pointer'}}>
                                 <strong>Display Author & Date on Page</strong> 
                                 <small className="text-muted d-block" style={{fontSize: '0.8rem'}}>If checked the writer&apos;s name and publication date will be shown below the main title.
-                                </small>
+</small>
                             </label>
                         </div>
                     </div>
@@ -441,13 +474,32 @@ const CmsPages = () => {
                                                 <td className="fw-bold text-muted">{index + 1}</td>
                                                 <td className="fw-semibold text-dark">{item.title}</td>
                                                 <td className="text-muted">{item.writer_name || 'N/A'}</td>
-                                                <td><span className={`badge rounded-pill px-3 py-2 ${item.status === 'Published' ? 'bg-success' : 'bg-warning text-dark'}`}>{item.status || 'Draft'}</span></td>
+                                                <td>
+                                                    {/* 🌟 Better Status Colors */}
+                                                    <span className={`badge rounded-pill px-3 py-2 ${item.status === 'Published' ? 'bg-success' : item.status === 'Pending Approval' ? 'bg-info text-dark' : 'bg-warning text-dark'}`}>{item.status || 'Draft'}</span>
+                                                </td>
                                                 <td><button onClick={() => handleManageSeoContentClick(item.id, item.seo_content || item)} className="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#seoContentModal">Manage SEO</button></td>
                                                 <td className="text-end">
-                                                    {item.seo_content?.slug && (<a href={`/${item.seo_content.slug}`} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-success me-2 shadow-sm">Live Link</a>)}
+                                                    
+                                                    {/* 🌟 Only show live link if Published */}
+                                                    {item.status === 'Published' && item.seo_content?.slug && (
+                                                        <a href={`/${item.seo_content.slug}`} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-success me-2 shadow-sm">Live Link</a>
+                                                    )}
+                                                    
                                                     <button onClick={() => duplicateHandler(item.id)} className="btn btn-sm btn-outline-secondary me-2 shadow-sm">Duplicate</button>
                                                     <button onClick={() => handleEditClick(item)} className="btn btn-sm btn-primary me-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#editNewpageModal">Edit / Preview</button>
-                                                    <button className="btn btn-sm btn-danger shadow-sm" onClick={() => deleteHandler(item.id)}>Delete</button>
+                                                    
+                                                    {/* 🌟 Quick Approve for Admins */}
+                                                    {isAdmin && item.status === 'Pending Approval' && (
+                                                        <button className="btn btn-sm btn-success me-2 shadow-sm fw-bold" onClick={() => quickApproveHandler(item.id)}>
+                                                            <i className="bi bi-check-circle me-1"></i> Approve
+                                                        </button>
+                                                    )}
+
+                                                    {/* 🌟 HIDE DELETE FROM EDITORS */}
+                                                    {isAdmin && (
+                                                        <button className="btn btn-sm btn-danger shadow-sm" onClick={() => deleteHandler(item.id)}>Delete</button>
+                                                    )}
                                                 </td>
                                             </tr>
                                         )) : (<tr><td colSpan="6" className="text-center py-4 text-muted">No pages found.</td></tr>)}
