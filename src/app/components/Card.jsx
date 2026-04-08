@@ -19,7 +19,7 @@ const Card = ({
     return (
         <div>
             <div className={cardNameALl}>
-                <a href={cardLinkName || "#"} style={{ display: 'block' }}>
+                <a href={cardLinkName || "#"} style={{ display: 'block' }} aria-label="Work">
                     {/* 🌟 CMS Fix: Added style tag for strict aspect-ratio lock and cover fit */}
                     <Image 
                         src={imgSrc || "/placeholder-image.jpg"} 

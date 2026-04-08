@@ -6,10 +6,8 @@ export async function getPageSEO(pageUrlIdentifier) {
         ? process.env.NEXT_PUBLIC_API_DEV_URL 
         : process.env.NEXT_PUBLIC_API_BASE_URL;
   
-      // Ensure the identifier has a leading slash to match your database format (e.g., "/home")
       const pathQuery = pageUrlIdentifier.startsWith('/') ? pageUrlIdentifier : `/${pageUrlIdentifier}`;
 
-      // 🌟 Fetch only the exact record we need, bypassing cache
       const res = await fetch(`${baseURL}/seo-tag/route?path=${encodeURIComponent(pathQuery)}`, { 
         cache: "no-store" 
       });
@@ -19,24 +17,44 @@ export async function getPageSEO(pageUrlIdentifier) {
         
         if (pageSeo && pageSeo.id) {
           const { index, follow } = getRobotsDirectives(pageSeo);
+          
+          const metaTitle = pageSeo.meta_title || pageSeo.title || "";
+          const metaDescription = pageSeo.meta_description || "";
+          const canonicalTag = pageSeo.canonical_url || pageSeo.meta_can_tag || "";
+          const keywords = pageSeo.keywords || pageSeo.meta_keywords || "";
   
           let cleanCanonical = getCanonicalUrl({
-            metaCanonicalTag: pageSeo.meta_can_tag,
+            metaCanonicalTag: canonicalTag,
             fallbackPath: pageUrlIdentifier,
           });
   
           return {
-            title: pageSeo.title,
-            description: pageSeo.meta_description,
-            keywords: pageSeo.meta_keywords || "",
+            title: metaTitle,
+            description: metaDescription,
+            keywords: keywords,
             alternates: { canonical: cleanCanonical },
-            robots: { index, follow },
-            openGraph: {
-              title: pageSeo.og_title || pageSeo.title,
-              description: pageSeo.og_description || pageSeo.meta_description,
-              url: cleanCanonical,
-              images: pageSeo.og_image ? [{ url: pageSeo.og_image }] : [],
+            robots: { 
+                index, 
+                follow,
+                googleBot: { index, follow, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 } 
             },
+            openGraph: {
+              title: metaTitle,
+              description: metaDescription,
+              url: cleanCanonical,
+              siteName: "High Creation Interior",
+              images: pageSeo.og_image ? [{ url: pageSeo.og_image, width: 1200, height: 630 }] : [],
+              locale: "en_IN",
+              type: "website",
+            },
+            // 🌟 ADDED FOR 90+ SCORE: Twitter Cards
+            twitter: {
+              card: "summary_large_image",
+              title: metaTitle,
+              description: metaDescription,
+              images: pageSeo.og_image ? [pageSeo.og_image] : [],
+            },
+            customSchema: pageSeo.custom_schema || null,
           };
         }
       }
@@ -44,9 +62,5 @@ export async function getPageSEO(pageUrlIdentifier) {
       console.error(`SEO Fetch Error for ${pageUrlIdentifier}:`, err);
     }
   
-    // Global Fallback if no CMS entry is found
-    return {
-      title: "High Creation Interior | Best Interior Designers",
-      description: "Elevate your living space with the best interior design company in Noida & Delhi NCR.",
-    };
-  }
+    return null; 
+}

@@ -6,10 +6,10 @@ const IconBox = (props) => {
       <div className="box d-flex me-2">
         <div className="align-self-center"> 
           <Image
-            src={props.iconUrl}
-            alt={props.iconAlt}
-            width={props.iconWidth}
-            height={props.iconWidth}
+            src={props.iconUrl || "/images/default-icon.png"}
+            alt={props.iconAlt || props.iconDescription || "Feature Icon"} // 🌟 SEO FIX
+            width={props.iconWidth || 70}
+            height={props.iconWidth || 70}
             className="me-2"
           />
         </div>

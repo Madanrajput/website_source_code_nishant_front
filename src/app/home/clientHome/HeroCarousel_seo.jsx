@@ -41,7 +41,7 @@ export default function HeroCarousel({ bannerData }) {
                       <Image
                         src={banner?.banner_image ?? "/images/home-banner-1.png"}
                         className="d-block carousel_img"
-                        alt={banner?.title?.trim() || "High Creation Interior Design in Delhi NCR"} // 🌟 SEO FIX
+                        alt={banner?.title || "High Creation Interior Design in Delhi NCR"} // 🌟 SEO FIX
                         fill
                         priority={isFirstSlide} 
                         sizes="100vw"

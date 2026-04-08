@@ -1,8 +1,8 @@
 import { FaStar } from "react-icons/fa6";
+
 const BgImageCard = ({
   cardLinkTag,
   designerCardBgDiv,
-  // imgClass,
   style, 
   titleBgImage,
   descriptionBg,
@@ -12,8 +12,8 @@ const BgImageCard = ({
 }) => {
   return (
     <>
-   <a href={cardLinkTag}>
-   {/* 🌟 CMS Fix: Secured background size so it scales perfectly on mobile */}
+   {/* 🌟 SEO FIX: Added aria-label to wrapper link */}
+   <a href={cardLinkTag} aria-label={titleBgImage ? `View design details for ${titleBgImage}` : "View design details"}>
    <div 
       style={{ 
         backgroundSize: "cover", 
@@ -30,14 +30,14 @@ const BgImageCard = ({
 
       <div>
         <p className="mb-0 text-white">
-          {/* <FaStar className="pe-1 text-warning" /> */}
           {ratingBg}
         </p>
         <div className="d-flex">
-          <a href="" className="pe-3">
+          {/* 🌟 SEO FIX: Added descriptive aria-labels for utility links */}
+          <span className="pe-3" aria-label="Share this design">
             {buttonShareBg}
-          </a>
-          <a href="">{buttonCommentBg}</a>
+          </span>
+          <span aria-label="Comment on this design">{buttonCommentBg}</span>
         </div>
       </div>
     </div>

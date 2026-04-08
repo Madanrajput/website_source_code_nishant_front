@@ -9,36 +9,32 @@ const RowImage = (props) => {
   return (
     <div className="container">
       <div className="row mx-0">
-        <div
-          className={`col-lg-${imageColLg} col-xl-${imageColXl} col-md-${imageColMd} col-${imageCol}`}
-        >
+        <div className={`col-lg-${imageColLg} col-xl-${imageColXl} col-md-${imageColMd} col-${imageCol}`}>
           <Image
-            src={props.ImgAbout}
+            src={props.ImgAbout || "/placeholder-image.jpg"}
             className={`responsive-media ${props.ImgAboutClass || ""}`}
-            alt={props.imgAlt}
+            alt={props.imgAlt?.trim() ? props.imgAlt : (props.titleHeading || "About High Creation Interior")}
             width={600}
             height={400}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
             style={{ width: "100%", maxWidth: "100%" }}
           />
         </div>
-        <div
-          className={`d-flex align-items-center col-lg-${12 - imageColLg} col-md-${12 - imageColMd} col-${12 - imageCol}`}
-        >
+        <div className={`d-flex align-items-center col-lg-${12 - imageColLg} col-md-${12 - imageColMd} col-${12 - imageCol}`}>
           <div className={props.divclass}>
-            <h3 className="">
+            {/* 🌟 SEO FIX: Changed to h2 but kept the h3 visual size */}
+            <h2 className="h3">
               {props.titleHeading}
               <span className={props.subHeadingClass}>{props.subHeading}</span>
-            </h3>
+            </h2>
             <p>{props.description}</p>
             {props.textAboutBtn ? (
-              <a className={props.textAboutBtnCLass} href={props.btnLink}>
+              <a 
+                className={props.textAboutBtnCLass} 
+                href={props.btnLink}
+                aria-label={`${props.textAboutBtn} - ${props.titleHeading || 'Read more'}`} 
+              >
                 {props.textAboutBtn}
-              </a>
-            ) : null}
-            {props.textAboutBtn2 ? (
-              <a className={props.textAboutBtnCLass2}>
-                {props.textAboutBtn2}
               </a>
             ) : null}
           </div>
