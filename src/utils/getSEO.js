@@ -1,44 +1,39 @@
+import { getCanonicalUrl, getRobotsDirectives } from "@/utils/seoHelpers";
+
 export async function getPageSEO(pageUrlIdentifier) {
     try {
       const baseURL = process.env.NODE_ENV === "development" 
         ? process.env.NEXT_PUBLIC_API_DEV_URL 
         : process.env.NEXT_PUBLIC_API_BASE_URL;
   
-      const res = await fetch(`${baseURL}/seo-tag?status=active`, { cache: "no-store" });
+      // Ensure the identifier has a leading slash to match your database format (e.g., "/home")
+      const pathQuery = pageUrlIdentifier.startsWith('/') ? pageUrlIdentifier : `/${pageUrlIdentifier}`;
+
+      // 🌟 Fetch only the exact record we need, bypassing cache
+      const res = await fetch(`${baseURL}/seo-tag/route?path=${encodeURIComponent(pathQuery)}`, { 
+        cache: "no-store" 
+      });
   
       if (res.ok) {
-        const allSeoTags = await res.json();
+        const pageSeo = await res.json();
         
-        // Find the specific tag for the requested page
-        const pageSeo = allSeoTags.find(tag => 
-          tag.page_name === pageUrlIdentifier || 
-          tag.page_name === `${pageUrlIdentifier}/` ||
-          tag.page_name.includes(pageUrlIdentifier) // flexible matching
-        );
+        if (pageSeo && pageSeo.id) {
+          const { index, follow } = getRobotsDirectives(pageSeo);
   
-        if (pageSeo) {
-          const robotsString = pageSeo.meta_robots?.toLowerCase() || "";
-          const shouldIndex = robotsString.includes('index') && !robotsString.includes('noindex');
-          const shouldFollow = robotsString.includes('follow') && !robotsString.includes('nofollow');
-  
-          let cleanCanonical = pageUrlIdentifier;
-          if (pageSeo.meta_can_tag) {
-              if (pageSeo.meta_can_tag.includes("href=")) {
-                  const match = pageSeo.meta_can_tag.match(/href=[“"']([^"“']+)["”']/);
-                  if (match) cleanCanonical = match[1];
-              } else {
-                  cleanCanonical = pageSeo.meta_can_tag; 
-              }
-          }
+          let cleanCanonical = getCanonicalUrl({
+            metaCanonicalTag: pageSeo.meta_can_tag,
+            fallbackPath: pageUrlIdentifier,
+          });
   
           return {
             title: pageSeo.title,
             description: pageSeo.meta_description,
+            keywords: pageSeo.meta_keywords || "",
             alternates: { canonical: cleanCanonical },
-            robots: { index: shouldIndex, follow: shouldFollow },
+            robots: { index, follow },
             openGraph: {
-              title: pageSeo.title,
-              description: pageSeo.meta_description,
+              title: pageSeo.og_title || pageSeo.title,
+              description: pageSeo.og_description || pageSeo.meta_description,
               url: cleanCanonical,
               images: pageSeo.og_image ? [{ url: pageSeo.og_image }] : [],
             },

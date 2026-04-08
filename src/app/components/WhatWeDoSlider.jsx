@@ -5,6 +5,7 @@ import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { MdOutlineChevronLeft, MdKeyboardArrowRight } from "react-icons/md";
 import api from "@/utils/api";
+import { defaultAltText } from "@/utils/helper";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -99,8 +100,9 @@ const SliderAbout = (props) => {
                           alt={
                             sliderItems?.json_content?.title ?? defaultAltText
                           }
-                          className="w-100 object-fit-contain"
-                          height={150}
+                          className="responsive-media object-fit-contain"
+                          loading="lazy"
+                          decoding="async"
                         />
                         <div className="card-body text-center pt-3">
                           <h4 className="card-title py-3 text-black">

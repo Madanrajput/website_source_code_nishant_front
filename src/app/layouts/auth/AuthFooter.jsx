@@ -12,7 +12,7 @@ const AuthFooter = () => {
                             <div className="row justify-content-center">
                                 <div className="col-lg-5 ps-lg-5">
                                     <div>
-                                        <a href="/"> <Image
+                                        <a href="/" aria-label="Home"> <Image
                                             src="/images/Hc-Logo.jpeg"
                                             alt="hero image"
                                             className=""
@@ -40,8 +40,8 @@ const AuthFooter = () => {
                                             src="/images/gpay.PNG"
                                             className="me-3"
                                             alt="google-playstore"
-                                        />
-                                        <img src="/images/apple.PNG" alt="ois-store" />
+                                        decoding="async"  loading="lazy" />
+                                        <img src="/images/apple.PNG" alt="ois-store" decoding="async"  loading="lazy" />
                                     </div>
                                 </div>
                                 <div className="col-lg-2 col-md-4 col-6">

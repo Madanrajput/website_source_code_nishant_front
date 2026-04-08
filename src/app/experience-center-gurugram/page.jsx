@@ -1,4 +1,3 @@
-// "use client";
 // import {useCallback, useEffect, useState } from "react";
 // import BackgroundImageRow from "../components/BackgroundImageRow";
 // import WallpaperCard from "../components/WallpaperCard";
@@ -258,7 +257,7 @@
 //             <video
 //               width="100%"
 //               height="590"
-//               class="object-fit-cover"
+//               className="object-fit-cover"
 //               autoPlay
 //               loop
 //               muted

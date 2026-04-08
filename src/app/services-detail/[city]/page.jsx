@@ -3,6 +3,7 @@ import MainLayout from "../../layouts/MainLayout";
 import ServicesRowLeft from "../../components/ServicesRowLeft";
 import api from "@/utils/api";
 import { defaultAltText } from "@/utils/helper";
+import { getCanonicalUrl, getRobotsDirectives } from "@/utils/seoHelpers";
 import { notFound } from "next/navigation";
 
 // --- GSC FIX: ISR (Update content every hour) ---
@@ -18,16 +19,22 @@ export async function generateMetadata({ params }) {
     if (!data) {
       return {
         title: "Service Not Found",
-        robots: "noindex",
+        robots: { index: false, follow: true },
       };
     }
+
+    const canonicalUrl = getCanonicalUrl({
+      canonicalUrl: data?.seo_content?.canonical_url,
+      fallbackPath: `/services-detail/${city}`,
+    });
 
     return {
       title: data?.seo_content?.meta_title || `${city} Interior Design Services`,
       description: data?.seo_content?.meta_description,
       alternates: {
-        canonical: `https://hcinterior.in/services-detail/${city}`,
+        canonical: canonicalUrl,
       },
+      robots: getRobotsDirectives(data?.seo_content),
       openGraph: {
         title: data?.main_title,
         description: data?.main_description?.substring(0, 160),
@@ -37,7 +44,7 @@ export async function generateMetadata({ params }) {
   } catch (error) {
     return {
       title: "Error",
-      robots: "noindex",
+      robots: { index: false, follow: true },
     };
   }
 }
@@ -97,7 +104,7 @@ export default async function ServicesDetail({ params }) {
                       width={700}
                       alt={pageData?.main_title ?? defaultAltText}
                       className="pt-0 pt-lg-5 w-100 object-fit-contain"
-                    />
+                    decoding="async"  loading="lazy" />
                   </div>
                 </center>
               </div>
@@ -130,7 +137,7 @@ export default async function ServicesDetail({ params }) {
                         className="w-100 object-fit-contain"
                         height={150}
                         alt="Warranty Icon"
-                      />
+                      decoding="async"  loading="lazy" />
                       <div className="pt-3 text-center card-body">
                         <h4 className="px-4 py-3 text-center card-title card_Services_heading">
                           India&apos;s only full home warranty* up to 10-yrs
@@ -146,7 +153,7 @@ export default async function ServicesDetail({ params }) {
                         className="w-100 object-fit-contain"
                         height={150}
                         alt="Quality Check Icon"
-                      />
+                      decoding="async"  loading="lazy" />
                       <div className="pt-3 text-center card-body">
                         <h4 className="px-4 py-3 text-center card-title card_Services_heading">
                           146 quality checks to give your home the best
@@ -161,7 +168,7 @@ export default async function ServicesDetail({ params }) {
                         className="w-100 object-fit-contain"
                         height={150}
                         alt="Installation Icon"
-                      />
+                      decoding="async"  loading="lazy" />
                       <div className="pt-3 text-center card-body">
                         <h4 className="px-4 py-3 text-center card-title card_Services_heading">
                           45-day installation swift kitchens, wardrobes &

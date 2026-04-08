@@ -7,8 +7,10 @@ const ServicesRightOriginal = (props) => {
               <div className={props.colum1}>
                 <img
                   src={props.ServicesImgUrlRight}
-                  className={props.servicesImgClass}
+                  className={`responsive-media ${props.servicesImgClass || ""}`}
                   alt={props.servicesImgAltRight}
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               <div className={props.colum2}>

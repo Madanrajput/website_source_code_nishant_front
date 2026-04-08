@@ -1,8 +1,11 @@
 "use client";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import api from "@/utils/api";
+import { buildLeadMetadata } from "@/utils/leadForms";
 
 export default function ContactForm({ mapSrc }) {
+  const pathname = usePathname();
   const [formData, setFormData] = useState({
     fullName: "",
     contact: "",
@@ -36,6 +39,12 @@ export default function ContactForm({ mapSrc }) {
         email: formData.email,
         place: formData.place,
         query: formData.query,
+        ...buildLeadMetadata({
+          pathname,
+          leadFormType: "inline",
+          leadFormName: "Home Contact Form",
+          ctaText: "SEND",
+        }),
       });
       if (response.status === 201) {
         setStatus({ message: "Form submitted successfully!", error: "" });
@@ -55,12 +64,18 @@ export default function ContactForm({ mapSrc }) {
       <div className="container">
         <div className="row position-relative card_form_row mx-0">
           <div className="col-lg-7 col-md-5 col-12">
-            <div className="rounded map pe-lg-5" style={{ minHeight: "525px" }}>
-              <iframe 
-                src={mapSrc} 
-                width="100%" height="525" className="map" allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade" 
-              />
-            </div>
+          <div className="rounded map pe-lg-5" style={{ minHeight: "525px", height: "100%" }}>
+  <iframe 
+    src={mapSrc} 
+    width="100%" 
+    height="100%" 
+    // className="map" 
+    style={{ border: 20, minHeight: "525px" }}
+    allowFullScreen="" 
+    loading="lazy" 
+    referrerPolicy="no-referrer-when-downgrade" 
+  />
+</div>
           </div>
           <div className="col-lg-5 col-md-7 col-12 mt-4 mt-lg-0">
             <div className="contact_form">

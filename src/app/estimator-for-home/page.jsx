@@ -1,4 +1,3 @@
-// "use client";
 // import MainLayout from "../layouts/MainLayout";
 // import { useState, useRef, useEffect } from "react";
 // import { CiCirclePlus, CiCircleMinus } from "react-icons/ci";
@@ -489,7 +488,7 @@
 //               </div>
 //               <div className="triangle-wrapper">
 //                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 100">
-//                   <path d="M0,0 L50,50 L0,100" stroke="var(--step_border_color)" fill="none" stroke-width="1" />
+//                   <path d="M0,0 L50,50 L0,100" stroke="var(--step_border_color)" fill="none" strokeWidth="1" />
 //                 </svg>
 //               </div>
 //             </div>
@@ -505,7 +504,7 @@
 //               </div>
 //               <div className="triangle-wrapper">
 //                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 100">
-//                   <path d="M0,0 L50,50 L0,100" stroke="var(--step_border_color)" fill="none" stroke-width="1" />
+//                   <path d="M0,0 L50,50 L0,100" stroke="var(--step_border_color)" fill="none" strokeWidth="1" />
 //                 </svg>
 //               </div>
 //             </div>
@@ -519,7 +518,7 @@
 //               </div>
 //               <div className="triangle-wrapper">
 //                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 100">
-//                   <path d="M0,0 L50,50 L0,100" stroke="var(--step_border_color)" fill="none" stroke-width="1" />
+//                   <path d="M0,0 L50,50 L0,100" stroke="var(--step_border_color)" fill="none" strokeWidth="1" />
 //                 </svg>
 //               </div>
 //             </div>
@@ -558,7 +557,7 @@
 //                           className="w-100 object-fit-contain"
 //                           height={160}
 //                           alt="Apartment"
-//                         />
+//                         decoding="async"  loading="lazy" />
 //                         <h5 className="pt-3 text-center">Apartments</h5>
 //                         <div className="m-auto my-3 text-center">
 //                           {["1bhk", "2bhk", "3bhk", "4bhk"].map((bhk) => (
@@ -612,7 +611,7 @@
 //                           className="w-100 object-fit-contain"
 //                           height={160}
 //                           alt="Villa"
-//                         />
+//                         decoding="async"  loading="lazy" />
 //                         <h5 className="pt-3 text-center">Villa</h5>
 //                         <div className="m-auto my-3 text-center">
 //                           {["1bhk", "2bhk", "3bhk", "4bhk"].map((bhk) => (
@@ -666,7 +665,7 @@
 //                           className="w-100 object-fit-contain"
 //                           height={160}
 //                           alt="flat"
-//                         />
+//                         decoding="async"  loading="lazy" />
 //                         <h5 className="pt-3 text-center">Flat</h5>
 //                         <div className="m-auto my-3 text-center">
 //                           {["1bhk", "2bhk", "3bhk", "4bhk"].map((bhk) => (
@@ -951,7 +950,7 @@
 //                           src="/images/standard_ico.jpeg"
 //                           width={80}
 //                           alt="bill"
-//                         />
+//                         decoding="async"  loading="lazy" />
 //                       </div>
 //                       <div className="col-lg-7 col-8">
 //                         <h5 className="header text-capitalize">
@@ -1056,7 +1055,7 @@
 //                         </div>
 //                       </div>
 //                     </div>
-//                     <div class="text-center mt-4"><a href="/thankyou" class="know_more px-3">Next</a></div>
+//                     <div className="text-center mt-4"><a href="/thankyou" className="know_more px-3">Next</a></div>
 //                   </div>
 //                 </div>
 //               </div>

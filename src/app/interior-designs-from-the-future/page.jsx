@@ -4,11 +4,14 @@ import { IoIosCall } from "react-icons/io";
 import CounterNumber from "../components/CounterNumber";
 import ContactUsPopUp from "../components/ContactUsPopUp";
 import { useCallback, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Testimonial from "../components/Testimonial";
 import TestimonialTwo from "../components/TestimonialTwo";
 import api from "@/utils/api";
 import { toast } from "react-toastify";
+import { buildLeadMetadata } from "@/utils/leadForms";
 const HcLandingTwo = () => {
+  const pathname = usePathname();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -68,6 +71,12 @@ const HcLandingTwo = () => {
       email: formData.email,
       place: formData.place,
       query: formData.query,
+      ...buildLeadMetadata({
+        pathname,
+        leadFormType: "inline",
+        leadFormName: "Interior Designs From The Future Lead Form",
+        ctaText: "SEND",
+      }),
     };
 
     try {
@@ -115,14 +124,14 @@ const HcLandingTwo = () => {
         <header className="container-fluid px-lg-5 px-3">
           <nav className="navbar navbar-expand-lg p-0">
             <div className="container-fluid">
-              <a className="navbar-brand ms-lg-5" href="/">
+              <a className="navbar-brand ms-lg-5" href="/" aria-label="Home">
                 <img
                   src="/images/new_hc_logo.png"
                   width={90}
                   height={90}
                   alt="hc-logo"
                   className="p-2"
-                />
+                decoding="async"  loading="lazy" />
               </a>
               <button
                 className="navbar-toggler d-block d-lg-none"
@@ -167,9 +176,9 @@ const HcLandingTwo = () => {
               <div className="row">
                 <div className="col-lg-7 d-flex align-items-center">
                   <div className="pe-lg-5">
-                    <h6 className="fw-lighter fs-3 pb-0 mb-0 home_subhead text-white">
+                    <h3 className="fw-lighter fs-3 pb-0 mb-0 home_subhead text-white">
                       Bringing Your
-                    </h6>
+                    </h3>
                     <h3 className="letheading home_banner_heading text-white">
                       Dream Home to Life
                     </h3>
@@ -290,7 +299,7 @@ const HcLandingTwo = () => {
                       src="/images/Whatsapp-icon.png"
                       width="40"
                       alt="whatsapp"
-                    />
+                    decoding="async"  loading="lazy" />
                   </div>
                 </a>
               </div>
@@ -455,7 +464,7 @@ interior project"
                           src="/images/hc_landing_2/testimonial_2.png"
                           width={70}
                           alt="user"
-                        />
+                        decoding="async"  loading="lazy" />
                       </div>
                       <div className="ps-4">
                         <p className="mb-1">
@@ -485,7 +494,7 @@ interior project"
                           className="w-100 object-fit-contain"
                           height={250}
                           alt=""
-                        />
+                        decoding="async"  loading="lazy" />
                       </div>
                     </div>
                   </div>
@@ -798,7 +807,7 @@ interior project"
             <div className="row justify-content-lg-center g-4 mx-0">
               <div className="col-lg-3 ps-lg-5 col-md-4 col-12">
                 <div>
-                  <a href="/">
+                  <a href="/" aria-label="Home">
                     {" "}
                     <img
                       src="/images/new_hc_logo.png"
@@ -806,7 +815,7 @@ interior project"
                       className=""
                       width={150}
                       height={150}
-                    />
+                    decoding="async"  loading="lazy" />
                   </a>
                 </div>
 

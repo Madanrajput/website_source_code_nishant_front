@@ -1,3 +1,4 @@
+"use client";
 // components/TabsComponent.js
 import { IoMdCloseCircle } from "react-icons/io";
 import { CiCirclePlus, CiCircleMinus, CiCircleCheck } from "react-icons/ci";
@@ -357,9 +358,9 @@ const Tabs = () => {
                                                             name="amount"
                                                             onChange={(e) => handleInputChange(e, field.id, tab, sectionIndex)}
                                                         />
-                                                            <div class="form-check form-switch ms-1">
+                                                            <div className="form-check form-switch ms-1">
                                                             <input
-                                                                class="form-check-input"
+                                                                className="form-check-input"
                                                                 type="checkbox"
                                                                 role="switch"
                                                                 id="flexSwitchCheckDefault"

@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import { MdOutlineDashboard, MdMessage, MdLeaderboard } from "react-icons/md";
 import { FaBlog, FaCalculator, FaFileAlt, FaQuestionCircle, FaRegUser } from "react-icons/fa";
@@ -7,11 +8,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { usePathname, useRouter } from 'next/navigation';
 import { logout } from '../../../store/slices/authSlice';
 import Link from 'next/link';
+import { getCmsAccess } from '@/utils/cmsAccess';
 
 function AuthSidebar() {
     const { user } = useSelector((state) => state.auth);
-    console.log("User role" , user?.role)
-    const isAdmin = user?.role === "Admin";
+    const { isAdmin } = getCmsAccess(user);
     const dispatch = useDispatch();
     const router = useRouter();
     const pathname = usePathname();
@@ -29,7 +30,7 @@ function AuthSidebar() {
             <div className="mt-3 position-sticky my_admin_sidebar">
                 <div className="usercard">
                     <center>
-                        <img src="/images/user-icons.svg" width={70} alt="user" />
+                        <img src="/images/user-icons.svg" width={70} alt="user" decoding="async"  loading="lazy" />
                         <h6 className="pt-3 text-white">{user?.firstName} {user?.lastName}</h6>
                         <p className="text-white team_description">{user?.email}</p>
                     </center>
@@ -41,7 +42,7 @@ function AuthSidebar() {
                         </a>
                     </li>
                     {/* <li className="nav-item">
-                        <a className={`nav-link ${isActive('/')}`} href="/">
+                        <a className={`nav-link ${isActive('/')}`} href="/" aria-label="Home">
                             <IoHomeOutline className={`dashboard_icon pe-2 ${isIconActive('/')}`} />
                             Home Page
                         </a>
@@ -53,12 +54,22 @@ function AuthSidebar() {
                         </a>
                     </li> */}
                     {isAdmin && 
+                    <>
 <li className="menu-item">
             <Link href="/cms/team-management" className={`menu-link ${pathname === '/cms/team-management' ? 'active' : ''}`}>
                 <i className="menu-icon tf-icons bi bi-people-fill"></i>
                 <div data-i18n="Team">Team Management</div>
             </Link>
         </li>
+
+        <li className="menu-item">
+            <Link href="/cms/popup-manager" className={`menu-link ${pathname === '/cms/popup-manager' ? 'active' : ''}`}>
+                <i className="menu-icon tf-icons bi bi-people-fill"></i>
+                <div data-i18n="Team">Popup Manager</div>
+            </Link>
+        </li>
+        
+        </>
 }
                     <li className="nav-item">
                         <a className={`nav-link ${isActive('/estimator-for-home/setup')}`} href="/estimator-for-home/setup">
@@ -136,11 +147,20 @@ function AuthSidebar() {
         <i className="bi bi-images me-2"></i> Media Library
     </Link>
 </li>
+{isAdmin && (
+<>
 <li className="nav-item">
-    <Link href="/cms/site-setting" className="nav-link text-white">
-        <i className="bi bi-images me-2"></i> Site Settings
-    </Link>
-</li>
+        <Link href="/cms/site-setting" className="nav-link text-white">
+            <i className="bi bi-images me-2"></i> Site Settings
+        </Link>
+ </li>
+<li className="nav-item">
+        <Link href="/cms/robots-txt" className="nav-link text-white">
+            <i className="bi bi-file-earmark-code me-2"></i> Robots.txt
+        </Link>
+ </li>
+</>
+)}
                             <li>
                                 <a className={`${isActive('/cms/design-gallery')}`} href="/cms/design-gallery">
                                     Design Gallery

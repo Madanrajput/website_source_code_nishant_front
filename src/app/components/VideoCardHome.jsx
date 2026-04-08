@@ -49,11 +49,11 @@ const VideoThumbnail = ({ videoUrl, imageUrl }) => {
           position: relative;
           width: 100%;
           margin: 0 auto;
+          aspect-ratio: 16 / 9;
           border-radius: 15px;
           overflow: hidden;
           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-          height: 580px;
-          background-color: #f0f0f0; /* Light gray placeholder color */
+          background-color: #f0f0f0;
         }
 
         .video-frame {
@@ -61,6 +61,7 @@ const VideoThumbnail = ({ videoUrl, imageUrl }) => {
           height: 100%;
           border: none;
           background: black;
+          display: block;
         }
 
         .thumbnail-container {
@@ -69,7 +70,6 @@ const VideoThumbnail = ({ videoUrl, imageUrl }) => {
           height: 100%;
         }
 
-        /* This ensures the image covers the area perfectly */
         :global(.thumbnail-img) {
           object-fit: cover;
         }
@@ -88,12 +88,12 @@ const VideoThumbnail = ({ videoUrl, imageUrl }) => {
         }
 
         .play-button:hover {
-          transform: translate(-50%, -50%) scale(1.1); /* Slight zoom effect on hover */
+          transform: translate(-50%, -50%) scale(1.1);
         }
 
         @media screen and (max-width: 767px) {
           .video-thumbnail {
-            height: 400px;
+            min-height: 220px;
           }
         }
       `}</style>

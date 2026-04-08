@@ -1,8 +1,9 @@
 import MainLayout from "../layouts/MainLayout";
 import ContactForm from "./ContactForm";
+import MapSection from "../components/MapSection"; // <-- Import your new client component
 
 // --- CONFIGURATION ---
-export const revalidate = 60; // Regenerate page every 60 seconds
+export const revalidate = 60; 
 
 // --- HELPER: Base URL Logic ---
 const getBaseUrl = () => {
@@ -23,7 +24,6 @@ async function getSeoData() {
 
     const allTags = await res.json();
 
-    // Match the specific page URL for Contact
     if (Array.isArray(allTags)) {
       return allTags.find(
         (tag) =>
@@ -98,7 +98,7 @@ export default function Contact() {
                     </a>
                   </p>
                   <p className="text-white">
-                    Customer care :{" "}
+                    Customer care :{" "}
                     <a href="tel:1800-1200-532" className="text-white">
                       1800-1200-532
                     </a>
@@ -113,67 +113,15 @@ export default function Contact() {
               </div>
               <div className="col-lg-4">
                 {/* Client Component for Form Logic */}
-                <ContactForm />
+                <ContactForm mapSrc="https://www.google.com/maps?q=H101,+LGF,+Sector-63,+Noida,+Uttar+Pradesh-+201301&output=embed" />
               </div>
             </div>
           </div>
         </section>
 
-        <section className="container my-5 map">
-          <div className="row mx-0">
-            <div className="col-lg-6">
-              <h2 className="pb-4">Explore us on Map</h2>
-              
-              <h5>Branch Office</h5>
-              <p>
-                <b>H101, LGF, Sector-63, Noida, Uttar Pradesh- 201301</b>
-              </p>
-              <p>
-                <b>H-56, 1st Floor, Sector-63, Noida, Uttar Pradesh- 201301</b>
-              </p>
-              <p>
-                <b>
-                  4th Floor, Jmd Galleria Mall, Unit Nos. 402, Sector-47 & 48,
-                  Sohna - Gurgaon Rd, Gurugram, Haryana 122001
-                </b>
-              </p>
-              <p>
-                <b>
-                  DDC Arcade, 1st Floor, Plot No 1 Main, Sector 48 Road, Badshahpur Sohna Rd, Opposite Vipul Business Park, Gurugram, Haryana 122018
-                </b>
-              </p>
-              <p>
-                <b>
-                  1st Floor, Plot No 24, near old Faridabad Metro Station,
-                  Sector 20A, Faridabad, Haryana 121002
-                </b>
-              </p>
-
-              <h5 className="pt-2">Workshop</h5>
-              <p>
-                <b>
-                  Plot No-3, Sorkha Village , Sector-115, Noida, Uttar Pradesh-
-                  201301
-                </b>
-              </p>
-            </div>
-            <div className="col-lg-6">
-              <div className="">
-                <div className="rounded map">
-                  {/* Restored the original Iframe */}
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.086690960129!2d77.3736059745727!3d28.62716378432606!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce935de2f5987%3A0x4333ffee08ad5270!2sHigh%20Creation%20Interior%20-%20Best%20Home%20And%20Office%20Interior%20Designer%20In%20Noida!5e0!3m2!1sen!2sin!4v1727021310878!5m2!1sen!2sin"
-                    width="100%"
-                    height="500"
-                    allowFullScreen=""
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  ></iframe>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Replaced static HTML with the interactive map component */}
+        <MapSection />
+        
       </main>
       <hr />
     </MainLayout>

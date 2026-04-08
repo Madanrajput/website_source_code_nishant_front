@@ -13,7 +13,16 @@ const BgImageCard = ({
   return (
     <>
    <a href={cardLinkTag}>
-   <div style={style} className={designerCardBgDiv}>
+   {/* 🌟 CMS Fix: Secured background size so it scales perfectly on mobile */}
+   <div 
+      style={{ 
+        backgroundSize: "cover", 
+        backgroundPosition: "center", 
+        backgroundRepeat: "no-repeat", 
+        ...style 
+      }} 
+      className={designerCardBgDiv}
+    >
       <div>
         <h5>{titleBgImage}</h5>
         <p className="text-white mb-0">{descriptionBg}</p>

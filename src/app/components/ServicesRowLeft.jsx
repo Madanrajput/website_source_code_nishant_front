@@ -18,8 +18,10 @@ const ServicesRowLeft = (props) => {
                 <img
                   src={props.ServicesImgUrl}
                   alt={props.servicesImgAlt || "Interior Design Project"}
-                  className={`position-relative w-100 shadow-sm object-fit-cover ${props.servicesImgClass || ''}`}
-                  style={{ height: "400px", zIndex: 1, borderRadius: "2px" }}
+                  className={`position-relative responsive-media shadow-sm object-fit-cover ${props.servicesImgClass || ''}`}
+                  style={{ aspectRatio: "5 / 4", zIndex: 1, borderRadius: "2px" }}
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
 

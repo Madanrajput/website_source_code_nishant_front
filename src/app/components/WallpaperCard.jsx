@@ -6,8 +6,10 @@ const WallpaperCard = (props) => {
         <div className="">
           <img
             src={props.imgWallpaper}
-            className={props.wallpaperImgClass}
+            className={`responsive-media ${props.wallpaperImgClass || ""}`}
             alt={props.altWallpaper}
+            loading="lazy"
+            decoding="async"
           />
         </div></a>
         <div className="card-body px-4 pt-3">

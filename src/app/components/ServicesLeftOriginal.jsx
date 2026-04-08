@@ -20,8 +20,10 @@ const ServicesLeftOriginal = (props) => {
               <div className={props.column2}>
                 <img
                   src={props.ServicesImgUrl}
-                  className={props.servicesImgClass}
+                  className={`responsive-media ${props.servicesImgClass || ""}`}
                   alt={props.servicesImgAlt}
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             </div>

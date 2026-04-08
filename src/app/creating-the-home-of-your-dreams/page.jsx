@@ -6,11 +6,14 @@ import { IoIosCall } from "react-icons/io";
 import { FaComments } from "react-icons/fa";
 import ContactUsPopUp from "../components/ContactUsPopUp";
 import { useCallback, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import VideoBox from "../components/VideoBox";
 import { toast } from "react-toastify";
 import api from "@/utils/api";
 import { image } from "@nextui-org/theme";
+import { buildLeadMetadata } from "@/utils/leadForms";
 const HCLandingPage = () => {
+  const pathname = usePathname();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -203,6 +206,12 @@ const HCLandingPage = () => {
       email: formData.email,
       place: formData.place,
       query: formData.query,
+      ...buildLeadMetadata({
+        pathname,
+        leadFormType: "inline",
+        leadFormName: "Creating The Home Of Your Dreams Lead Form",
+        ctaText: "SEND",
+      }),
     };
 
     try {
@@ -255,14 +264,14 @@ const HCLandingPage = () => {
         <header className="container-fluid px-lg-5 px-3">
           <nav className="navbar navbar-expand-lg p-0">
             <div className="container-fluid">
-              <a className="navbar-brand ms-lg-5" href="/">
+              <a className="navbar-brand ms-lg-5" href="/" aria-label="Home">
                 <img
                   src="/images/new_hc_logo.png"
                   width={90}
                   height={90}
                   alt="hc-logo"
                   className="p-2"
-                />
+                decoding="async"  loading="lazy" />
               </a>
               <button
                 className="navbar-toggler d-block d-lg-none"
@@ -314,9 +323,9 @@ const HCLandingPage = () => {
               <div className="row">
                 <div className="col-lg-7 d-flex align-items-center">
                   <div className="pe-lg-5">
-                    <h6 className="fw-lighter fs-3 pb-0 mb-0 home_subhead">
+                    <h3 className="fw-lighter fs-3 pb-0 mb-0 home_subhead">
                     {data1?.top_title}
-                    </h6>
+                    </h3>
                     <h3 className="letheading home_banner_heading">
                   
                       {data1?.mid_sub_title}
@@ -426,7 +435,7 @@ const HCLandingPage = () => {
               </div>
               <div className="mt-4    me-0">
                 <a href="https://wa.me/919560277787">
-                  <img src="/images/whatsapp.svg" width={50} alt="" />
+                  <img src="/images/whatsapp.svg" width={50} alt="" decoding="async"  loading="lazy" />
                 </a>
               </div>
             </div>
@@ -794,7 +803,7 @@ const HCLandingPage = () => {
                 <div className="row justify-content-lg-center g-4 mx-0">
                   <div className="col-lg-3 ps-lg-5 col-md-4 col-12">
                     <div>
-                      <a href="/">
+                      <a href="/" aria-label="Home">
                         {" "}
                         <img
                           src="/images/new_hc_logo.png"
@@ -802,7 +811,7 @@ const HCLandingPage = () => {
                           className=""
                           width={150}
                           height={150}
-                        />
+                        decoding="async"  loading="lazy" />
                       </a>
                     </div>
 
