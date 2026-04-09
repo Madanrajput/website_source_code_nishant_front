@@ -1,5 +1,5 @@
 import dynamic from "next/dynamic";
-import { format, isValid, parseISO } from "date-fns";
+// import { format, isValid, parseISO } from "date-fns";
 import Image from "next/image";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import React, { Fragment } from "react"; 
@@ -17,10 +17,25 @@ import RoomOfice from "../components/RoomOfice";
 import IconBox from "../components/IconBox";
 
 // --- DYNAMIC IMPORTS ---
-const SliderCard = dynamic(() => import("../components/SliderCard"));
-const VideoTestimonialSlider = dynamic(() => import("../components/VideoTestimonialSlider"));
-const CounterRow = dynamic(() => import("../components/CounterRow"));
+
 const Blogs = dynamic(() => import("../components/Blogs"));
+
+
+const SliderCard = dynamic(() => import("../components/SliderCard"), { 
+  ssr: false, 
+  loading: () => <div style={{ height: "400px", background: "#f8f9fa", width: "100%" }} /> 
+});
+
+const VideoTestimonialSlider = dynamic(() => import("../components/VideoTestimonialSlider"), { 
+  ssr: false,
+  loading: () => <div style={{ height: "400px", background: "#f8f9fa", width: "100%" }} /> 
+});
+
+const CounterRow = dynamic(() => import("../components/CounterRow"), { 
+  ssr: false,
+  loading: () => <div style={{ height: "300px", background: "#f8f9fa", width: "100%" }} /> 
+});
+
 
 // --- DATA FETCHING WITH FETCH (FIXED) ---
 async function getRemainingData() {
@@ -62,8 +77,15 @@ async function getRemainingData() {
 }
 
 const formatDate = (dateString) => {
-  const date = dateString ? parseISO(dateString) : null;
-  return date && isValid(date) ? format(date, "dd-MM-yyyy") : "Invalid Date";
+  if (!dateString) return "Date not available";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "Invalid Date";
+
+  // 🌟 PERF FIX: Native JS formatting (0 bytes of extra JS)
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
 };
 
 export default async function HomeContent() {
@@ -120,6 +142,7 @@ export default async function HomeContent() {
           textAboutBtn="Read More About Us"
           btnLink="/about-us"
           textAboutBtnCLass="read_morebtn"
+          priority={true}
         />
       </section>
 

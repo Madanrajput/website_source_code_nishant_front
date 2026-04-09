@@ -22,7 +22,7 @@ const Card = ({
                 <a href={cardLinkName || "#"} style={{ display: 'block' }} aria-label="Work">
                     {/* 🌟 CMS Fix: Added style tag for strict aspect-ratio lock and cover fit */}
                     <Image 
-                        src={imgSrc || "/placeholder-image.jpg"} 
+                        src={imgSrc || "/images/about/About-banner.jpg"} 
                         className={imgClass} 
                         alt={imgAlt || "Website Image"} 
                         width={400} 

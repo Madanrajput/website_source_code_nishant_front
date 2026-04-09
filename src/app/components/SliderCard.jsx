@@ -95,7 +95,7 @@ useEffect(() => {
                 cardLinkName={`/ready-togo-design/gallery?id=${slider?.id}`}
                 cardoffer="card"
                 // 🌟 CMS Fix: Added fallback string to prevent broken image icons
-                imgSrc={slider?.child_content?.image || "/placeholder-image.jpg"}
+                imgSrc={slider?.child_content?.image || "/images/about/About-banner.jpg"}
                 imgAlt={slider.child_content?.title ?? defaultAltText}
                 imgClass={"fastrack_img"}
                 titleCard={slider.child_content?.title}

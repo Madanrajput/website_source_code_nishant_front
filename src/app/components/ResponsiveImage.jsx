@@ -12,7 +12,7 @@ const ResponsiveImage = ({
     const [isLoading, setIsLoading] = useState(true);
 
     // Provide a safe fallback if no image is provided
-    const imageSrc = src || '/placeholder-image.jpg'; // Ensure you have a placeholder image in your public folder
+    const imageSrc = src || '/images/about/About-banner.jpg'; // Ensure you have a placeholder image in your public folder
 
     return (
         <div className={`aspect-ratio-${aspectRatio} bg-light overflow-hidden rounded ${className}`}>
