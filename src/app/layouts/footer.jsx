@@ -140,7 +140,7 @@ const Footer = () => {
                   <div>
                     <a href="/" aria-label="Home">
                       <Image
-                        src="/images/new_hc_logo.png"
+                        src="/images/new_hc_logo.avif"
                         alt="High Creation Interior Logo"
                         width={150}
                         height={150}

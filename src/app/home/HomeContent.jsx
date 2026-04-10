@@ -241,7 +241,7 @@ export default async function HomeContent() {
       </LazySection>
 
       {/* Ready To Go */}
-      <LazySection placeholderHeight="400px">
+      {/* <LazySection placeholderHeight="400px">
         <section className="my-5">
           <div className="container">
             <div className="mx-0 row position-relative">
@@ -251,8 +251,32 @@ export default async function HomeContent() {
             <SliderCard />
           </div>
         </section>
+      </LazySection> */}
+{/* Ready To Go */}
+<LazySection placeholderHeight="400px">
+        <section className="my-5">
+          <div className="container">
+            {/* 🌟 UI FIX: Removed the absolute positioning classes and used Flexbox to stack them cleanly */}
+            <div className="mx-0 mb-4 row justify-content-center text-center">
+              <div className="col-12 d-flex flex-column align-items-center">
+                <span 
+                  className="font_stylish" 
+                  style={{ marginBottom: "-15px", zIndex: 1 }}
+                >
+                  Ready To Go Designs
+                </span>
+                <h2 
+                  className="h3 font_about position-relative" 
+                  style={{ zIndex: 2 }}
+                >
+                  with Our Exclusive Design Choices
+                </h2>
+              </div>
+            </div>
+            <SliderCard />
+          </div>
+        </section>
       </LazySection>
-
       {/* Designer Choice */}
       <LazySection placeholderHeight="800px">
         <div className="my-5 bgsectionroom">

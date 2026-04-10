@@ -8,6 +8,7 @@ export default function HeroCarousel({ bannerData }) {
   
   const [showRest, setShowRest] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [prevIndex, setPrevIndex] = useState(0); // 🌟 FLASH FIX: Keeps track of the previous slide
 
   useEffect(() => {
     if (window.innerWidth >= 768) {
@@ -21,14 +22,28 @@ export default function HeroCarousel({ bannerData }) {
   useEffect(() => {
     if (activeBanners.length > 1) {
       const interval = setInterval(() => {
-        setActiveIndex((prevIndex) => (prevIndex + 1) % activeBanners.length);
+        setActiveIndex((currentActive) => {
+          setPrevIndex(currentActive);
+          return (currentActive + 1) % activeBanners.length;
+        });
       }, 5000); 
       return () => clearInterval(interval);
     }
   }, [activeBanners.length]);
 
-  const nextSlide = () => setActiveIndex((prev) => (prev + 1) % activeBanners.length);
-  const prevSlide = () => setActiveIndex((prev) => (prev - 1 + activeBanners.length) % activeBanners.length);
+  const nextSlide = () => {
+    setActiveIndex((currentActive) => {
+      setPrevIndex(currentActive);
+      return (currentActive + 1) % activeBanners.length;
+    });
+  };
+
+  const prevSlide = () => {
+    setActiveIndex((currentActive) => {
+      setPrevIndex(currentActive);
+      return (currentActive - 1 + activeBanners.length) % activeBanners.length;
+    });
+  };
 
   if (!firstBanner) return null;
 
@@ -36,7 +51,6 @@ export default function HeroCarousel({ bannerData }) {
     <section className="position-relative">
       <div id="carouselExampleAutoplaying" className="carousel slide">
         
-        {/* 🌟 FIX 1: The container controls the height, ensuring zero layout shifts or flashing */}
         <div 
           className="carousel-inner" 
           style={{ position: "relative", width: "100%", aspectRatio: "192/85", overflow: "hidden", backgroundColor: "#f0f0f0" }}
@@ -46,29 +60,29 @@ export default function HeroCarousel({ bannerData }) {
             const isVideo = banner?.banner_image?.endsWith(".mp4");
             const isFirstSlide = index === 0;
             const isActive = index === activeIndex;
+            const isPrev = index === prevIndex;
 
             return (
               <div 
-                className={`carousel-item ${isActive ? "active" : ""}`} 
+                className="carousel-item" 
                 key={index}
                 style={{
-                  // 🌟 FIX 2: Smooth opacity transition with pointer-events instead of visibility
-                  opacity: isActive ? 1 : 0,
-                  transition: "opacity 0.8s ease-in-out",
+                  // 🌟 FLASH FIX: The new slide fades in over the old slide. No background bleeding!
+                  opacity: isActive ? 1 : (isPrev ? 1 : 0),
+                  transition: isActive ? "opacity 0.8s ease-in-out" : "none",
                   position: "absolute",
                   top: 0,
                   left: 0,
                   width: "100%",
                   height: "100%",
                   display: "block", 
-                  zIndex: isActive ? 2 : 1,
+                  zIndex: isActive ? 2 : (isPrev ? 1 : 0),
                   pointerEvents: isActive ? "auto" : "none"
                 }}
               >                
                 <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                   
                   {isVideo ? (
-                    /* 🌟 FIX 3: Static autoPlay ensures the browser knows to play the video the moment it buffers */
                     <video 
                       className="object-fit-cover home_video_banner" 
                       autoPlay
@@ -116,11 +130,12 @@ export default function HeroCarousel({ bannerData }) {
         
         {activeBanners.length > 1 && (
           <>
+            {/* 🌟 CLICK FIX: Z-index pushed to 20 to pierce through the Enquire Now tab overlay! */}
             <button 
               className="carousel-control-prev" 
               type="button" 
-              onClick={prevSlide}
-              style={{ zIndex: 3 }} 
+              onClick={(e) => { e.preventDefault(); prevSlide(); }}
+              style={{ zIndex: 20, pointerEvents: 'auto', cursor: 'pointer' }} 
               aria-label="Previous slide"
             >
               <span className="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -128,8 +143,8 @@ export default function HeroCarousel({ bannerData }) {
             <button 
               className="carousel-control-next" 
               type="button" 
-              onClick={nextSlide}
-              style={{ zIndex: 3 }} 
+              onClick={(e) => { e.preventDefault(); nextSlide(); }}
+              style={{ zIndex: 20, pointerEvents: 'auto', cursor: 'pointer' }} 
               aria-label="Next slide"
             >
               <span className="carousel-control-next-icon" aria-hidden="true"></span>

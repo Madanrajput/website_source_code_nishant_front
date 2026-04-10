@@ -88,7 +88,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body suppressHydrationWarning={false} className={`${greatVibes.variable} ${poppins.variable} ${outfit.variable}`}>
-        {/* <AddBootstrap /> */}
+        <AddBootstrap />
         <ClientProvider>{children}</ClientProvider>
         <LazyToast />
       </body>
