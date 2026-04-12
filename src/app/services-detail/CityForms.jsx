@@ -61,7 +61,7 @@ export function SidebarForm({ city }) {
 
   return (
     <div className="sidebar-widget mb-4 bg-white p-4 rounded-4 shadow-sm border">
-      <h4 className="fw-bold font-outfit mb-4 text-center">Quick Quote</h4>
+      <h4 className="fw-bold font-outfit mb-4 text-center">Get Free Consultation</h4>
       <form onSubmit={handleSubmit}>
         {status.error && <div className="alert alert-danger small py-2">{status.error}</div>}
         <div className="mb-3 position-relative">
@@ -73,7 +73,7 @@ export function SidebarForm({ city }) {
           <input type="tel" className="form-control border-0 bg-light p-3 ps-5 rounded-3" name="contactNo" value={formData.contactNo} onChange={handleInputChange} placeholder="Phone Number" required />
         </div>
         <button type="submit" className="btn btn-warning w-100 fw-bold text-white py-3 rounded-3 shadow-sm" style={{ background: 'linear-gradient(to right, #ff914d, #ff5722)' }}>
-          Get Free Estimate
+        Submit
         </button>
       </form>
     </div>

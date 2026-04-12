@@ -94,8 +94,15 @@ export default function RootLayout({ children }) {
       </body>
       
       {/* 🌟 PERF FIX: These components automatically defer tracking until the page is fully interactive */}
+      {/* <GoogleTagManager gtmId="GTM-PRVJK9N" />
+      <GoogleAnalytics gaId="G-MJZK1MXG9E" /> */}
       <GoogleTagManager gtmId="GTM-PRVJK9N" />
-      <GoogleAnalytics gaId="G-MJZK1MXG9E" />
+        
+        {/* 2. Google Analytics (GA4) */}
+        <GoogleAnalytics gaId="G-MJZK1MXG9E" />
+
+        {/* 3. Google Ads Tag (This fixes the error in your screenshot) */}
+        <GoogleAnalytics gaId="AW-11474758205" />
     </html>
   );
 }
