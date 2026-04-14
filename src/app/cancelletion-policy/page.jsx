@@ -1,163 +1,3 @@
-// import BackgroundImageWithHeading from "../components/BackgroundImageWithHeading";
-// import MainLayout from "../layouts/MainLayout";
-
-// // --- CONFIGURATION ---
-// export const revalidate = 60; // Regenerate page every 60 seconds
-
-// // --- HELPER: Base URL Logic ---
-// const getBaseUrl = () => {
-//   return process.env.NODE_ENV === "development"
-//     ? process.env.NEXT_PUBLIC_API_DEV_URL
-//     : process.env.NEXT_PUBLIC_API_BASE_URL;
-// };
-
-// // --- HELPER: Fetch Cancellation Policy Content ---
-// async function getCancellationPolicyContent() {
-//   try {
-//     const baseURL = getBaseUrl();
-    
-//     // Fetching the array of policy data
-//     const res = await fetch(`${baseURL}/cms-content/cancellation_policy`, {
-//       next: { revalidate: 60 }
-//     });
-
-//     if (!res.ok) {
-//       console.error(`Failed to fetch cancellation policy: ${res.status}`);
-//       return [];
-//     }
-
-//     const data = await res.json();
-    
-//     // Ensure we are returning an array
-//     if (Array.isArray(data)) {
-//       // Sort by ID ascending so that "Project Booking" (id 18) appears before "Phase 4" (id 21)
-//       return data;
-//     }
-    
-//     return [];
-//   } catch (err) {
-//     console.error("Cancellation Policy Content Fetch Error:", err);
-//     return [];
-//   }
-// }
-
-// // --- HELPER: Fetch SEO Data ---
-// async function getSeoData() {
-//   try {
-//     const baseURL = getBaseUrl();
-//     const res = await fetch(`${baseURL}/seo-tag`, {
-//       next: { revalidate: 60 },
-//     });
-
-//     if (!res.ok) return null;
-
-//     const allTags = await res.json();
-
-//     if (Array.isArray(allTags)) {
-//       return allTags.find(
-//         (tag) =>
-//           tag.page_name === "https://hcinterior.in/cancelletion-policy" ||
-//           tag.page_name === "https://hcinterior.in/cancellation-policy" ||
-//           tag.page_name?.endsWith("/cancelletion-policy") ||
-//           tag.page_name?.endsWith("/cancellation-policy")
-//       );
-//     }
-//     return null;
-//   } catch (err) {
-//     console.error("SEO Fetch Error:", err);
-//     return null;
-//   }
-// }
-
-// // --- DYNAMIC METADATA GENERATION ---
-// export async function generateMetadata() {
-//   const seoData = await getSeoData();
-
-//   const defaultTitle = "Cancellation Policy - High Creation Interior";
-//   const defaultDesc =
-//     "Understand the terms and conditions for canceling design projects, including timelines, fees, and other important information.";
-//   const defaultCanonical = "https://hcinterior.in/cancelletion-policy";
-
-//   return {
-//     title: seoData?.title || defaultTitle,
-//     description: seoData?.meta_description || defaultDesc,
-//     alternates: {
-//       canonical: seoData?.page_name || defaultCanonical,
-//     },
-//     openGraph: {
-//       title: seoData?.title || defaultTitle,
-//       description: seoData?.meta_description || defaultDesc,
-//       url: seoData?.page_name || defaultCanonical,
-//       type: "website",
-//     },
-//   };
-// }
-
-// // --- MAIN SERVER COMPONENT ---
-// export default async function CancelletionPolicy() {
-//   const policyData = await getCancellationPolicyContent();
-
-//   return (
-//     <MainLayout>
-//       <BackgroundImageWithHeading
-//         sectionBgImages={"contact_wrapper cancelation_policy_banner"}
-//         sectionBgHeading="Cancellation Policy"
-//         secBgHeadingClass="sec_bgheading_lass"
-//         sectionBgDescription="Get all the information you need"
-//         secBgDesClass={"text-center text-white"}
-//       />
-//       <section className="privacy my-5">
-//         <div className="container">
-//           <div className="text-center row mx-0">
-//             <h2>High Creation Interior</h2>
-//             <h3>
-//               <span className="font_stylish" style={{ color: "#ff914d" }}>
-//                 Cancellation Policy
-//               </span>
-//             </h3>
-            
-//             <div className="col-12 mt-4 text-start">
-//               {policyData.length > 0 ? (
-//                 <div className="table-responsive shadow-sm rounded">
-//                   <table className="table table-bordered table-striped table-hover align-middle mb-0">
-//                     <thead className="table-light">
-//                       <tr>
-//                         <th scope="col" className="py-3 px-4">Phase</th>
-//                         <th scope="col" className="py-3 px-4">Time Period</th>
-//                         <th scope="col" className="py-3 px-4">Eligibility / Details</th>
-//                       </tr>
-//                     </thead>
-//                     <tbody>
-//                       {policyData.map((item) => (
-//                         <tr key={item.id}>
-//                           <td className="py-3 px-4 fw-bold text-secondary">
-//                             {item.json_content?.phase || "N/A"}
-//                           </td>
-//                           <td className="py-3 px-4">
-//                             {item.json_content?.time_period || "N/A"}
-//                           </td>
-//                           <td className="py-3 px-4">
-//                             {item.json_content?.eligibility || "N/A"}
-//                           </td>
-//                         </tr>
-//                       ))}
-//                     </tbody>
-//                   </table>
-//                 </div>
-//               ) : (
-//                 <div className="alert alert-info text-center" role="alert">
-//                   No cancellation policy details are currently available. Please check back later.
-//                 </div>
-//               )}
-//             </div>
-            
-//           </div>
-//         </div>
-//       </section>
-//       <hr />
-//     </MainLayout>
-//   );
-// }
 import BackgroundImageWithHeading from "../components/BackgroundImageWithHeading";
 import MainLayout from "../layouts/MainLayout";
 
@@ -263,7 +103,7 @@ export default async function CancelletionPolicy() {
                 </div>
                 <h5 className="fw-bold">Early Request</h5>
                 <p className="small text-secondary">
-                  Within 7 days of booking (Before Designer alignment)
+                  Within 7 days of booking (Before Designer/Ops alignment)
                 </p>
                 <div className="mt-auto">
                   <span className="h4 fw-bold text-success">100% Refund</span>
@@ -382,7 +222,7 @@ export default async function CancelletionPolicy() {
                   <tr>
                     <td className="fw-bold">Case 1: Cancellation requested within seven (7) days of booking amount receipt.</td>
                     <td>Cancellation request is received within 7 days of booking (Only Applicable if designer and operation team does not aligned for Project)</td>
-                    <td>A full (100%) refund of the amount paid will be refund</td>
+                    <td>A full (100%) refund of the amount paid will be refund.</td>
                   </tr>
                   <tr>
                     <td className="fw-bold">Case 2: Cancellation Requested after 7 Days or Site Handover (whichever is earlier)</td>
@@ -416,9 +256,9 @@ export default async function CancelletionPolicy() {
                     <td>A service charge of twenty percent (20%) of the value of the removed line items shall be applicable</td>
                   </tr>
                   <tr>
-                    <td className="fw-bold">Case 3: removal of existing or any additional items from the BOQ during discussion of design phase</td>
-                    <td>Applicable only (3d design or 2D drawings any one of them should be done)</td>
-                    <td>A design consultancy of 20% on the value of the removed items shall be applicable</td>
+                    <td className="fw-bold">Removal of existing or additional items from the BOQ during the design discussion phase</td>
+                    <td>Applicable only upon commencement of either 2D drawings or 3D design work.</td>
+                    <td>A design consultancy fee of twenty percent (20%) on the value of removed items shall apply</td>
                   </tr>
                 </tbody>
               </table>
@@ -430,31 +270,31 @@ export default async function CancelletionPolicy() {
               <div className="col-md-4">
                 <div className="p-3 border rounded bg-light h-100">
                   <h6 className="fw-bold text-primary">Ex case 1:-</h6>
-                  <p className="mb-2">Client books an order worth ₹15 lakh. Before design work (2D/3D) starts, the client:</p>
+                  <p className="mb-2">The Client books an order worth ₹15 lakh. Prior to commencement of any 2D/3D design work, the Client:</p>
                   <ul className="mb-2">
-                    <li>Removes work worth 5 lakh, and</li>
-                    <li>Adds new work of ₹5 lakh or more.</li>
+                    <li>Removes work or line items worth ₹5 lakh, and</li>
+                    <li>Adds new work of ₹25 lakh or more.</li>
                   </ul>
-                  <p className="fw-bold mb-1">Result: No service charge will be applied.</p>
-                  <p className="text-muted small mb-0">Note: This applies only if 2D drawings or 3D designs have not been started yet.</p>
+                  <p className="fw-bold mb-1">Result: No service charge shall be applicable.</p>
+                  <p className="text-muted small mb-0">Note: This shall apply only if 2D drawings or 3D designs have not been initiated.</p>
                 </div>
               </div>
               
               <div className="col-md-4">
                 <div className="p-3 border rounded bg-light h-100">
-                  <h6 className="fw-bold text-primary">Ex case 2: Order value: ₹15 lakh</h6>
-                  <p className="mb-2">Design phase has already started design work (2D/3D) starts,</p>
-                  <p className="mb-2">Client removes work worth ₹5 lakh</p>
-                  <p className="fw-bold text-danger mb-0">Service Charge: 1 lakh (20% of ₹5 lakh) will be charged separately.</p>
+                  <h6 className="fw-bold text-primary">Ex case 2:</h6>
+                  <p className="mb-2">The Client books an order worth ₹15 lakh. Upon commencement of the design phase (2D/3D), the Client:</p>
+                  <p className="mb-2">Removes work worth ₹5 lakh.</p>
+                  <p className="fw-bold text-danger mb-0">Result: A service charge of ₹1 lakh (20% of ₹5 lakh) shall be charged separately.</p>
                 </div>
               </div>
               
               <div className="col-md-4">
                 <div className="p-3 border rounded bg-light h-100">
-                  <h6 className="fw-bold text-primary">Ex Case 3: Initial order value: ₹15 lakh</h6>
-                  <p className="mb-2">During design phase (2D/3D completed), BOQ increases to ₹20 lakh. If the client removes any item after this</p>
-                  <p className="fw-bold text-danger mb-2">Service Charge: 20% of the removed item value will be charged separately.</p>
-                  <p className="text-muted small mb-0">Note: In this case, Example 1 and Example 2 will not apply.</p>
+                  <h6 className="fw-bold text-primary">Ex Case 3:-</h6>
+                  <p className="mb-2">The initial order value is ₹15 lakh. During the design phase (upon completion of 2D/3D), the BOQ increases to ₹20 lakh. If the Client removes any item thereafter:</p>
+                  <p className="fw-bold text-danger mb-2">Service Charge: A service charge of twenty percent (20%) of the value of the removed items shall be charged separately.</p>
+                  <p className="text-muted small mb-0">Note: In such cases, Example 1 and Example 2 shall not apply.</p>
                 </div>
               </div>
             </div>
@@ -462,11 +302,11 @@ export default async function CancelletionPolicy() {
             {/* Final PDF Notes */}
             <div className="alert alert-warning border-warning" role="alert">
               <p className="mb-1">
-               { "All charges are applicable due to resource allocation, design efforts, and operational planning already undertaken by the company."
+                {"All charges are applicable due to resource allocation, design efforts, and operational planning already undertaken by the company."
 }</p>
               <p className="mb-0 fw-bold">
  {               "Discount is not applicable in any type of either partial or full cancellation"
-    }    </p>
+            }            </p>
             </div>
           </div>
         </div>
