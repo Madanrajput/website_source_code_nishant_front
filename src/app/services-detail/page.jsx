@@ -234,9 +234,9 @@ const ServicesDetailPage = async ({ searchParams }) => {
         .related-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
       `}} />
 
-      <div className="floating-contact-widget d-none d-md-flex">
+      {/* <div className="floating-contact-widget d-none d-md-flex">
         <a href="tel:+91 707070 1373" className="widget-btn call"><FaPhoneAlt size={20}/></a>
-      </div>
+      </div> */}
 
       <main className="bg-light pb-5">
         

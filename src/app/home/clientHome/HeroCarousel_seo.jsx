@@ -41,7 +41,7 @@ export default function HeroCarousel({ bannerData }) {
                       <Image
                         src={banner?.banner_image ?? "/images/home-banner-1.png"}
                         className="d-block carousel_img"
-                        alt={banner?.title || "High Creation Interior Design in Delhi NCR"} // 🌟 SEO FIX
+                        alt={banner?.title.trim() || "High Creation Interior Design in Delhi NCR"} // 🌟 SEO FIX
                         fill
                         priority={isFirstSlide} 
                         sizes="100vw"
@@ -79,12 +79,7 @@ export default function HeroCarousel({ bannerData }) {
         </button>
       </div>
       
-      <div className="rotate_div container-fluid" style={{ zIndex: 4 }}>
-        <div className="sssss ms-auto me-0">
-          {/* 🌟 SEO FIX: Added aria-label for screen readers and bots */}
-          <a href="/contact" className="know_moress" aria-label="Enquire Now for Interior Design Services">Enquiry Now</a>
-        </div>
-      </div>
+      
     </section>
   );
 }

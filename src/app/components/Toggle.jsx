@@ -2,33 +2,23 @@
 import { useEffect, useState } from "react";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import { FaBars } from "react-icons/fa";
-import axios from "axios"; // Import axios for API calls
 import api from "@/utils/api";
+
 const Toggle = () => {
   const [lookMenu, setLookMenu] = useState([]);
   const [error, setError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false); // Added setLoading state
+  const [loading, setLoading] = useState(false);
 
-  // Function to open the sidebar
-  const openSidebar = () => {
-    setIsOpen(true);
-  };
-
-  // Function to close the sidebar
-  const closeSidebar = () => {
-    setIsOpen(false);
-  };
+  const openSidebar = () => setIsOpen(true);
+  const closeSidebar = () => setIsOpen(false);
 
   useEffect(() => {
     setLoading(true);
-
-    // ✅ Correct function name
     const fetchLookMenu = async () => {
       try {
-        const response =  await api.get("/look-menu");
-        setLookMenu(response.data); // ✅ Set data properly
-        console.log("Error fetching design idea:", setLookMenu(response.data));
+        const response = await api.get("/look-menu");
+        setLookMenu(response.data); 
       } catch (err) {
         console.error("Error fetching design idea:", err);
         setError("Failed to load design ideas. Please try again.");
@@ -37,331 +27,178 @@ const Toggle = () => {
       }
     };
 
-    fetchLookMenu(); // ✅ Call function properly
+    fetchLookMenu();
   }, []);
+
   return (
     <div>
+      {/* 🌟 STYLING: Injected Custom CSS for premium hover effects */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .menu-toggle-btn {
+          transition: all 0.3s ease;
+          color: #333;
+        }
+        .menu-toggle-btn:hover {
+          transform: scale(1.15);
+          color: #ff914d; /* Brand Orange */
+        }
+        .sidebar-close-btn {
+          transition: transform 0.4s ease, color 0.3s ease;
+          color: #ffffff;
+        }
+        .sidebar-close-btn:hover {
+          transform: rotate(90deg) scale(1.2);
+          color: #ff914d;
+        }
+        .offcanvas_heading {
+          background: -webkit-linear-gradient(45deg, #fff, #ff914d);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        .stylish-section-title {
+          color: #ff914d;
+          font-weight: 600;
+          border-bottom: 1px solid rgba(255, 145, 77, 0.3);
+          display: inline-block;
+        }
+        .offcanvas_anchor {
+          transition: color 0.3s ease, transform 0.3s ease;
+          color: #d1d1d1;
+          text-decoration: none;
+          display: inline-block;
+        }
+        .offcanvas_anchor:hover {
+          color: #ff914d;
+          transform: translateX(8px); /* Adjusted hover for centered text */
+        }
+      `}} />
+
       {/* Button to open sidebar */}
-      <button className="btn border-none d-block" onClick={openSidebar} aria-label="Open sidebar menu">
-        <FaBars className="fs-3 mt-1" />
+      <button 
+        className="btn border-0 d-block p-0 ms-3" 
+        onClick={openSidebar} 
+        aria-label="Open sidebar menu"
+      >
+        <FaBars className="fs-2 mt-1 menu-toggle-btn" />
       </button>
 
       {/* Sidebar */}
       <div
         id="mySidebar"
         style={{
-          width: isOpen ? "100%" : "0", // Control width based on state
-          display: isOpen ? "block" : "none", // Control display based on state
+          width: isOpen ? "100%" : "0", 
+          opacity: isOpen ? 1 : 0,
+          visibility: isOpen ? "visible" : "hidden",
           position: "fixed",
           top: 0,
           left: 0,
-          // backgroundColor: "#171717;",
+          backgroundColor: "rgba(15, 15, 15, 0.98)", 
+          backdropFilter: "blur(12px)", 
           overflowX: "hidden",
+          overflowY: "auto", 
           height: "100%",
-          transition: "0.5s",
-          zIndex: 1000,
+          transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)", 
+          zIndex: 1055, 
         }}
       >
-        <div className="d-flex justify-content-between container-fluid px-lg-5">
-          <div className="logo ">
+        <div className="d-flex justify-content-between align-items-center container-fluid px-4 px-lg-5 pt-3">
+          {/* <div className="logo">
             <a href="/" className="d-block d-lg-none" aria-label="Home">
               <img
-                src="/images/iconsHC.png"
-                className="bg-white mt-3"
-                width={90}
-                height={90}
+                src="/images/new_hc_logo.png" 
+                className="mt-2"
+                width={70}
+                height={70}
                 alt="hc-logo"
-              decoding="async"  loading="lazy" />
+                style={{ objectFit: 'contain' }}
+                decoding="async"  
+                loading="lazy" 
+              />
             </a>
-          </div>
+          </div> */}
           <div className="close">
-            {/* <a
-              href="javascript:void(0)"
-              className="closebtn"
-              onClick={closeSidebar}
-            >
-              <IoCloseCircleOutline className="" />
-            </a> */}
             <button
               type="button"
-              className="closebtn"
               onClick={closeSidebar}
-              style={{
-                background: "none",
-                border: "none",
-                padding: 0,
-                margin: 0,
-                cursor: "pointer",
-              }}
+              style={{ background: "none", border: "none", cursor: "pointer" }}
               aria-label="Close sidebar"
             >
-              <IoCloseCircleOutline className="" />
+              <IoCloseCircleOutline className="fs-1 sidebar-close-btn" />
             </button>
           </div>
         </div>
-        <div style={{ padding: "10px", color: "white" }}>
+
+        <div style={{ padding: "20px 10px", color: "white" }}>
           <div className="container">
-            <div className="row">
-              <div className="col-lg-6">
-                <h2 className="offcanvas_heading text-white">
+            <div className="row mt-3">
+              {/* Left Column Intro (Desktop only) */}
+              <div className="col-lg-5 mb-5 mb-lg-0 pe-lg-5 d-none d-lg-block">
+                <h2 className="offcanvas_heading fw-bold mb-3">
                   High Creation Interior
                 </h2>
-                <p className="offcanvas_description">
+                <p className="offcanvas_description" style={{ color: '#a3a3a3', lineHeight: '1.8' }}>
                   If you are looking out for a beautiful home that fits in your
                   budget, Yes! You are at the right place, we will make your
-                  dream home come true!!
+                  dream home come true.
                 </p>
               </div>
-              <div className="col-lg-6 ">
-                <div className="row g-5">
-                  <div className="col-6 col-lg-6 col-md-6 d-block d-lg-none">
-                    <h3 className="my-2 pb-2">Design Ideas</h3>
-                    <ul className="list-unstyled mb-0">
-                      <li className="footer_li">
-                        <a href="/design-idea/" className="offcanvas_anchor">
-                          Design Gallery
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a href="/product/" className="offcanvas_anchor">
-                          Products
-                        </a>
-                      </li>
+
+              {/* Right Column Links */}
+              <div className="col-lg-7">
+                <div className="row g-4 g-lg-5">
+                  
+                  {/* Exclusive Design & Centers - Side by Side on Mobile */}
+                  <div className="col-6 col-md-4 text-center text-lg-start">
+                  <h5 className="mb-4 pb-1 stylish-section-title fs-4">Design Ideas</h5>
+                    {/* Headers hidden or omitted in your screenshot design, adjusting list directly */}
+                    <ul className="list-unstyled mb-0 gap-3 d-flex flex-column mt-2">
+                      <li><a href="/furniture/" className="offcanvas_anchor">Furniture</a></li>
+                      <li><a href="/ready-togo-design/" className="offcanvas_anchor">Ready To Go</a></li>
+                      <li><a href="/sustainable-furniture/" className="offcanvas_anchor">Sustainable</a></li>
+                      <li><a href="/spacesaving-furniture/" className="offcanvas_anchor">Space-Saving</a></li>
+                      <li><a href="/wallpaper/" className="offcanvas_anchor">Wallpapers</a></li>
                     </ul>
                   </div>
 
-                  <div className="col-6 col-lg-6 col-md-6 d-block d-lg-none">
-                    <h3 className="my-2 pb-2">Portfolio</h3>
-                    <ul className="list-unstyled mb-0">
-                      <li className="footer_li">
-                        <a
-                          href="/residential-projects/"
-                          className="offcanvas_anchor"
-                        >
-                          Residential Projects
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a
-                          href="/luxury-projects/"
-                          className="offcanvas_anchor"
-                        >
-                          luxury Projects
-                        </a>
-                      </li>
+                  <div className="col-6 col-md-4 text-center text-lg-start">
+                  <h5 className="mb-4 pb-1 stylish-section-title fs-4">Experience Center</h5>
+                    <ul className="list-unstyled mb-0 gap-3 d-flex flex-column mt-2">
+                      <li><a href="/experience-center/" className="offcanvas_anchor">Noida Center</a></li>
+                      <li><a href="/experience-center-gurugram/" className="offcanvas_anchor">Gurugram Center</a></li>
+                      <li><a href="/experience-center-faridabad/" className="offcanvas_anchor">Faridabad Center</a></li>
                     </ul>
                   </div>
 
-                  <div className="col-6 col-lg-6 col-md-6 d-block d-lg-none">
-                    <h3 className="my-2 pb-2">Exclusive Design</h3>
-                    <ul className="list-unstyled mb-0">
-                      <li className="footer_li">
-                        <a href="/furniture/" className="offcanvas_anchor">
-                          Furniture
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a
-                          href="/ready-togo-design/"
-                          className="offcanvas_anchor"
-                        >
-                          Ready To Go Design
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a
-                          href="/sustainable-furniture/"
-                          className="offcanvas_anchor"
-                        >
-                          Sustainable Furniture
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a
-                          href="/spacesaving-furniture/"
-                          className="offcanvas_anchor"
-                        >
-                          Space-Saving Furniture
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a href="/wallpaper/" className="offcanvas_anchor">
-                          Wallpapers
-                        </a>
-                      </li>
+                  {/* Looks - Centered Full Width on Mobile */}
+                  <div className="col-12 col-md-4 text-center text-lg-start mt-5 mt-md-0">
+                    <h5 className="mb-4 pb-1 stylish-section-title fs-4">Looks</h5>
+                    <ul className="list-unstyled mb-0 gap-3 d-flex flex-column align-items-center align-items-lg-start">
+                      {loading ? (
+                        <li className="text-muted small">Loading...</li>
+                      ) : lookMenu.map((item) => (
+                        <li key={item.id}>
+                          <a href={item.web_url} className="offcanvas_anchor">{item.title}</a>
+                        </li>
+                      ))}
                     </ul>
                   </div>
 
-                  <div className="col-6 col-lg-6 col-md-6">
-                    <h3 className="my-2 pb-2">High Creation</h3>
-                    <ul className="list-unstyled mb-0">
-                      <li className="footer_li d-block d-lg-none">
-                        <a
-                          href="/experience-center/"
-                          className="offcanvas_anchor"
-                        >
-                          Experience Center
-                        </a>
-                      </li>
-                      <li className="footer_li d-block d-lg-none">
-                        <a
-                          href="/reallife-portfolio/"
-                          className="offcanvas_anchor"
-                        >
-                          Real Time 3D
-                        </a>
-                      </li>
-
-                      <li className="footer_li">
-                        <a href="/about-us/" className="offcanvas_anchor">
-                          About Us
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a href="/how-its-works/" className="offcanvas_anchor">
-                          How It Works
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a href="/services/" className="offcanvas_anchor">
-                          Services
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a href="/team/" className="offcanvas_anchor">
-                          Team
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a href="/contact/" className="offcanvas_anchor">
-                          Contact Us
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a href="/blog/" className="offcanvas_anchor">
-                          Blogs
-                        </a>
-                      </li>
-
-                      <li className="footer_li">
-                        <a href="/awards/" className="offcanvas_anchor">
-                          Awards Gallery
-                        </a>
-                      </li>
+                  {/* Cities - Centered Full Width on Mobile */}
+                  <div className="col-12 col-md-4 text-center text-lg-start mt-5 mt-md-0">
+                    <h5 className="mb-4 pb-1 stylish-section-title fs-4">Cities</h5>
+                    <ul className="list-unstyled mb-0 gap-3 d-flex flex-column align-items-center align-items-lg-start">
+                      <li><a href="/interior-designers-in-noida" className="offcanvas_anchor">Designers In Noida</a></li>
+                      <li><a href="/interior-designers-in-ghaziabad" className="offcanvas_anchor">Designers in Ghaziabad</a></li>
+                      <li><a href="/interior-designers-in-greater-noida" className="offcanvas_anchor">Designers in Greater Noida</a></li>
+                      <li><a href="/interior-designers-in-delhi" className="offcanvas_anchor">Designers in Delhi</a></li>
+                      <li><a href="/interior-designers-in-dwarka" className="offcanvas_anchor">Designers in Dwarka</a></li>
+                      <li><a href="/best-interior-designers-in-faridabad" className="offcanvas_anchor">Designers in Faridabad</a></li>
+                      <li><a href="/interior-designers-in-gurgaon" className="offcanvas_anchor">Designers in Gurugram</a></li>
+                      <li><a href="/interior-designers-in-manesar" className="offcanvas_anchor">Designers In Manesar</a></li>
+                      <li><a href="/interior-designer-in-sohna-gurgaon" className="offcanvas_anchor">Designers In Sohna</a></li>
                     </ul>
                   </div>
-                  <div className="col-6 col-lg-6 col-md-6">
-                    <h3 className="my-2 pb-2">Looks</h3>
-                    <ul className="list-unstyled mb-0">
 
-                    {lookMenu.map((item) => (
-                  <li key={item.id} className="footer_li">
-                    <a
-                      href={item.web_url}
-                      className="offcanvas_anchor"
-                    >
-                      {item.title}
-                    </a>
-                  </li>
-                ))}
-                     
-
-                      
-                    </ul>
-                  </div>
-                  {/* <div className="col-6 col-lg-6 col-md-6">
-                    <h3 className="my-2 pb-2">Gallery</h3>
-                    <ul className="list-unstyled mb-0">
-                      <li className="footer_li">
-                        <a href="/gallery/" className="offcanvas_anchor">
-                          Home Interior Gallery
-                        </a>
-                      </li>
-                     
-                      <li className="footer_li">
-                        <a href="/team/" className="offcanvas_anchor">
-                          Team&apos;s Gallery
-                        </a>
-                      </li>
-                    </ul>
-                  </div> */}
-                  <div className="col-12 col-lg-6 col-md-6">
-                    <h3 className="my-2 pb-2">Cities</h3>
-                    <ul className="list-unstyled mb-0">
-                      <li className="footer_li">
-                        <a
-                          href="/interior-designers-in-noida"
-                          className="offcanvas_anchor"
-                        >
-                          Interior Designers In Noida
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a
-                          href="/interior-designers-in-ghaziabad"
-                          className="offcanvas_anchor"
-                        >
-                          Interior Designers in Ghaziabad
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a
-                          href="/interior-designers-in-greater-noida"
-                          className="offcanvas_anchor"
-                        >
-                          Interior Designers in Greater Noida
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a
-                          href="/interior-designers-in-delhi"
-                          className="offcanvas_anchor"
-                        >
-                          Interior Designers in Delhi
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a
-                          href="/interior-designers-in-dwarka"
-                          className="offcanvas_anchor"
-                        >
-                          Interior Designers in Dwarka
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a
-                          href="/best-interior-designers-in-faridabad"
-                          className="offcanvas_anchor"
-                        >
-                          Interior Designers in Faridabad
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a
-                          href="/interior-designers-in-gurgaon"
-                          className="offcanvas_anchor"
-                        >
-                          Interior Designers in Gurugram
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a
-                          href="/interior-designers-in-manesar"
-                          className="offcanvas_anchor"
-                        >
-                          Interior Designers In Manesar
-                        </a>
-                      </li>
-                      <li className="footer_li">
-                        <a
-                          href="/interior-designer-in-sohna-gurgaon"
-                          className="offcanvas_anchor"
-                        >
-                          Interior Designers In Sohna
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
                 </div>
               </div>
             </div>

@@ -1,16 +1,36 @@
 "use client";
-import Image from "next/image";
-import { useState, useEffect } from "react";
+import React, { useEffect, useState, useCallback } from 'react';
+import Image from 'next/image';
+import useEmblaCarousel from 'embla-carousel-react';
+import Autoplay from 'embla-carousel-autoplay';
+import Fade from 'embla-carousel-fade';
 
 export default function HeroCarousel({ bannerData }) {
+  // 🌟 RESTORED ORIGINAL LOGIC: Strictly limit to 3 slides total
   const firstBanner = bannerData?.[0];
   const restBanners = bannerData?.slice(1, 3) || [];
-  
-  const [showRest, setShowRest] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [prevIndex, setPrevIndex] = useState(0); // 🌟 FLASH FIX: Keeps track of the previous slide
 
+  const [showRest, setShowRest] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { loop: true, duration: 40 }, 
+    [Fade(), Autoplay({ delay: 5000, stopOnInteraction: false })]
+  );
+
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setActiveIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
+
+  // 🌟 RESTORED ORIGINAL LOGIC: Only load remaining slides on desktop after 2.5s
   useEffect(() => {
+    setIsMounted(true);
     if (window.innerWidth >= 768) {
       const timer = setTimeout(() => setShowRest(true), 2500);
       return () => clearTimeout(timer);
@@ -19,145 +39,134 @@ export default function HeroCarousel({ bannerData }) {
 
   const activeBanners = showRest ? [firstBanner, ...restBanners] : [firstBanner];
 
+  // Inform Embla when we add the remaining slides to the DOM
   useEffect(() => {
-    if (activeBanners.length > 1) {
-      const interval = setInterval(() => {
-        setActiveIndex((currentActive) => {
-          setPrevIndex(currentActive);
-          return (currentActive + 1) % activeBanners.length;
-        });
-      }, 5000); 
-      return () => clearInterval(interval);
-    }
-  }, [activeBanners.length]);
-
-  const nextSlide = () => {
-    setActiveIndex((currentActive) => {
-      setPrevIndex(currentActive);
-      return (currentActive + 1) % activeBanners.length;
-    });
-  };
-
-  const prevSlide = () => {
-    setActiveIndex((currentActive) => {
-      setPrevIndex(currentActive);
-      return (currentActive - 1 + activeBanners.length) % activeBanners.length;
-    });
-  };
+    if (!emblaApi) return;
+    emblaApi.reInit();
+    onSelect();
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+  }, [emblaApi, onSelect, activeBanners.length]);
 
   if (!firstBanner) return null;
 
   return (
-    <section className="position-relative">
-      <div id="carouselExampleAutoplaying" className="carousel slide">
+    <section className="position-relative w-100" style={{ backgroundColor: '#f0f0f0' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .embla { overflow: hidden; width: 100%; aspect-ratio: 16/9; }
+        @media (min-width: 768px) { .embla { aspect-ratio: 192/85; } }
+        .embla__container { display: flex; height: 100%; }
+        .embla__slide { flex: 0 0 100%; min-width: 0; position: relative; }
+        .banner-media { object-fit: cover; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
         
-        <div 
-          className="carousel-inner" 
-          style={{ position: "relative", width: "100%", aspectRatio: "192/85", overflow: "hidden", backgroundColor: "#f0f0f0" }}
-        >
-          
+        .banner-overlay { 
+            position: absolute; 
+            z-index: 10; 
+            inset: 0; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            padding: 5%; 
+            pointer-events: none;
+            text-shadow: 0px 2px 10px rgba(0,0,0,0.6); 
+        }
+
+        .embla__nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 20;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .embla__nav-btn:hover { 
+            background: rgba(255, 145, 77, 0.9); 
+            border-color: #ff914d; 
+            transform: translateY(-50%) scale(1.1);
+        }
+        .embla__nav-btn.prev { left: 20px; }
+        .embla__nav-btn.next { right: 20px; }
+        .embla__nav-icon { width: 24px; height: 24px; fill: currentColor; }
+      `}} />
+
+      <div className="embla" ref={emblaRef}>
+        <div className="embla__container">
           {activeBanners.map((banner, index) => {
+            if (!banner) return null; // Safety check
+            
             const isVideo = banner?.banner_image?.endsWith(".mp4");
             const isFirstSlide = index === 0;
-            const isActive = index === activeIndex;
-            const isPrev = index === prevIndex;
+            const isSlideActiveOrNext = activeIndex === index || activeIndex === (index - 1 + activeBanners.length) % activeBanners.length;
 
             return (
-              <div 
-                className="carousel-item" 
-                key={index}
-                style={{
-                  // 🌟 FLASH FIX: The new slide fades in over the old slide. No background bleeding!
-                  opacity: isActive ? 1 : (isPrev ? 1 : 0),
-                  transition: isActive ? "opacity 0.8s ease-in-out" : "none",
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  display: "block", 
-                  zIndex: isActive ? 2 : (isPrev ? 1 : 0),
-                  pointerEvents: isActive ? "auto" : "none"
-                }}
-              >                
-                <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                  
-                  {isVideo ? (
-                    <video 
-                      className="object-fit-cover home_video_banner" 
-                      autoPlay
-                      loop 
-                      muted 
-                      playsInline
-                      preload={isFirstSlide ? "metadata" : "auto"}
-                      poster={banner?.banner_image_poster || ""} 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }}
-                    >
-                      <source src={banner?.banner_image} type="video/mp4" />
-                    </video>
-                  ) : (
-                    <Image
-                      src={banner?.banner_image ?? "/images/home-banner-1.png"}
-                      className="d-block carousel_img"
-                      alt={banner?.title?.trim() || "High Creation Interior Design in Delhi NCR"} 
-                      fill
-                      priority={isFirstSlide} 
-                      fetchPriority={isFirstSlide ? "high" : "auto"}
-                      sizes="100vw"
-                      style={{ objectFit: "contain" }}
-                    />
-                  )}
-                  
-                  <div className="pt-0 carousel-caption d-md-block" style={{ zIndex: 2 }}>
-                    <div className="pb-0 mb-0 fw-lighter fs-3 home_subhead">{banner?.top_slogan}</div>
-                    <div className="d-lg-flex">
-                      <div>
-                        {isFirstSlide ? (
-                          <h1 className="letheading home_banner_heading">{banner?.title ?? "Best Interior Designers"}</h1>
-                        ) : (
-                          <h2 className="letheading home_banner_heading">{banner?.title ?? ""}</h2>
-                        )}
-                        <div className="font_stylish_home">{banner?.sub_title}</div>
-                      </div>
+              <div className="embla__slide" key={index}>
+                {isVideo ? (
+                  <>
+                    {isSlideActiveOrNext && (
+                      <video
+                        className="banner-media"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        preload="auto"
+                        poster={banner?.banner_image_poster || ""}
+                      >
+                        <source src={banner?.banner_image} type="video/mp4" />
+                      </video>
+                    )}
+                  </>
+                ) : (
+                  <Image
+                    src={banner?.banner_image ?? "/images/home-banner-1.png"}
+                    className="banner-media"
+                    alt={banner?.title?.trim() || "High Creation Interior"}
+                    fill
+                    priority={isFirstSlide}
+                    fetchPriority={isFirstSlide ? "high" : "auto"}
+                    sizes="100vw"
+                  />
+                )}
+
+                <div className="banner-overlay text-white carousel-caption d-md-block text-start pt-0">
+                  <div className="fw-lighter fs-3 home_subhead">{banner?.top_slogan}</div>
+                  <div className="d-lg-flex">
+                    <div>
+                      {isFirstSlide ? (
+                        <h1 className="letheading home_banner_heading">{banner?.title}</h1>
+                      ) : (
+                        <h2 className="letheading home_banner_heading">{banner?.title}</h2>
+                      )}
+                      <div className="font_stylish_home">{banner?.sub_title}</div>
                     </div>
                   </div>
-
                 </div>
               </div>
             );
           })}
         </div>
-        
-        {activeBanners.length > 1 && (
-          <>
-            {/* 🌟 CLICK FIX: Z-index pushed to 20 to pierce through the Enquire Now tab overlay! */}
-            <button 
-              className="carousel-control-prev" 
-              type="button" 
-              onClick={(e) => { e.preventDefault(); prevSlide(); }}
-              style={{ zIndex: 20, pointerEvents: 'auto', cursor: 'pointer' }} 
-              aria-label="Previous slide"
-            >
-              <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-            </button>
-            <button 
-              className="carousel-control-next" 
-              type="button" 
-              onClick={(e) => { e.preventDefault(); nextSlide(); }}
-              style={{ zIndex: 20, pointerEvents: 'auto', cursor: 'pointer' }} 
-              aria-label="Next slide"
-            >
-              <span className="carousel-control-next-icon" aria-hidden="true"></span>
-            </button>
-          </>
-        )}
       </div>
-      
-      <div className="rotate_div container-fluid" style={{ zIndex: 4 }}>
-        <div className="sssss ms-auto me-0">
-          <a href="/contact" className="know_moress" aria-label="Enquire Now for Interior Design Services">Enquiry Now</a>
-        </div>
-      </div>
+
+      {isMounted && activeBanners.length > 1 && (
+        <>
+          <button className="embla__nav-btn prev" onClick={scrollPrev} aria-label="Previous slide">
+            <svg className="embla__nav-icon" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          </button>
+          <button className="embla__nav-btn next" onClick={scrollNext} aria-label="Next slide">
+            <svg className="embla__nav-icon" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </button>
+        </>
+      )}
     </section>
   );
 }

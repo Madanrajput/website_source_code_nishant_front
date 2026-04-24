@@ -140,7 +140,7 @@ export default async function AboutUs() {
                         Interior designing Company?
                       </span>
                     </p>
-                    <p>{formData?.mid_sub_description}</p>
+                    <p style={{color:"#FFF"}}>{formData?.mid_sub_description}</p>
                   </div>
                 </div>
               </div>

@@ -101,7 +101,7 @@ const Footer = () => {
         .footer-social-btn.yt:hover { background-color: #FF0000; color: white; box-shadow: 0 6px 12px rgba(255, 0, 0, 0.3); }
       `}} />
 
-      <div
+      {/* <div
         className="mt-4 ms-auto me-0"
         style={{
           position: "fixed",
@@ -130,7 +130,7 @@ const Footer = () => {
             />
           </div>
         </a>
-      </div>
+      </div> */}
       <div className="footer_wrapper pb-0 position-relative">
         <div className="container">
           <div className="py-5 pb-0 mx-0 row justify-content-center">
