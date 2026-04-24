@@ -59,9 +59,11 @@ const Footer = () => {
     // 2. Fetch Site Settings (Social Links, etc) using direct clean URL
     const fetchSiteSettings = async () => {
       try {
-        const response = await axios.get("https://apidev.hcinterior.in/site-settings");
-        // Assuming the API returns an array or an object
-        const settingsData = Array.isArray(response.data) ? response.data[0] : response.data;
+        const response = await api.get("/site-settings");
+        // Handle both Next.js/Axios standard responses and NestJS nested { data: [...] } objects
+        let rawData = response.data?.data || response.data;
+        const settingsData = Array.isArray(rawData) ? rawData[0] : rawData;
+        
         if(settingsData) {
           setSettings(settingsData);
         }
@@ -308,62 +310,61 @@ const Footer = () => {
             <div className="d-flex justify-content-between align-items-center flex-wrap">
               <div>
                 <ul className="list-unstyled d-flex mb-0">
+                  {/* 👈 FIX: Apply the new 'footer-policy-link' class */}
                   <li className="footer_li pe-3 border-end">
-                    <a href="/privacy-policy/" className="text-black">
+                    <a href="/privacy-policy/" className="footer-policy-link">
                       Privacy Policy
                     </a>
                   </li>
                   <li className="footer_li pe-3 border-start ps-3">
-                    <a href="/term-and-condition/" className="text-black">
+                    <a href="/term-and-condition/" className="footer-policy-link">
                       Terms & Condition
                     </a>
                   </li>
                   <li className="footer_li pe-3 border-start ps-3">
-                    <a href="/cancelletion-policy/" className="text-black">
+                    <a href="/cancelletion-policy/" className="footer-policy-link">
                       Cancellation Policy
                     </a>
                   </li>
                 </ul>
               </div>
               
-              {/* ✅ Dynamic Year Update */}
               <div>
                 <p className="mb-0 team_description text-center pt-2 pt-lg-0">
-                  All Rights Reserved ©{currentYear} High Creation Interior Projects
-                  Private Limited
+                  All Rights Reserved ©{currentYear} High Creation Interior Projects Private Limited
                 </p>
               </div>
 
-              {/* ✅ Unified, Animated Social Media Links */}
+              {/* 👈 FIX: Trim spaces from API URLs and ensure all render dynamically */}
               <div className="m-auto m-lg-0 text-center">
                 <div className="social-links d-flex gap-2 justify-content-center my-3">
                     {(settings?.facebook_url || "https://www.facebook.com/HighCreationInteriorProjectsPvtLtd") && (
-                        <a href={settings?.facebook_url || "https://www.facebook.com/HighCreationInteriorProjectsPvtLtd"} target="_blank" rel="noopener noreferrer" className="footer-social-btn fb" aria-label="Facebook">
+                        <a href={settings?.facebook_url?.trim() || "https://www.facebook.com/HighCreationInteriorProjectsPvtLtd"} target="_blank" rel="noopener noreferrer" className="footer-social-btn fb" aria-label="Facebook">
                             <FaFacebookF size={18} />
                         </a>
                     )}
                     {(settings?.instagram_url || "https://www.instagram.com/highcreationinterior/") && (
-                        <a href={settings?.instagram_url || "https://www.instagram.com/highcreationinterior/"} target="_blank" rel="noopener noreferrer" className="footer-social-btn ig" aria-label="Instagram">
+                        <a href={settings?.instagram_url?.trim() || "https://www.instagram.com/highcreationinterior/"} target="_blank" rel="noopener noreferrer" className="footer-social-btn ig" aria-label="Instagram">
                             <FaInstagram size={18} />
                         </a>
                     )}
-                    {(settings?.twitter_url || "https://x.com/HC_Interior?mx=2") && (
-                        <a href={settings?.twitter_url || "https://x.com/HC_Interior?mx=2"} target="_blank" rel="noopener noreferrer" className="footer-social-btn tw" aria-label="X (Twitter)">
+                    {(settings?.twitter_url || "https://x.com/HC_Interior") && (
+                        <a href={settings?.twitter_url?.trim() || "https://x.com/HC_Interior"} target="_blank" rel="noopener noreferrer" className="footer-social-btn tw" aria-label="X (Twitter)">
                             <FaTwitter size={18} />
                         </a>
                     )}
                     {(settings?.linkedin_url || "https://www.linkedin.com/company/high-creation-interior-projects-private-limited/") && (
-                        <a href={settings?.linkedin_url || "https://www.linkedin.com/company/high-creation-interior-projects-private-limited/"} target="_blank" rel="noopener noreferrer" className="footer-social-btn in" aria-label="LinkedIn">
+                        <a href={settings?.linkedin_url?.trim() || "https://www.linkedin.com/company/high-creation-interior-projects-private-limited/"} target="_blank" rel="noopener noreferrer" className="footer-social-btn in" aria-label="LinkedIn">
                             <FaLinkedin size={18} />
                         </a>
                     )}
                     {settings?.pinterest_url && (
-                        <a href={settings.pinterest_url} target="_blank" rel="noopener noreferrer" className="footer-social-btn pi" aria-label="Pinterest">
+                        <a href={settings.pinterest_url.trim()} target="_blank" rel="noopener noreferrer" className="footer-social-btn pi" aria-label="Pinterest">
                             <FaPinterest size={18} />
                         </a>
                     )}
                     {settings?.youtube_url && (
-                        <a href={settings.youtube_url} target="_blank" rel="noopener noreferrer" className="footer-social-btn yt" aria-label="YouTube">
+                        <a href={settings.youtube_url.trim()} target="_blank" rel="noopener noreferrer" className="footer-social-btn yt" aria-label="YouTube">
                             <FaYoutube size={18} />
                         </a>
                     )}
@@ -373,9 +374,9 @@ const Footer = () => {
             <hr />
 
             <p className="text-lg-end text-center team_description">
-              Designed By
+             {`Designed By ` } 
               <a href="#" className="text-black">
-                {" "}
+                
                 HC Interior
               </a>
             </p>

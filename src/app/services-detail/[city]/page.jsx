@@ -5,6 +5,7 @@ import api from "@/utils/api";
 import { defaultAltText } from "@/utils/helper";
 import { getCanonicalUrl, getRobotsDirectives } from "@/utils/seoHelpers";
 import { notFound } from "next/navigation";
+import { getPageSEO } from "@/utils/getSEO"; // 👈 1. Import getPageSEO
 
 // --- GSC FIX: ISR (Update content every hour) ---
 export const revalidate = 3600; 
@@ -13,8 +14,13 @@ export const revalidate = 3600;
 export async function generateMetadata({ params }) {
   const city = params.city;
   try {
-    const response = await api.get(`cms-city/${city}`);
-    const data = response.data;
+    // 👈 2. Fetch both City Data and Global SEO Data concurrently
+    const [cityRes, seoData] = await Promise.all([
+      api.get(`cms-city/${city}`).catch(() => null),
+      getPageSEO(`/services-detail/${city}`)
+    ]);
+
+    const data = cityRes?.data;
 
     if (!data) {
       return {
@@ -23,23 +29,27 @@ export async function generateMetadata({ params }) {
       };
     }
 
+    // 👈 3. Merge canonicals, prioritizing the SEO Tag CMS
     const canonicalUrl = getCanonicalUrl({
-      canonicalUrl: data?.seo_content?.canonical_url,
+      canonicalUrl: seoData?.alternates?.canonical || data?.seo_content?.canonical_url,
       fallbackPath: `/services-detail/${city}`,
     });
 
+    // 👈 4. Return merged metadata
     return {
-      title: data?.seo_content?.meta_title || `${city} Interior Design Services`,
-      description: data?.seo_content?.meta_description,
+      title: seoData?.title || data?.seo_content?.meta_title || `${city} Interior Design Services`,
+      description: seoData?.description || data?.seo_content?.meta_description,
+      keywords: seoData?.keywords || data?.seo_content?.meta_keywords,
       alternates: {
         canonical: canonicalUrl,
       },
-      robots: getRobotsDirectives(data?.seo_content),
-      openGraph: {
+      robots: seoData?.robots || getRobotsDirectives(data?.seo_content),
+      openGraph: seoData?.openGraph || {
         title: data?.main_title,
         description: data?.main_description?.substring(0, 160),
         images: [data?.location_image || "/images/services/1-min.png"],
       },
+      twitter: seoData?.twitter || null,
     };
   } catch (error) {
     return {
@@ -63,16 +73,36 @@ async function getCityData(city) {
 // --- GSC FIX: Converted to Server Component ---
 export default async function ServicesDetail({ params }) {
   const city = params.city;
-  const pageData = await getCityData(city);
+  
+  // 👈 5. Fetch City Data AND SEO Data for the actual page component
+  const [pageData, seoData] = await Promise.all([
+    getCityData(city),
+    // getPageSEO(`/services-detail/${city}`)
+    getPageSEO(`/interior-designers-in-${city}`).catch(() => null)
+  ]);
 
   // If API returns no data, return a REAL 404. 
-  // This fixes "Soft 404" errors in GSC.
   if (!pageData) {
     notFound();
   }
 
+  // 👈 6. Extract the custom schema if the SEO team added one
+  const customSchema = seoData?.custom_schema;
+
   return (
     <MainLayout>
+      {/* 👈 7. Safely inject the Custom Schema into the DOM */}
+      {customSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ 
+            __html: typeof customSchema === 'string' 
+              ? customSchema.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '') 
+              : JSON.stringify(customSchema)
+          }}
+        />
+      )}
+
       <main>
         <BackgroundImageWithHeading
           sectionBgImages={"contact_wrapper services"}
@@ -104,7 +134,8 @@ export default async function ServicesDetail({ params }) {
                       width={700}
                       alt={pageData?.main_title ?? defaultAltText}
                       className="pt-0 pt-lg-5 w-100 object-fit-contain"
-                    decoding="async"  loading="lazy" />
+                      decoding="async"  loading="lazy" 
+                    />
                   </div>
                 </center>
               </div>
@@ -137,7 +168,8 @@ export default async function ServicesDetail({ params }) {
                         className="w-100 object-fit-contain"
                         height={150}
                         alt="Warranty Icon"
-                      decoding="async"  loading="lazy" />
+                        decoding="async"  loading="lazy" 
+                      />
                       <div className="pt-3 text-center card-body">
                         <h4 className="px-4 py-3 text-center card-title card_Services_heading">
                           India&apos;s only full home warranty* up to 10-yrs
@@ -153,7 +185,8 @@ export default async function ServicesDetail({ params }) {
                         className="w-100 object-fit-contain"
                         height={150}
                         alt="Quality Check Icon"
-                      decoding="async"  loading="lazy" />
+                        decoding="async"  loading="lazy" 
+                      />
                       <div className="pt-3 text-center card-body">
                         <h4 className="px-4 py-3 text-center card-title card_Services_heading">
                           146 quality checks to give your home the best
@@ -168,7 +201,8 @@ export default async function ServicesDetail({ params }) {
                         className="w-100 object-fit-contain"
                         height={150}
                         alt="Installation Icon"
-                      decoding="async"  loading="lazy" />
+                        decoding="async"  loading="lazy" 
+                      />
                       <div className="pt-3 text-center card-body">
                         <h4 className="px-4 py-3 text-center card-title card_Services_heading">
                           45-day installation swift kitchens, wardrobes &

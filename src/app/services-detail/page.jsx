@@ -14,7 +14,7 @@ import {
 
 // Import your new smart forms
 // import { SidebarForm, BottomContactForm } from "@/components/CityContactForms";
-
+import { getPageSEO } from "@/utils/getSEO";
 import { SidebarForm,BottomContactForm } from "./CityForms";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://apidev.hcinterior.in";
 
@@ -56,8 +56,13 @@ const parseJsonSafe = (data) => {
 // --- SEO METADATA ---
 export async function generateMetadata({ searchParams }) {
   const city = searchParams?.city && searchParams.city !== "undefined" ? searchParams.city : "delhi";
-  const pageData = await getCityData(city);
+  // const pageData = await getCityData(city);
   const fallbackPath = cityUrlMap[city] || `/services-detail/${city}`;
+  // 👈 2. Fetch both Page Data and SEO Data concurrently
+  const [pageData, seoData] = await Promise.all([
+    getCityData(city),
+    getPageSEO(fallbackPath).catch(() => null)
+  ]);
   const canonicalUrl = getCanonicalUrl({ canonicalUrl: pageData?.seo_content?.canonical_url, fallbackPath });
 
   if (!pageData) return { title: "Services", robots: { index: false, follow: true } };
@@ -73,12 +78,23 @@ export async function generateMetadata({ searchParams }) {
 
 const ServicesDetailPage = async ({ searchParams }) => {
   const city = searchParams?.city && searchParams.city !== "undefined" ? searchParams.city : "delhi";
-  const pageData = await getCityData(city);
+  // const pageData = await getCityData(city);
   
+  // if (!pageData) notFound(); 
+
+  // const recentBlogs = await getRecentBlogs();
+  const fallbackPath = cityUrlMap[city] || `/services-detail/${city}`;
+
+  // 👈 3. Fetch Data + Global SEO schemas concurrently for the component
+  const [pageData, recentBlogs, seoData] = await Promise.all([
+    getCityData(city),
+    getRecentBlogs(),
+    getPageSEO(fallbackPath).catch(() => null)
+  ]);
   if (!pageData) notFound(); 
 
-  const recentBlogs = await getRecentBlogs();
-  
+  // 👈 4. Extract the custom schemas
+  const customSchema = seoData?.customSchema;
   // Sanitizing CMS Data for UI
   const safeDescription = pageData?.main_description ? DOMPurify.sanitize(pageData.main_description) : "";
   const safeSideDescription = pageData?.side_description ? DOMPurify.sanitize(pageData.side_description) : "";
@@ -91,6 +107,16 @@ const ServicesDetailPage = async ({ searchParams }) => {
 
   return (
     <MainLayout>
+      {customSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ 
+            __html: typeof customSchema === 'string' 
+              ? customSchema.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '') 
+              : JSON.stringify(customSchema)
+          }}
+        />
+      )}
       <style dangerouslySetInnerHTML={{__html: `
         :root { --hc-primary: #ff914d; --hc-dark: #0f172a; }
         .font-outfit { font-family: var(--font-outfit), sans-serif; }
