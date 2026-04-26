@@ -9,13 +9,10 @@ import {
   FaMapMarkerAlt, FaArrowRight, FaPhoneAlt, FaEnvelope, FaUser, 
   FaShieldAlt, FaGem, FaClock, FaTrophy, FaStar, FaAward, 
   FaCheckCircle, FaWallet, FaTools, FaDraftingCompass, FaHardHat, FaHome,
-  FaWhatsapp, FaPlus
+  FaWhatsapp, FaPlus, FaChevronDown
 } from "react-icons/fa";
 
-// Import your new smart forms
-// import { SidebarForm, BottomContactForm } from "@/components/CityContactForms";
-import { getPageSEO } from "@/utils/getSEO";
-import { SidebarForm,BottomContactForm } from "./CityForms";
+import { SidebarForm, BottomContactForm } from "./CityForms";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://apidev.hcinterior.in";
 
 const cityUrlMap = {
@@ -27,6 +24,43 @@ const cityUrlMap = {
   "ghaziabad": "/interior-designers-in-ghaziabad",
   "manesar": "/interior-designers-in-manesar",
   "dwarka": "/interior-designers-in-dwarka",
+};
+
+// 🌟 EXPANDED SUB-CITY LOGIC: Clean, robust list for the new sidebar widget
+const subCitiesMap = {
+  "noida": [
+    { name: "Sector 150", link: "/interior-designers-in-noida-sector-150" },
+    { name: "Sector 137", link: "/interior-designers-in-noida-sector-137" },
+    { name: "Sector 74", link: "/interior-designers-in-noida-sector-74" },
+    { name: "Sector 75", link: "/interior-designers-in-noida-sector-75" },
+    { name: "Sector 143", link: "/interior-designers-in-noida-sector-143" },
+    { name: "Sector 104", link: "/interior-designers-in-noida-sector-104" },
+    { name: "Sector 50", link: "/interior-designers-in-noida-sector-50" },
+    { name: "Sector 93A", link: "/interior-designers-in-noida-sector-93a" },
+    { name: "Sector 128", link: "/interior-designers-in-noida-sector-128" },
+    { name: "Sector 44", link: "/interior-designers-in-noida-sector-44" },
+  ],
+  "gurugram": [
+    { name: "Golf Course Road", link: "/interior-designers-in-gurgaon-golf-course-road" },
+    { name: "DLF Phase 1", link: "/interior-designers-in-gurgaon-dlf-phase-1" },
+    { name: "DLF Phase 5", link: "/interior-designers-in-gurgaon-dlf-phase-5" },
+    { name: "Sector 56", link: "/interior-designers-in-gurgaon-sector-56" },
+    { name: "Sector 65", link: "/interior-designers-in-gurgaon-sector-65" },
+    { name: "Sohna Road", link: "/interior-designers-in-gurgaon-sohna-road" },
+    { name: "Sector 54", link: "/interior-designers-in-gurgaon-sector-54" },
+    { name: "Sector 57", link: "/interior-designers-in-gurgaon-sector-57" },
+  ],
+  "delhi": [
+    { name: "Vasant Vihar", link: "/interior-designers-in-delhi-vasant-vihar" },
+    { name: "Dwarka", link: "/interior-designers-in-dwarka" },
+    { name: "South Extension", link: "/interior-designers-in-delhi-south-extension" },
+    { name: "Greater Kailash", link: "/interior-designers-in-delhi-greater-kailash" },
+    { name: "Defence Colony", link: "/interior-designers-in-delhi-defence-colony" },
+    { name: "Hauz Khas", link: "/interior-designers-in-delhi-hauz-khas" },
+    { name: "Punjabi Bagh", link: "/interior-designers-in-delhi-punjabi-bagh" },
+    { name: "Rohini", link: "/interior-designers-in-delhi-rohini" },
+    { name: "Janakpuri", link: "/interior-designers-in-delhi-janakpuri" },
+  ]
 };
 
 // --- DATA FETCHERS ---
@@ -56,13 +90,8 @@ const parseJsonSafe = (data) => {
 // --- SEO METADATA ---
 export async function generateMetadata({ searchParams }) {
   const city = searchParams?.city && searchParams.city !== "undefined" ? searchParams.city : "delhi";
-  // const pageData = await getCityData(city);
+  const pageData = await getCityData(city);
   const fallbackPath = cityUrlMap[city] || `/services-detail/${city}`;
-  // 👈 2. Fetch both Page Data and SEO Data concurrently
-  const [pageData, seoData] = await Promise.all([
-    getCityData(city),
-    getPageSEO(fallbackPath).catch(() => null)
-  ]);
   const canonicalUrl = getCanonicalUrl({ canonicalUrl: pageData?.seo_content?.canonical_url, fallbackPath });
 
   if (!pageData) return { title: "Services", robots: { index: false, follow: true } };
@@ -78,45 +107,27 @@ export async function generateMetadata({ searchParams }) {
 
 const ServicesDetailPage = async ({ searchParams }) => {
   const city = searchParams?.city && searchParams.city !== "undefined" ? searchParams.city : "delhi";
-  // const pageData = await getCityData(city);
+  const pageData = await getCityData(city);
   
-  // if (!pageData) notFound(); 
-
-  // const recentBlogs = await getRecentBlogs();
-  const fallbackPath = cityUrlMap[city] || `/services-detail/${city}`;
-
-  // 👈 3. Fetch Data + Global SEO schemas concurrently for the component
-  const [pageData, recentBlogs, seoData] = await Promise.all([
-    getCityData(city),
-    getRecentBlogs(),
-    getPageSEO(fallbackPath).catch(() => null)
-  ]);
   if (!pageData) notFound(); 
 
-  // 👈 4. Extract the custom schemas
-  const customSchema = seoData?.customSchema;
-  // Sanitizing CMS Data for UI
+  const recentBlogs = await getRecentBlogs();
+  
   const safeDescription = pageData?.main_description ? DOMPurify.sanitize(pageData.main_description) : "";
   const safeSideDescription = pageData?.side_description ? DOMPurify.sanitize(pageData.side_description) : "";
   
   const displayCity = city.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   const faqs = parseJsonSafe(pageData.faqs);
 
-  // Get 3 other cities for the bottom section
   const otherCities = Object.keys(cityUrlMap).filter(c => c !== city).slice(0, 3);
+  
+  // Localities Logic for Sidebar Widget
+  const currentSubCities = subCitiesMap[city] || [];
+  const initialSubCities = currentSubCities.slice(0, 6);
+  const hiddenSubCities = currentSubCities.slice(6);
 
   return (
     <MainLayout>
-      {customSchema && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ 
-            __html: typeof customSchema === 'string' 
-              ? customSchema.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '') 
-              : JSON.stringify(customSchema)
-          }}
-        />
-      )}
       <style dangerouslySetInnerHTML={{__html: `
         :root { --hc-primary: #ff914d; --hc-dark: #0f172a; }
         .font-outfit { font-family: var(--font-outfit), sans-serif; }
@@ -125,76 +136,16 @@ const ServicesDetailPage = async ({ searchParams }) => {
         
         .lazy-render { content-visibility: auto; contain-intrinsic-size: 1px 800px; }
 
-        /* 🌟 REFINED PREMIUM FAQ & HEADING STYLES */
-        .faq-main-title {
-          font-family: var(--font-outfit), sans-serif;
-          /* clamp(MIN, PREFERRED, MAX) -> Scales smoothly! */
-          font-size: clamp(1.75rem, 6vw, 2.5rem); 
-          font-weight: 800;
-          color: var(--hc-dark);
-          line-height: 1.15;
-          letter-spacing: -0.02em;
-          margin-bottom: 2rem;
-          position: relative;
-          padding-bottom: 12px;
-        }
-        
-        /* Adds a luxury orange gradient underline to the heading */
-        .faq-main-title::after {
-          content: "";
-          position: absolute;
-          left: 0;
-          bottom: 0;
-          width: 60px;
-          height: 4px;
-          background: linear-gradient(135deg, var(--hc-primary) 0%, #ff5722 100%);
-          border-radius: 2px;
-        }
+        .faq-main-title { font-family: var(--font-outfit), sans-serif; font-size: clamp(1.75rem, 6vw, 2.5rem); font-weight: 800; color: var(--hc-dark); line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 2rem; position: relative; padding-bottom: 12px; }
+        .faq-main-title::after { content: ""; position: absolute; left: 0; bottom: 0; width: 60px; height: 4px; background: linear-gradient(135deg, var(--hc-primary) 0%, #ff5722 100%); border-radius: 2px; }
 
-        /* 🌟 INTERACTIVE LUXURY FAQs (Mobile Optimized) */
-        .faq-premium-item { 
-          border: none !important; 
-          margin-bottom: 16px; 
-          border-radius: 16px !important; 
-          overflow: hidden; 
-          box-shadow: 0 4px 20px rgba(0,0,0,0.04); 
-          background: #ffffff; 
-          border: 1px solid #f1f5f9 !important; 
-        }
-        
-        .faq-premium-btn { 
-          width: 100%; 
-          text-align: left; 
-          background: white; 
-          border: none; 
-          /* Responsive padding: tighter on mobile, spacious on desktop */
-          padding: clamp(16px, 4vw, 24px); 
-          font-weight: 700; 
-          /* Responsive font size for the questions */
-          font-size: clamp(1.05rem, 3.5vw, 1.2rem); 
-          color: var(--hc-dark); 
-          display: flex; 
-          justify-content: space-between; 
-          align-items: center; 
-          box-shadow: none !important;
-          line-height: 1.4;
-          gap: 15px; /* Ensures text doesn't overlap the plus icon */
-        }
-        
+        .faq-premium-item { border: none !important; margin-bottom: 16px; border-radius: 16px !important; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04); background: #ffffff; border: 1px solid #f1f5f9 !important; }
+        .faq-premium-btn { width: 100%; text-align: left; background: white; border: none; padding: clamp(16px, 4vw, 24px); font-weight: 700; font-size: clamp(1.05rem, 3.5vw, 1.2rem); color: var(--hc-dark); display: flex; justify-content: space-between; align-items: center; box-shadow: none !important; line-height: 1.4; gap: 15px; }
         .faq-premium-btn:not(.collapsed) { color: var(--hc-primary); background: #fffcf9; }
         .faq-icon-toggle { transition: transform 0.3s ease; color: var(--hc-primary); flex-shrink: 0; }
         .faq-premium-btn:not(.collapsed) .faq-icon-toggle { transform: rotate(45deg); color: #ff5722; }
+        .faq-premium-body { padding: 0 clamp(16px, 4vw, 24px) 20px; color: #475569; font-size: clamp(0.95rem, 3vw, 1.05rem); line-height: 1.7; background: #fffcf9; }
         
-        /* Adjust body text size for mobile readability */
-        .faq-premium-body { 
-          padding: 0 clamp(16px, 4vw, 24px) 20px; 
-          color: #475569; 
-          font-size: clamp(0.95rem, 3vw, 1.05rem);
-          line-height: 1.7; 
-          background: #fffcf9; 
-        }
-        
-        /* 🌟 PREMIUM HTML PARSER FOR CMS CONTENT */
         .rich-text-content h2, .rich-text-content h3 { font-family: var(--font-outfit), sans-serif; font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: 700; color: #0f172a; margin-top: 2rem; margin-bottom: 1rem; }
         .rich-text-content p { font-family: var(--font-poppins), sans-serif; font-size: 1rem; line-height: 1.8; color: #475569; margin-bottom: 1.2rem; }
         .rich-text-content ul { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; padding: 0; list-style: none; margin: 2rem 0; }
@@ -205,13 +156,6 @@ const ServicesDetailPage = async ({ searchParams }) => {
         .micro-trust-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; }
         .micro-trust-item:last-child { border-bottom: none; padding-bottom: 0; }
         .micro-trust-icon { color: #22c55e; font-size: 18px; margin-right: 12px; }
-
-        .faq-premium-item { border: none !important; margin-bottom: 12px; border-radius: 16px !important; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03); background: #ffffff; border: 1px solid #f1f5f9 !important; }
-        .faq-premium-btn { width: 100%; text-align: left; background: white; border: none; padding: 20px 25px; font-weight: 700; color: var(--hc-dark); display: flex; justify-content: space-between; align-items: center; }
-        .faq-premium-btn:not(.collapsed) { color: var(--hc-primary); background: #fffcf9; }
-        .faq-icon-toggle { transition: transform 0.3s ease; color: var(--hc-primary); }
-        .faq-premium-btn:not(.collapsed) .faq-icon-toggle { transform: rotate(45deg); color: #ff5722; }
-        .faq-premium-body { padding: 0 25px 20px; color: #475569; line-height: 1.7; background: #fffcf9; }
 
         .floating-contact-widget { position: fixed; right: 20px; top: 55%; transform: translateY(-50%); z-index: 999; display: flex; flex-direction: column; gap: 12px; }
         .widget-btn { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: 0.3s; text-decoration: none; }
@@ -258,11 +202,43 @@ const ServicesDetailPage = async ({ searchParams }) => {
 
         .related-card { overflow: hidden; border-radius: 16px; transition: transform 0.3s ease; border: 1px solid #f0f0f0; }
         .related-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
-      `}} />
+        
+        .modern-card { background: #ffffff; padding: 30px 25px; border-radius: 16px; border: 1px solid #f1f5f9; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.3s ease; height: 100%; position: relative; overflow: hidden;}
+        .modern-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); border-color: #ff914d;}
+        .modern-card-icon { width: 50px; height: 50px; background: #fff4ed; color: #ff914d; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px; transition: transform 0.3s ease;}
+        .modern-card:hover .modern-card-icon { transform: scale(1.1); background: #ff914d; color: white; }
+        
+        .approach-number { width: 60px; height: 60px; background: #fff4ed; color: #ff914d; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; margin: 0 auto 15px; }
 
-      {/* <div className="floating-contact-widget d-none d-md-flex">
-        <a href="tel:+91 707070 1373" className="widget-btn call"><FaPhoneAlt size={20}/></a>
-      </div> */}
+        /* 🌟 NEW: STYLING FOR LOCALITY PILLS IN SIDEBAR */
+        .subcity-pill {
+          display: inline-flex;
+          align-items: center;
+          padding: 8px 16px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 30px;
+          font-size: 13px;
+          color: #475569;
+          text-decoration: none;
+          font-family: var(--font-poppins), sans-serif;
+          font-weight: 500;
+          transition: all 0.3s ease;
+          margin-bottom: 8px;
+          margin-right: 8px;
+        }
+        .subcity-pill:hover {
+          background: #ff914d;
+          color: white;
+          border-color: #ff914d;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 10px rgba(255,145,77,0.2);
+        }
+        /* Collapsible Button specific styles */
+        .view-all-btn[aria-expanded="true"] .fa-chevron-down { transform: rotate(180deg); transition: 0.3s ease; }
+        .view-all-btn[aria-expanded="false"] .fa-chevron-down { transition: 0.3s ease; }
+
+      `}} />
 
       <main className="bg-light pb-5">
         
@@ -292,23 +268,17 @@ const ServicesDetailPage = async ({ searchParams }) => {
             <div className="col-lg-8">
               <div className="dual-sticky-wrapper">
                 
-                <div className="premium-card mb-4">
+                 {/* --- 5. LENGTHY CONTENT --- */}
+                 <div className="premium-card mb-4">
                   <h2 className="font-outfit fw-bold h3 mb-4 text-dark">
                     Transforming Spaces in <span className="text-gradient">{displayCity}</span>
                   </h2>
                   <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: safeDescription }} />
                 </div>
+                {/* --- 1. NEW SECTION: APPROACH & OFFERINGS --- */}
+                
 
-                {(pageData?.side_title || safeSideDescription) && (
-                  <div className="lazy-render">
-                    <div className="premium-card mb-4" style={{ background: '#fffcf9' }}>
-                      <h3 className="font-outfit fw-bold h4 mb-3 text-dark">{pageData.side_title}</h3>
-                      <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: safeSideDescription }} />
-                    </div>
-                  </div>
-                )}
-
-                {/* --- DESIGN PROCESS GRID --- */}
+                {/* --- 2. DESIGN PROCESS GRID --- */}
                 <div className="lazy-render">
                   <div className="premium-card bg-white border-0">
                     <h2 className="font-outfit fw-bold h3 mb-4 text-dark">Our Proven Design Process</h2>
@@ -331,36 +301,29 @@ const ServicesDetailPage = async ({ searchParams }) => {
                   </div>
                 </div>
 
-                {/* --- TRUST PILLARS --- */}
-                <div className="lazy-render">
-                  <div className="premium-card bg-transparent border-0 shadow-none px-0 py-0 mb-4">
-                    <div className="row g-4 mobile-slider-wrapper">
-                      <div className="col-md-4">
-                        <div className="trust-box bg-white shadow-sm">
-                          <div className="trust-icon"><FaShieldAlt /></div>
-                          <h4 className="font-outfit fw-bold h5">10-Year Warranty</h4>
-                          <p className="text-muted font-poppins small mb-0">India&apos;s only full-home coverage guarantee.</p>
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <div className="trust-box bg-white shadow-sm">
-                          <div className="trust-icon"><FaGem /></div>
-                          <h4 className="font-outfit fw-bold h5">Elite Finishes</h4>
-                          <p className="text-muted font-poppins small mb-0">Sourcing luxury materials that stand the test of time.</p>
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <div className="trust-box bg-white shadow-sm">
-                          <div className="trust-icon"><FaClock /></div>
-                          <h4 className="font-outfit fw-bold h5">45-Day Delivery</h4>
-                          <p className="text-muted font-poppins small mb-0">Swift, on-time installation of storage & kitchens.</p>
-                        </div>
+                {recentBlogs.length > 0 && (
+                  <div className="lazy-render">
+                    <div className="premium-card border-0 px-0 pt-0">
+                      <h2 className="font-outfit fw-bold h3 mb-4">Design Inspiration</h2>
+                      <div className="row g-4 font-poppins mobile-slider-wrapper">
+                        {recentBlogs.map((blog, idx) => (
+                          <div className="col-md-6" key={idx}>
+                            <Link href={`/${blog.seo_content?.slug || `blog-detail?id=${blog.id}`}`} className="text-decoration-none">
+                              <div className="d-flex align-items-center border p-3 rounded-4 bg-white shadow-sm h-100 transition-all hover:shadow-md">
+                                <img src={blog.image || "/images/default.jpg"} alt={blog.title} className="rounded" style={{ width: "80px", height: "80px", objectFit: "cover" }} loading="lazy" />
+                                <div className="ms-3">
+                                  <h6 className="text-dark fw-bold mb-1" style={{ fontSize: '14px' }}>{blog.title.length > 45 ? `${blog.title.substring(0, 45)}...` : blog.title}</h6>
+                                  <small className="text-gradient fw-bold">READ ARTICLE <FaArrowRight size={10} /></small>
+                                </div>
+                              </div>
+                            </Link>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
-                </div>
-
-                {/* --- EXCELLENCE STATS --- */}
+                )}
+                {/* --- 3. EXCELLENCE STATS --- */}
                 <div className="lazy-render">
                   <div className="premium-card shadow-sm" style={{ background: 'linear-gradient(to right, #ffffff, #fff9f5)' }}>
                     <div className="row align-items-center mobile-slider-wrapper">
@@ -383,12 +346,59 @@ const ServicesDetailPage = async ({ searchParams }) => {
                   </div>
                 </div>
 
-                {/* 🌟 INTEGRATED: BOTTOM CONTACT FORM (Above FAQs/Blogs) */}
-                {/* <div className="lazy-render">
-                    <BottomContactForm mapSrc={pageData?.map_url} />
-                </div> */}
+                {/* --- 4. WHY CHOOSE US (Modern Cards) --- */}
+                <div className="lazy-render">
+                  <div className="premium-card bg-transparent border-0 shadow-none px-0 py-0 mb-4">
+                    <div className="text-center mb-4">
+                        <h2 className="font-outfit fw-bold h3 text-dark">What makes us the best choice for your project.</h2>
+                        {/* <p className="text-muted font-poppins small"></p> */}
+                    </div>
+                    <div className="row g-4 mobile-slider-wrapper">
+                      <div className="col-md-6 col-lg-3">
+                        <div className="modern-card">
+                          <div className="modern-card-icon"><FaShieldAlt /></div>
+                          <h4 className="font-outfit fw-bold h6">10-Year Warranty</h4>
+                          <p className="text-muted font-poppins small mb-0">India&apos;s only full-home coverage guarantee.</p>
+                        </div>
+                      </div>
+                      <div className="col-md-6 col-lg-3">
+                        <div className="modern-card">
+                          <div className="modern-card-icon"><FaGem /></div>
+                          <h4 className="font-outfit fw-bold h6">Elite Finishes</h4>
+                          <p className="text-muted font-poppins small mb-0">Sourcing luxury materials that stand the test of time.</p>
+                        </div>
+                      </div>
+                      <div className="col-md-6 col-lg-3">
+                        <div className="modern-card">
+                          <div className="modern-card-icon"><FaClock /></div>
+                          <h4 className="font-outfit fw-bold h6">45-Day Delivery</h4>
+                          <p className="text-muted font-poppins small mb-0">Swift, on-time installation of storage & kitchens.</p>
+                        </div>
+                      </div>
+                      <div className="col-md-6 col-lg-3">
+                        <div className="modern-card">
+                          <div className="modern-card-icon"><FaTools /></div>
+                          <h4 className="font-outfit fw-bold h6">Expert Team</h4>
+                          <p className="text-muted font-poppins small mb-0">Highly skilled professionals handling your project end-to-end.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-                {/* 🌟 INTERACTIVE PREMIUM FAQs */}
+               
+
+                {/* --- 6. MORE LENGTHY CONTENT --- */}
+                {(pageData?.side_title || safeSideDescription) && (
+                  <div className="lazy-render">
+                    <div className="premium-card mb-4" style={{ background: '#fffcf9' }}>
+                      <h3 className="font-outfit fw-bold h4 mb-3 text-dark">{pageData.side_title}</h3>
+                      <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: safeSideDescription }} />
+                    </div>
+                  </div>
+                )}
+
+                {/* --- 7. INTERACTIVE PREMIUM FAQs --- */}
                 {faqs.length > 0 && (
                   <div className="lazy-render">
                     <div className="premium-card border-0 px-0">
@@ -412,45 +422,29 @@ const ServicesDetailPage = async ({ searchParams }) => {
                   </div>
                 )}
 
-                {/* --- BLOG INSPIRATION --- */}
-                {recentBlogs.length > 0 && (
-                  <div className="lazy-render">
-                    <div className="premium-card border-0 px-0 pt-0">
-                      <h2 className="font-outfit fw-bold h3 mb-4">Design Inspiration</h2>
-                      <div className="row g-4 font-poppins mobile-slider-wrapper">
-                        {recentBlogs.map((blog, idx) => (
-                          <div className="col-md-6" key={idx}>
-                            <Link href={`/${blog.seo_content?.slug || `blog-detail?id=${blog.id}`}`} className="text-decoration-none">
-                              <div className="d-flex align-items-center border p-3 rounded-4 bg-white shadow-sm h-100 transition-all hover:shadow-md">
-                                <img src={blog.image || "/images/default.jpg"} alt={blog.title} className="rounded" style={{ width: "80px", height: "80px", objectFit: "cover" }} loading="lazy" />
-                                <div className="ms-3">
-                                  <h6 className="text-dark fw-bold mb-1" style={{ fontSize: '14px' }}>{blog.title.length > 45 ? `${blog.title.substring(0, 45)}...` : blog.title}</h6>
-                                  <small className="text-gradient fw-bold">READ ARTICLE <FaArrowRight size={10} /></small>
-                                </div>
-                              </div>
-                            </Link>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {/* --- 8. BLOG INSPIRATION --- */}
+                
               </div>
             </div>
 
             {/* --- RIGHT COLUMN: SIDEBAR --- */}
             <div className="col-lg-4">
               <div className="dual-sticky-wrapper">
+                
+                {/* 1. TOP RIGHT: BOOK SITE VISIT CTA */}
                 <div className="sidebar-cta shadow-lg mb-4">
                   <h4 className="font-outfit fw-bold mb-2">Book a Site Visit</h4>
                   <p className="font-poppins small text-white-50 mb-4">Expert designers will visit your {displayCity} property.</p>
                   <Link href="/contact" className="btn btn-light w-100 fw-bold py-2 rounded-pill">Schedule Now</Link>
                 </div>
 
-                {/* 🌟 INTEGRATED: SIDEBAR FORM (Replaced static form) */}
+                {/* 🌟 2. NEW TOP RIGHT: LOCALITY WIDGET WITH "VIEW ALL" TOGGLE */}
+                
+
+                {/* 3. SIDEBAR FORM */}
                 <SidebarForm city={city} />
 
-                {/* --- THE PROMISE --- */}
+                {/* 4. THE PROMISE */}
                 <div className="sidebar-widget py-4 font-poppins lazy-render">
                   <h4 className="widget-title mb-4">The Promise</h4>
                   <div className="micro-trust-item">
@@ -469,6 +463,7 @@ const ServicesDetailPage = async ({ searchParams }) => {
                   </div>
                 </div>
 
+                {/* 5. MAJOR CITIES */}
                 <div className="sidebar-widget">
                   <h4 className="widget-title">Service Areas</h4>
                   <div className="d-flex flex-column">
@@ -480,23 +475,24 @@ const ServicesDetailPage = async ({ searchParams }) => {
                     ))}
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
         </div>
 
-        {/* --- NEARBY LOCATIONS --- */}
+        {/* --- NEARBY MAJOR CITIES AT THE BOTTOM --- */}
         {otherCities.length > 0 && (
-          <div className="container mt-5 pt-4 border-top">
+          <div className="container mt-5 pt-5 border-top">
             <div className="d-flex justify-content-between align-items-end mb-4">
-              <h2 className="font-outfit fw-bold text-dark h3">Nearby Locations</h2>
+              <h2 className="font-outfit fw-bold text-dark h3">Nearby Cities</h2>
               <Link href="/services" className="text-decoration-none fw-bold small text-gradient">VIEW ALL CITIES <FaArrowRight /></Link>
             </div>
             <div className="row g-4 mobile-slider-wrapper">
               {otherCities.map((cityName, idx) => (
                 <div className="col-lg-4" key={idx}>
                   <Link href={cityUrlMap[cityName]} className="text-decoration-none">
-                    <div className="related-card bg-white position-relative shadow-sm h-100">
+                    <div className="related-card bg-white position-relative shadow-sm h-100 rounded-4 overflow-hidden">
                       <div style={{ height: "200px", position: "relative" }}>
                         <Image src="/images/wework_bgImage.jpg" alt={cityName} fill style={{ objectFit: "cover" }} loading="lazy" />
                         <div className="position-absolute bottom-0 start-0 p-4 w-100 text-white fw-bold" style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.8))' }}>

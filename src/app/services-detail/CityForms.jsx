@@ -3,12 +3,13 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import api from "@/utils/api";
 import { buildLeadMetadata } from "@/utils/leadForms";
-import { FaUser, FaPhoneAlt, FaCheckCircle } from "react-icons/fa";
+import { FaUser, FaPhoneAlt, FaCheckCircle, FaMapMarkerAlt } from "react-icons/fa"; // Added FaMapMarkerAlt
 
 // 🌟 1. THE SMART SIDEBAR FORM
 export function SidebarForm({ city }) {
   const pathname = usePathname();
-  const [formData, setFormData] = useState({ fullName: "", contactNo: "" });
+  // Added 'place' to the initial state
+  const [formData, setFormData] = useState({ fullName: "", contactNo: "", place: "" });
   const [status, setStatus] = useState({ error: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
 
@@ -24,7 +25,8 @@ export function SidebarForm({ city }) {
         name: formData.fullName,
         mobile: formData.contactNo,
         email: "", // Maintain consistency with working forms
-        place: city || "Not Specified",
+        // Capture user input location, fallback to page city, or default
+        place: formData.place || city || "Not Specified", 
         query: "Quick Quote Request from Sidebar",
         ...buildLeadMetadata({
           pathname,
@@ -36,7 +38,7 @@ export function SidebarForm({ city }) {
 
       if (response.status === 201) {
         setSubmitted(true);
-        setFormData({ fullName: "", contactNo: "" });
+        setFormData({ fullName: "", contactNo: "", place: "" }); // Reset place
       } else {
         setStatus({ error: "Failed to submit. Try again.", message: "" });
       }
@@ -64,14 +66,23 @@ export function SidebarForm({ city }) {
       <h4 className="fw-bold font-outfit mb-4 text-center">Get Free Consultation</h4>
       <form onSubmit={handleSubmit}>
         {status.error && <div className="alert alert-danger small py-2">{status.error}</div>}
+        
         <div className="mb-3 position-relative">
           <FaUser className="position-absolute text-muted" style={{ top: '16px', left: '15px' }} />
           <input type="text" className="form-control border-0 bg-light p-3 ps-5 rounded-3" name="fullName" value={formData.fullName} onChange={handleInputChange} placeholder="Full Name" required />
         </div>
+        
         <div className="mb-3 position-relative">
           <FaPhoneAlt className="position-absolute text-muted" style={{ top: '16px', left: '15px' }} />
           <input type="tel" className="form-control border-0 bg-light p-3 ps-5 rounded-3" name="contactNo" value={formData.contactNo} onChange={handleInputChange} placeholder="Phone Number" required />
         </div>
+
+        {/* 🌟 NEW LOCATION FIELD */}
+        <div className="mb-3 position-relative">
+          <FaMapMarkerAlt className="position-absolute text-muted" style={{ top: '16px', left: '15px' }} />
+          <input type="text" className="form-control border-0 bg-light p-3 ps-5 rounded-3" name="place" value={formData.place} onChange={handleInputChange} placeholder="Location / City" required />
+        </div>
+
         <button type="submit" className="btn btn-warning w-100 fw-bold text-white py-3 rounded-3 shadow-sm" style={{ background: 'linear-gradient(to right, #ff914d, #ff5722)' }}>
         Submit
         </button>
