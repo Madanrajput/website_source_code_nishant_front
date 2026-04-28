@@ -1,5 +1,4 @@
 import dynamic from "next/dynamic";
-// import { format, isValid, parseISO } from "date-fns";
 import Image from "next/image";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import React, { Fragment } from "react"; 
@@ -14,12 +13,10 @@ import Card from "../components/Card";
 import VideoCardHome from "../components/VideoCardHome";
 import BgImageCard from "../components/BgImageCard";
 import RoomOfice from "../components/RoomOfice";
-import IconBox from "../components/IconBox";
 
 // --- DYNAMIC IMPORTS ---
 
 const Blogs = dynamic(() => import("../components/Blogs"));
-
 
 const SliderCard = dynamic(() => import("../components/SliderCard"), { 
   ssr: false, 
@@ -36,6 +33,17 @@ const CounterRow = dynamic(() => import("../components/CounterRow"), {
   loading: () => <div style={{ height: "300px", background: "#f8f9fa", width: "100%" }} /> 
 });
 
+// --- MARQUEE DATA ---
+const whyChooseUsData = [
+  { title: "Lifetime warranty¹", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/city-page/year-warranty-1775824886-iq5EB.png" },
+  { title: "45-day move-in guarantee²", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/unification-home-1663681501-pVo75/desktop-1663681517-hulYi/why-choose-us-1682067952-gXbOw/45-day-move-in-guarantee-1682070434-vYtgS.jpg" },
+  { title: "146 quality checks", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/unification-home-1663681501-pVo75/desktop-1663681517-hulYi/why-choose-us-1682067952-gXbOw/146-quality-checks-1682070435-krIlQ.jpg" },
+  { title: "1,00,000+ happy homes", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/unification-home-1663681501-pVo75/desktop-1663681517-hulYi/why-choose-us-1682067952-gXbOw/50000-happy-homes-1682070435-ih1Ir.jpg" },
+  { title: "100+ cities", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/unification-home-1663681501-pVo75/desktop-1663681517-hulYi/why-choose-us-1682067952-gXbOw/40-cities-1682070433-M7Q2t.jpg" },
+  { title: "20 lakh+ catalogue products", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/unification-home-1663681501-pVo75/desktop-1663681517-hulYi/why-choose-us-1682067952-gXbOw/20-lakhcatalogue-products-1682070432-CoDEa.jpg" },
+  { title: "2,000+ designers", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/unification-home-1663681501-pVo75/desktop-1663681517-hulYi/why-choose-us-1682067952-gXbOw/3500-designers-1682070430-eEvZq.jpg" }
+];
+
 
 // --- DATA FETCHING WITH FETCH (FIXED) ---
 async function getRemainingData() {
@@ -49,7 +57,7 @@ async function getRemainingData() {
           const res = await fetch(`${baseURL}${endpoint}`, { next: { revalidate: 60 } });
           if (!res.ok) return [];
           const json = await res.json();
-          return json; // Adjust based on if your API returns data directly or inside a key
+          return json; 
       } catch (e) {
           console.error(`Error fetching ${endpoint}:`, e);
           return [];
@@ -81,7 +89,6 @@ const formatDate = (dateString) => {
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return "Invalid Date";
 
-  // 🌟 PERF FIX: Native JS formatting (0 bytes of extra JS)
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
@@ -95,7 +102,6 @@ export default async function HomeContent() {
   const sortedDesignIdea = [...designIdea].sort((a, b) => b.id - a.id);
   
   // FIX: Take the First 5 (Newest)
-  // const staticRecords = sortedDesignIdea.slice(0, 5); 
   const staticRecords = sortedDesignIdea.slice(-5);
 
   const workProcessConfig = [
@@ -128,12 +134,75 @@ export default async function HomeContent() {
 
   return (
     <>
+      {/* --- INJECTED CSS FOR MOBILE HORIZONTAL SLIDERS --- */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @media (max-width: 768px) {
+          /* Generic Mobile Slider */
+          .mobile-scroll-row {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            scroll-snap-type: x mandatory;
+            padding-bottom: 20px !important;
+            margin-bottom: 10px !important;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+            justify-content: flex-start !important; /* CRITICAL FIX: forces scroll from left */
+          }
+          .mobile-scroll-row::-webkit-scrollbar { display: none; }
+          
+          .mobile-scroll-row > [class*="col-"] {
+            flex: 0 0 85% !important;
+            max-width: 85% !important;
+            scroll-snap-align: center;
+          }
+
+          /* The Way We Work specific mobile slider */
+          .mobile-process-row {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            scroll-snap-type: x mandatory;
+            padding-bottom: 20px !important;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            gap: 15px;
+            margin-left: 0;
+            margin-right: 0;
+            justify-content: flex-start !important; /* CRITICAL FIX: prevents items from bleeding off screen */
+          }
+          .mobile-process-row::-webkit-scrollbar { display: none; }
+          
+          .process-mobile-wrap {
+            flex: 0 0 85% !important;
+            scroll-snap-align: center;
+            display: flex;
+            flex-direction: column; /* Stack the number and text box vertically on mobile */
+          }
+          
+          .process-mobile-wrap > div {
+            width: 100% !important;
+            max-width: 100% !important;
+            flex: unset !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+          }
+        }
+        
+        @media (min-width: 769px) {
+          .process-mobile-wrap {
+            display: contents; /* MAGIC: Keeps desktop grid perfectly intact */
+          }
+        }
+      `}} />
+
       {/* 2. About Us */}
       <section className="mt-2 mb-5 mt-lg-5 about_wrapper">
         <RowImage
-          imageColLg="6" imageColXl="6" imageColMd="6" imageCol="12"
+          /* Added d-none d-md-block to hide image column purely on mobile */
+          imageColLg="6" imageColXl="6" imageColMd="6" imageCol="12 d-none d-md-block"
           ImgAbout={content[2]?.json_content?.image}
-          ImgAboutClass={"aboout_img object-fit-contain w-100"}
+          ImgAboutClass={"aboout_img object-fit-contain w-100 d-none d-md-block"}
           imgAlt="About High Creation"
           titleHeading={content[2]?.json_content?.title}
           subHeading={content[2]?.json_content?.description}
@@ -149,8 +218,9 @@ export default async function HomeContent() {
       {/* 3. Explore What We Offer */}
       <div className="my-5 oofer_card">
           <div className="container">
-            <div className="mx-0 row g-4">
-              <h2 className="pb-3 font_about"><span className="font_stylish">Explore</span> What we Offer</h2>
+            {/* Title moved outside row to not be caught in mobile scroll */}
+            <h2 className="pb-3 font_about"><span className="font_stylish">Explore</span> What we Offer</h2>
+            <div className="mx-0 row g-4 mobile-scroll-row">
               {[23, 24, 22, 21].map((index) => (
                 <div className="col-lg-3 col-md-6 col-12" key={index}>
                   <Card 
@@ -165,9 +235,9 @@ export default async function HomeContent() {
                   />
                 </div>
               ))}
-              <div className="mt-5 text-end">
-                <a href="/what-we-offer" className="pe-2 know_more fs-6">View More <MdKeyboardArrowRight className="fs-4" /> </a>
-              </div>
+            </div>
+            <div className="mt-5 text-end">
+              <a href="/what-we-offer" className="pe-2 know_more fs-6">View More <MdKeyboardArrowRight className="fs-4" /> </a>
             </div>
           </div>
         </div>
@@ -176,9 +246,10 @@ export default async function HomeContent() {
       <div className="way_wework">
           <div className="container">
             <h3 className="text-center font_about">The Way <span className="font_stylish">We Work</span></h3>
-            <div className="mx-0 row justify-content-center g-lg-0">
+            {/* Added mobile-process-row */}
+            <div className="mx-0 row justify-content-center g-lg-0 mobile-process-row">
               {workProcessConfig.map((step) => (
-                <Fragment key={step.id}>
+                <div className="process-mobile-wrap" key={step.id}>
                   <div className={step.col1Class}>
                     <div className={step.boxClass}>
                       <h3 className="box_heading">{step.number}</h3>
@@ -204,14 +275,14 @@ export default async function HomeContent() {
                       </div>
                     </div>
                   </div>
-                </Fragment>
+                </div>
               ))}
             </div>
           </div>
         </div>
 
       {/* 5. Video Section */}
-      <LazySection placeholderHeight="500px">
+      {/* <LazySection placeholderHeight="500px">
         <div className="container my-5 video">
           <div className="row mx-0">
             <h3 className="pb-2 text-center"><span className="font_stylish">{content[0]?.json_content?.title}</span></h3>
@@ -221,8 +292,70 @@ export default async function HomeContent() {
             </div>
           </div>
         </div>
-      </LazySection>
+      </LazySection> */}
+ <LazySection placeholderHeight="300px">
+        <section className="my-5 py-5 overflow-hidden" style={{ backgroundColor: "#fafafa" }}>
+          
+          <div className="container mb-5">
+            <h2 className="text-center font_about fw-bold mb-0" style={{ fontSize: "clamp(2rem, 4vw, 2.8rem)" }}>
+              Why <span className="font_stylish" style={{ color: "#ff914d" }}>choose us</span>
+            </h2>
+          </div>
 
+          <div className="marquee-container position-relative w-100" style={{ overflow: "hidden" }}>
+            <div className="marquee-track d-flex align-items-center gap-4">
+              
+              {/* Render the array twice to create a seamless infinite loop */}
+              {[...whyChooseUsData, ...whyChooseUsData].map((item, idx) => (
+                <div 
+                  key={idx} 
+                  className="marquee-card bg-white p-4 rounded-4 shadow-sm d-flex flex-column align-items-center justify-content-center text-center flex-shrink-0" 
+                  style={{ width: "220px", height: "180px", border: "1px solid #f1f5f9" }}
+                >
+                  <img 
+                    src={item.img} 
+                    alt={item.title} 
+                    width="64" 
+                    height="64" 
+                    className="mb-3 object-fit-contain" 
+                    loading="lazy" 
+                  />
+                  <p className="mb-0 fw-bold font-poppins text-dark" style={{ fontSize: "15px" }}>
+                    {item.title}
+                  </p>
+                </div>
+              ))}
+              
+            </div>
+          </div>
+
+          <style dangerouslySetInnerHTML={{__html: `
+            .marquee-container {
+              mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+              -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            }
+            .marquee-track {
+              animation: scrollMarquee 30s linear infinite;
+              width: max-content;
+            }
+            .marquee-track:hover {
+              animation-play-state: paused;
+            }
+            .marquee-card {
+              transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .marquee-card:hover {
+              transform: translateY(-5px);
+              box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+            }
+            @keyframes scrollMarquee {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); } 
+            }
+          `}} />
+          
+        </section>
+      </LazySection>
       {/* Design Idea */}
       <LazySection placeholderHeight="700px">
         <div className="pt-5 my-5 designidea" style={{ backgroundImage: `url(${content[1]?.json_content?.image})` }}>
@@ -241,22 +374,9 @@ export default async function HomeContent() {
       </LazySection>
 
       {/* Ready To Go */}
-      {/* <LazySection placeholderHeight="400px">
+      <LazySection placeholderHeight="400px">
         <section className="my-5">
           <div className="container">
-            <div className="mx-0 row position-relative">
-              <span className="font_stylish ss ms-lg-5">Ready ToGo Designs</span>
-              <h3 className="text-center font_about with_heading w-auto">with Our Exclusive Design Choices</h3>
-            </div>
-            <SliderCard />
-          </div>
-        </section>
-      </LazySection> */}
-{/* Ready To Go */}
-<LazySection placeholderHeight="400px">
-        <section className="my-5">
-          <div className="container">
-            {/* 🌟 UI FIX: Removed the absolute positioning classes and used Flexbox to stack them cleanly */}
             <div className="mx-0 mb-4 row justify-content-center text-center">
               <div className="col-12 d-flex flex-column align-items-center">
                 <span 
@@ -277,6 +397,7 @@ export default async function HomeContent() {
           </div>
         </section>
       </LazySection>
+
       {/* Designer Choice */}
       <LazySection placeholderHeight="800px">
         <div className="my-5 bgsectionroom">
@@ -285,15 +406,16 @@ export default async function HomeContent() {
               <span className="pb-0 mb-0 font_stylish d-grid ms-lg-5 designer">Designer&apos;s Choice:</span>
               <h3 className="pb-4 w-auto font_about excluisive_home_heading">Exclusive Design Specials</h3>
             </div>
-            <div className="mt-4 row g-4 mx-0">
+            {/* Added mobile-scroll-row */}
+            <div className="mt-4 row g-4 mx-0 mobile-scroll-row">
               {staticRecords.map((record, i) => (
                 <div className={`col-lg-${i === 0 || i === 3 ? '5' : i === 4 ? '12' : '7'} col-md-6 col-12`} key={record.id}>
                   <BgImageCard style={{ backgroundImage: `url(${record?.child_content?.image})` }} cardLinkTag={`/designer-choice/gallery?id=${record?.id}`} designerCardBgDiv={"designercard designercardimg1"} titleBgImage={record?.child_content?.title} descriptionBg={record?.child_content?.description} />
                 </div>
               ))}
-              <div className="col-lg-12 text-right">
-                <div className="button_text"><a href="/designer-choice" className="know_more">Know More</a></div>
-              </div>
+            </div>
+            <div className="mt-4 col-lg-12 text-end pe-3">
+               <a href="/designer-choice" className="know_more">Know More</a>
             </div>
           </div>
         </div>
@@ -339,15 +461,16 @@ export default async function HomeContent() {
         </div>
       </LazySection>
 
-      {/* Gallery */}
+      {/* Gallery (Let's Save Time) */}
       <LazySection placeholderHeight="600px">
         <div className="savedesign">
           <div className="container">
-            <div className="mx-0 row g-4 justify-content-center ">
-              <div className="mb-5 position-relative">
-                <div><h3 className="mb-0"><span className="font_stylish">{content[8]?.json_content?.title}</span></h3></div>
-                <h3 className="pb-0 pb-lg-4 font_about mt-0 designs_lets">{content[8]?.json_content?.description}</h3>
-              </div>
+            <div className="mb-5 position-relative text-center">
+              <h3 className="mb-0"><span className="font_stylish">{content[8]?.json_content?.title}</span></h3>
+              <h3 className="pb-0 pb-lg-4 font_about mt-0 designs_lets">{content[8]?.json_content?.description}</h3>
+            </div>
+            {/* Added mobile-scroll-row */}
+            <div className="mx-0 row g-4 justify-content-center mobile-scroll-row">
               {h3d_gallery.map((hd_gallery, index) => (
                 <div key={index} className="col-lg-4 col-md-6 col-12">
                   <Card 
@@ -366,20 +489,64 @@ export default async function HomeContent() {
         </div>
       </LazySection>
 
-      {/* Let Transform */}
-      <LazySection placeholderHeight="400px">
-        <section className="mb-5 lettransformbg" style={{ backgroundImage: `url(${content[7]?.json_content?.image})` }}>
-          <div className="container">
-            <div className="row">
-              <div className="col-lg-2 col-md-3 col-3"><Image src="/images/home_Icon.png" width={150} height={150} alt="home-icon" /></div>
-              <div className="col-lg-10 col-md-9 col-9">
-                <div className="pt-3 text-end">
-                  <h3 className="text-white letheading">{content[7]?.json_content?.title}</h3>
-                  <p className="text-white">{content[7]?.json_content?.description}</p>
-                  <a href={content[7]?.json_content?.designation} className="know_more">Know More</a>
+      {/* 🚀 Get Estimate Section (Livspace Style Rotating Cube - Fixed Overlap) */}
+      <LazySection placeholderHeight="300px">
+        <section className="my-5 py-5" style={{ backgroundColor: "#fff9f9", borderTop: "1px solid #ffeeee", borderBottom: "1px solid #ffeeee" }}>
+          <div className="container text-center">
+            <div className="d-flex flex-column flex-md-row justify-content-center align-items-center gap-2 gap-md-3 mb-4">
+              <h2 className="font_about text-dark mb-0" style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)" }}>
+                Calculate the cost of your
+              </h2>
+              
+              {/* Animated 3D Cube Container */}
+              <div className="cube-container" style={{ height: "50px", width: "190px", perspective: "1000px" }}>
+                <div className="cube-spinner" style={{ position: "relative", width: "100%", height: "100%", transformStyle: "preserve-3d", animation: "spinCube 7.5s infinite cubic-bezier(0.2, 0.8, 0.2, 1)" }}>
+                  
+                  <div className="cube-face position-absolute w-100 h-100 fw-bold" 
+                       style={{ transform: "rotateX(0deg) translateZ(15px)", color: "#ff914d", fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: "50px", backfaceVisibility: "hidden" }}>
+                    Kitchen
+                  </div>
+                  
+                  <div className="cube-face position-absolute w-100 h-100 fw-bold" 
+                       style={{ transform: "rotateX(120deg) translateZ(15px)", color: "#ff914d", fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: "50px", backfaceVisibility: "hidden" }}>
+                    Wardrobe
+                  </div>
+                  
+                  <div className="cube-face position-absolute w-100 h-100 fw-bold" 
+                       style={{ transform: "rotateX(240deg) translateZ(15px)", color: "#ff914d", fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: "50px", backfaceVisibility: "hidden" }}>
+                    Full Home
+                  </div>
+
                 </div>
               </div>
             </div>
+
+            <p className="text-muted mb-4 font-poppins mx-auto" style={{ fontSize: "1.1rem", maxWidth: "600px" }}>
+              Get a personalized, transparent estimate for your interior project in just a few clicks. No hidden costs.
+            </p>
+            
+            <a href="/estimator-for-home" className="btn text-white fw-bold px-5 py-3 rounded-pill shadow-sm" style={{ backgroundColor:"#ff914d", fontSize: "1.1rem", transition: "all 0.3s ease" }}>
+              Get Free Estimate <MdKeyboardArrowRight size={24} className="ms-1" />
+            </a>
+
+            {/* Injected Keyframes for Clean Flipping */}
+            <style dangerouslySetInnerHTML={{__html: `
+              @keyframes spinCube {
+                0%, 22% { transform: translateZ(-15px) rotateX(0deg); }
+                33%, 55% { transform: translateZ(-15px) rotateX(-120deg); }
+                66%, 88% { transform: translateZ(-15px) rotateX(-240deg); }
+                100% { transform: translateZ(-15px) rotateX(-360deg); }
+              }
+              .cube-face {
+                 display: flex;
+                 align-items: center;
+                 justify-content: center;
+              }
+              @media (min-width: 768px) {
+                 .cube-face { justify-content: flex-start; }
+                 .cube-container { width: 230px !important; }
+              }
+            `}} />
           </div>
         </section>
       </LazySection>
@@ -388,8 +555,10 @@ export default async function HomeContent() {
       <LazySection placeholderHeight="500px">
         <div className="my-5 blogs_wrapper">
           <div className="container">
-            <div className="row g-2 g-lg-4 justify-content-center mx-1">
-              <h3 className="pb-2 pb-lg-4 text-center font_about">Blogs</h3>
+            {/* Title moved outside row */}
+            <h3 className="pb-2 pb-lg-4 text-center font_about">Blogs</h3>
+            {/* Added mobile-scroll-row */}
+            <div className="row g-2 g-lg-4 justify-content-center mx-1 mobile-scroll-row">
               {blogs.map((blog, index) => (
                 <div key={index} className="col-lg-4 col-md-6 col-12">
                   <Blogs 
@@ -424,20 +593,8 @@ export default async function HomeContent() {
       
       <hr />
       
-      {/* Icon Box */}
-      <LazySection placeholderHeight="300px">
-        <section className="container-fluid my-5 iconbox">
-          <div className="row justify-content-center mx-0">
-            <div className="col-lg-11">
-              <div className="row justify-content-center align-items-center g-4">
-                <div className="col-12 col-md-6 col-lg-4"><IconBox iconUrl={content[6]?.json_content?.image} iconAlt="checkicon" iconWidth="70" iconDescription={content[6]?.json_content?.description} descr="descriptionClass" /></div>
-                <div className="col-12 col-md-6 col-lg-4"><IconBox iconUrl={content[5]?.json_content?.image} iconAlt="checkicon" iconWidth="70" iconDescription={content[5]?.json_content?.description} descr="descriptionClass" /></div>
-                <div className="col-12 col-md-6 col-lg-4"><IconBox iconUrl={content[4]?.json_content?.image} iconAlt="checkicon" iconWidth="70" iconDescription={content[4]?.json_content?.description} descr="descriptionClass" /></div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </LazySection>
+      {/* 🚀 Why Choose Us (Infinite Marquee) */}
+      
       
       <hr />
 

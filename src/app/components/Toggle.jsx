@@ -170,7 +170,7 @@ const Toggle = () => {
                   </div>
 
                   {/* Looks - Centered Full Width on Mobile */}
-                  <div className="col-12 col-md-4 text-center text-lg-start mt-5 mt-md-0">
+                  {/* <div className="col-12 col-md-4 text-center text-lg-start mt-5 mt-md-0">
                     <h5 className="mb-4 pb-1 stylish-section-title fs-4">Looks</h5>
                     <ul className="list-unstyled mb-0 gap-3 d-flex flex-column align-items-center align-items-lg-start">
                       {loading ? (
@@ -181,7 +181,7 @@ const Toggle = () => {
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </div> */}
 
                   {/* Cities - Centered Full Width on Mobile */}
                   <div className="col-12 col-md-4 text-center text-lg-start mt-5 mt-md-0">

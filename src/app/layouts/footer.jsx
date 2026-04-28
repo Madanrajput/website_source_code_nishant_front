@@ -160,11 +160,11 @@ const Footer = () => {
                   <div>
                     <h6 className="pt-3">FOR QUERY</h6>
                     <p className="mb-0">
-                      <a href={`tel:${settings?.phone || '+918527750562'}`} className="text_mail p-2 m-n2 d-inline-block">
+                      <a href={`tel:${settings?.phone || '+918527750562'}`} className="text-black p-2 m-n2 d-inline-block fw-medium">
                         {settings?.phone || '+91 8527750562'}
                       </a>
                     </p>
-                    <a href="tel:+917070701373" className="text_mail p-2 m-n2 d-inline-block">
+                    <a href="tel:+917070701373" className="text-black p-2 m-n2 d-inline-block fw-medium">
                       +91 7070701373
                     </a>
                   </div>
@@ -234,71 +234,69 @@ const Footer = () => {
                 <div className="col-lg-3 col-md-12 col-6">
                   <h4 className="footer_heading">Branch Office</h4>
                   <ul className="list-unstyled">
-                    {/* Noida H101 */}
-                    <li className="footer_li pb-2">
+                    
+                    {/* Corporate Office */}
+                    <li className="footer_li pb-1 pt-2">
+                      <h6 className="mb-1 text-black fw-bold" style={{ fontSize: "14px" }}>Corporate Office:</h6>
                       <a
-                        href="https://share.google/HP7ACwe10N8abGQHv"
+                        href="https://share.google/NsJByald2Vm8Q2DRJ"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-black"
-                      >
-                        H101, LGF, Sector-63, Noida, Uttar Pradesh- 201301
-                      </a>
-                    </li>
-                    {/* Noida H-56 */}
-                    <li className="footer_li pb-2">
-                      <a
-                        href="https://share.google/y9omV2e5Ch6AfHlnB"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-black"
+                        className="text-black d-block pb-2"
+                        style={{ lineHeight: "1.4" }}
                       >
                         H-56, 1st Floor, Sector-63, Noida, Uttar Pradesh- 201301
                       </a>
                     </li>
-                    {/* Gurugram 1 */}
-                    <li className="footer_li pb-2">
+
+                    {/* Experience Centers */}
+                    <li className="footer_li pb-1 pt-2">
+                      <h6 className="mb-1 text-black fw-bold" style={{ fontSize: "14px" }}>Experience Center:</h6>
+                      
                       <a
-                        href="https://share.google/suG5UqBggFOVNmJql"
+                        href="https://share.google/LMhkJflVZey0KDXS8"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-black"
+                        className="text-black d-block pb-2"
+                        style={{ lineHeight: "1.4" }}
                       >
-                        4th Floor, Jmd Galleria Mall, Unit Nos. 402, Sector-47 &
-                        48, Sohna - Gurgaon Rd, Gurugram, Haryana 122001
+                        H101, LGF, Sector-63, Noida, Uttar Pradesh- 201301
                       </a>
-                    </li>
-                    {/* Gurugram 2 - NEW ADDRESS */}
-                    <li className="footer_li pb-2">
+                      
+                      {/* NO LINK FOR THIS LOCATION AS REQUESTED */}
+                      <span className="text-black d-block pb-2" style={{ lineHeight: "1.4" }}>
+                        4th Floor, Jmd Galleria Mall, Unit Nos. 402, Sector-47 & 48, Sohna - Gurgaon Rd, Gurugram, Haryana 122001
+                      </span>
+
                       <a
-                        href="https://www.google.com/maps/search/?api=1&query=DDC+Arcade,+1st+Floor,+Plot+No+1+Main,+Sector+48+Road,+Badshahpur+Sohna+Rd,+Opposite+Vipul+Business+Park,+Gurugram,+Haryana+122018"
+                        href="https://share.google/C9uQKfphGOlrhlUuM"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-black"
+                        className="text-black d-block pb-2"
+                        style={{ lineHeight: "1.4" }}
                       >
                         DDC Arcade, 1st Floor, Plot No 1 Main, Sector 48 Road, Badshahpur Sohna Rd, Opposite Vipul Business Park, Gurugram, Haryana 122018
                       </a>
-                    </li>
-                    {/* Faridabad */}
-                    <li className="footer_li pb-2">
+
                       <a
-                        href="https://share.google/5foJQ0EoWNl5MoeNv"
+                        href="https://share.google/mJMlqcOZ0249JEpN6"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-black"
+                        className="text-black d-block pb-2"
+                        style={{ lineHeight: "1.4" }}
                       >
-                        1st Floor, Plot No 24, near old Faridabad Metro Station,
-                        Sector 20A, Faridabad, Haryana 121002
+                        1st Floor, Plot No 24, near old Faridabad Metro Station, Sector 20A, Faridabad, Haryana 121002
                       </a>
                     </li>
 
+                    {/* Workshop */}
                     <li className="footer_li pb-2 pt-2">
-                      <h6>Workshop</h6>
-                      <span className="text-black">
-                        Plot No-3, Sorkha Village , Sector-115, Noida, Uttar
-                        Pradesh- 201301
+                      <h6 className="mb-1 text-black fw-bold" style={{ fontSize: "14px" }}>Workshop:</h6>
+                      <span className="text-black d-block" style={{ lineHeight: "1.4" }}>
+                        Plot No-3, Sorkha Village , Sector-115, Noida, Uttar Pradesh- 201301
                       </span>
                     </li>
+
                   </ul>
                 </div>
               </div>
@@ -310,7 +308,6 @@ const Footer = () => {
             <div className="d-flex justify-content-between align-items-center flex-wrap">
               <div>
                 <ul className="list-unstyled d-flex mb-0">
-                  {/* 👈 FIX: Apply the new 'footer-policy-link' class */}
                   <li className="footer_li pe-3 border-end">
                     <a href="/privacy-policy/" className="footer-policy-link">
                       Privacy Policy
@@ -335,7 +332,6 @@ const Footer = () => {
                 </p>
               </div>
 
-              {/* 👈 FIX: Trim spaces from API URLs and ensure all render dynamically */}
               <div className="m-auto m-lg-0 text-center">
                 <div className="social-links d-flex gap-2 justify-content-center my-3">
                     {(settings?.facebook_url || "https://www.facebook.com/HighCreationInteriorProjectsPvtLtd") && (
@@ -373,10 +369,9 @@ const Footer = () => {
             </div>
             <hr />
 
-            <p className="text-lg-end text-center team_description">
+            <p className="text-lg-end text-center team_description text-dark">
              {`Designed By ` } 
-              <a href="#" className="text-black">
-                
+              <a href="#" className="text-black fw-bold text-decoration-none">
                 HC Interior
               </a>
             </p>

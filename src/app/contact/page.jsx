@@ -104,7 +104,7 @@ export default function Contact() {
                     </a>
                   </p>
 
-                  <h6 className="fw-bolder">Branch Office</h6>
+                  <h6 className="fw-bolder">Corporate Office</h6>
                   <p className="text-white">
                     H101, LGF, Sector-63, Noida, <br />
                     Uttar Pradesh- 201301
