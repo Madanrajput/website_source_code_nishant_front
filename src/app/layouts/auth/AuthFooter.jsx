@@ -219,7 +219,7 @@ const AuthFooter = () => {
                     Designed By
                     <a href="" className="text-black">
                         {" "}
-                        Lead panther
+                        High Creation Interior
                     </a>
                 </p>
             </div>

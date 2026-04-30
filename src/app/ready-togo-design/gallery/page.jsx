@@ -44,63 +44,53 @@ const ResidentialProjectsGallery = async ({ searchParams }) => {
   const images = galleryData?.child_images ?? [];
   const title = galleryData?.child_content?.title ?? "Ready to go Gallery";
 
+  // If there are no images, show a graceful fallback
+  if (images.length === 0) {
+    return (
+      <MainLayout>
+        <main className="container my-5 py-5 text-center">
+           <h2 className="font-outfit text-muted">No images found for this gallery.</h2>
+        </main>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout>
-      <main>
-        <section className="container my-5">
-          <div className="row g-4 mx-0">
-            <h4 className="ps-3 mt-3">{title}</h4>
-            <div className="col-lg-6">
-              <GalleryDetail
-                imgGalUrl={images[0]?.image ?? "/images/detail-img/1.webp"}
-                imgGalAlt={defaultAltText}
-                imgGalImgClass="w-100 detail_gal_img"
-                images={images} 
-              />
-            </div>
-            <div className="col-lg-6">
-              <GalleryDetail
-                imgGalUrl={images[1]?.image ?? "/images/detail-img/6.webp"}
-                imgGalAlt={defaultAltText}
-                imgGalImgClass="w-100 detail_gal_img"
-                images={images} 
-              />
-            </div>
-            <div className="col-lg-12">
-              <GalleryDetail
-                imgGalUrl={images[2]?.image ?? "/images/detail-img/3.webp"}
-                imgGalAlt={defaultAltText}
-                imgGalImgClass="w-100 detail_gal_img2"
-                images={images} 
-              />
-            </div>
-            <div className="col-lg-6">
-              <GalleryDetail
-                imgGalUrl={images[3]?.image ?? "/images/detail-img/4.webp"}
-                imgGalAlt={defaultAltText}
-                imgGalImgClass="w-100 detail_gal_img"
-                images={images} 
-              />
-            </div>
-            <div className="col-lg-6">
-              <GalleryDetail
-                imgGalUrl={images[4]?.image ?? "/images/detail-img/5.webp"}
-                imgGalAlt={defaultAltText}
-                imgGalImgClass="w-100 detail_gal_img"
-                images={images} 
-              />
-            </div>
-            <div className="col-lg-12">
-              <GalleryDetail
-                imgGalUrl={images[5]?.image ?? "/images/detail-img/6.webp"}
-                imgGalAlt={defaultAltText}
-                imgGalImgClass="w-100 detail_gal_img2"
-                images={images} 
-              />
-            </div>
+      <main className="bg-light pb-5">
+        
+        {/* Modern Header Section */}
+        <section className="py-5 bg-white border-bottom shadow-sm mb-5">
+          <div className="container text-center">
+             <h1 className="font-outfit fw-bold text-dark mb-2">{title}</h1>
+             <p className="font-poppins text-muted mb-0">Explore our exclusive, ready-to-execute designs.</p>
           </div>
         </section>
-        <hr />
+
+        {/* Dynamic Masonry-Style Grid */}
+        <section className="container">
+          <div className="row g-4">
+            {images.map((img, index) => {
+              // Create a dynamic pattern: Mix of tall (col-lg-12) and standard (col-lg-6) blocks.
+              // Every 3rd image spans full width, others take half width.
+              const isLarge = (index + 1) % 3 === 0; 
+              
+              return (
+                <div key={index} className={isLarge ? "col-lg-12 col-12" : "col-lg-6 col-md-6 col-12"}>
+                  <div style={{ height: isLarge ? '500px' : '350px' }}>
+                    <GalleryDetail
+                      imgGalUrl={img?.image ?? "/images/default.jpg"}
+                      imgGalAlt={img?.title || defaultAltText}
+                      imgGalImgClass="" // Class removed as styling is now handled by the component
+                      images={images} 
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
       </main>
     </MainLayout>
   );

@@ -5,6 +5,7 @@ import Slider from "react-slick";
 import { MdOutlineChevronLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { useEffect, useState } from "react";
 import api from "@/utils/api";
+
 const NextArrow = ({ onClick }) => (
   <div className="arrow next" onClick={onClick}>
     <MdKeyboardArrowRight />
@@ -38,7 +39,6 @@ const VideoTestimonial = () => {
     fetchYoutubeVideos();
   }, []);
 
-  console.log('youtubeVideos', youtubeVideos);
   const settings = {
     dots: false,
     infinite: true,
@@ -68,50 +68,61 @@ const VideoTestimonial = () => {
   };
 
   return (
-    <div className="container-fluid my-5">
-      <div className="row justify-content-center mx-0">
-        <div className="col-lg-11">
-          {loading ? (
-            <p>Loading videos...</p>
-          ) : error ? (
-            <p className="text-danger">{error}</p>
-          ) : (
-            <Slider {...settings}>
-              {youtubeVideos.length > 0
-                ? youtubeVideos.map((video, index) => (
-                    <div key={index} className="m-4">
-                      <iframe
-                        height="250"
-                        className="map video_card"
-                        src={video.json_content.description}
-                        title={video.json_content.title}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                  ))
-                : // Fallback default videos if API fails
-                  ["k2yUmWMMY_A", "CUSkOUgr0Oc", "Dc-7Fj8sOa8", "iqtAPVt4p-k"].map((id, index) => (
-                    <div key={index} className="m-4">
-                      <iframe
-                        height="250"
-                        className="map video_card"
-                        src={`https://www.youtube.com/embed/${id}`}
-                        title={`YouTube Video ${index + 1}`}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                  ))}
-            </Slider>
-          )}
+    <>
+      {/* 🌟 FIXED: Mobile spacing for the right arrow */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @media (max-width: 768px) {
+          .arrow.next {
+            right: -25px !important; /* Pushes the right arrow out further from the video */
+          }
+        }
+      `}} />
+
+      <div className="container-fluid my-5">
+        <div className="row justify-content-center mx-0">
+          <div className="col-lg-11">
+            {loading ? (
+              <p>Loading videos...</p>
+            ) : error ? (
+              <p className="text-danger">{error}</p>
+            ) : (
+              <Slider {...settings}>
+                {youtubeVideos.length > 0
+                  ? youtubeVideos.map((video, index) => (
+                      <div key={index} className="m-4">
+                        <iframe
+                          height="250"
+                          className="map video_card"
+                          src={video.json_content.description}
+                          title={video.json_content.title}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          allowFullScreen
+                        ></iframe>
+                      </div>
+                    ))
+                  : // Fallback default videos if API fails
+                    ["k2yUmWMMY_A", "CUSkOUgr0Oc", "Dc-7Fj8sOa8", "iqtAPVt4p-k"].map((id, index) => (
+                      <div key={index} className="m-4">
+                        <iframe
+                          height="250"
+                          className="map video_card"
+                          src={`https://www.youtube.com/embed/${id}`}
+                          title={`YouTube Video ${index + 1}`}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          allowFullScreen
+                        ></iframe>
+                      </div>
+                    ))}
+              </Slider>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

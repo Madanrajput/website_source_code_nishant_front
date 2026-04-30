@@ -3,50 +3,43 @@ import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
-import Fade from 'embla-carousel-fade';
 
 export default function HeroCarousel({ bannerData }) {
-  // 🌟 RESTORED ORIGINAL LOGIC: Strictly limit to 3 slides total
+  // Strictly limit to 3 slides total
   const firstBanner = bannerData?.[0];
   const restBanners = bannerData?.slice(1, 3) || [];
 
   const [showRest, setShowRest] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
+  // 🌟 FIXED: Smooth sliding motion with 5-second explicitly set intervals
   const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, duration: 40 }, 
-    [Fade(), Autoplay({ delay: 5000, stopOnInteraction: false })]
+    { loop: true, duration: 60 }, 
+    [Autoplay({ delay: 5000, stopOnInteraction: false })]
   );
-
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setActiveIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
 
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
 
-  // 🌟 RESTORED ORIGINAL LOGIC: Only load remaining slides on desktop after 2.5s
+  // Load remaining slides on desktop after 2.5s to optimize Largest Contentful Paint
   useEffect(() => {
     setIsMounted(true);
     if (window.innerWidth >= 768) {
       const timer = setTimeout(() => setShowRest(true), 2500);
       return () => clearTimeout(timer);
+    } else {
+      setShowRest(true);
     }
   }, []);
 
-  const activeBanners = showRest ? [firstBanner, ...restBanners] : [firstBanner];
+  // Filter out any potential undefined/null banners
+  const activeBanners = (showRest ? [firstBanner, ...restBanners] : [firstBanner]).filter(Boolean);
 
-  // Inform Embla when we add the remaining slides to the DOM
+  // Inform Embla when we add the remaining slides to the DOM so it loops properly
   useEffect(() => {
     if (!emblaApi) return;
     emblaApi.reInit();
-    onSelect();
-    emblaApi.on('select', onSelect);
-    emblaApi.on('reInit', onSelect);
-  }, [emblaApi, onSelect, activeBanners.length]);
+  }, [emblaApi, activeBanners.length]);
 
   if (!firstBanner) return null;
 
@@ -102,38 +95,31 @@ export default function HeroCarousel({ bannerData }) {
       <div className="embla" ref={emblaRef}>
         <div className="embla__container">
           {activeBanners.map((banner, index) => {
-            if (!banner) return null; // Safety check
-            
             const isVideo = banner?.banner_image?.endsWith(".mp4");
             const isFirstSlide = index === 0;
-            const isSlideActiveOrNext = activeIndex === index || activeIndex === (index - 1 + activeBanners.length) % activeBanners.length;
 
+            {/* 🌟 FIXED: Media is permanently rendered so Embla creates perfect clones for a seamless loop */}
             return (
-              <div className="embla__slide" key={index}>
+              <div className="embla__slide" key={banner.id || index}>
                 {isVideo ? (
-                  <>
-                    {isSlideActiveOrNext && (
-                      <video
-                        className="banner-media"
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        preload="auto"
-                        poster={banner?.banner_image_poster || ""}
-                      >
-                        <source src={banner?.banner_image} type="video/mp4" />
-                      </video>
-                    )}
-                  </>
+                  <video
+                    className="banner-media"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="auto"
+                    poster={banner?.banner_image_poster || ""}
+                  >
+                    <source src={banner?.banner_image} type="video/mp4" />
+                  </video>
                 ) : (
                   <Image
                     src={banner?.banner_image ?? "/images/home-banner-1.png"}
                     className="banner-media"
                     alt={banner?.title?.trim() || "High Creation Interior"}
                     fill
-                    priority={isFirstSlide}
-                    fetchPriority={isFirstSlide ? "high" : "auto"}
+                    priority={true} // Prioritize rendering so the loop doesn't snap to an unloaded image
                     sizes="100vw"
                   />
                 )}

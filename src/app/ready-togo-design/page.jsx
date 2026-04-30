@@ -1,6 +1,7 @@
 import MainLayout from "../layouts/MainLayout";
-import WallpaperCard from "../components/WallpaperCard";
 import { defaultAltText } from "@/utils/helper";
+import Link from "next/link";
+import { FaArrowRight } from "react-icons/fa";
 
 // --- CONFIGURATION ---
 export const revalidate = 60; // Regenerate page every 60 seconds
@@ -89,11 +90,87 @@ export default async function ReadyToGoDesign() {
 
   return (
     <MainLayout>
-      <main>
-        <section className="container my-5">
-          <div className="text-center mb-5 mx-0 row">
-            <h1 className="pb-3">Ready To Go Design</h1>
-            <p className="px-lg-5 team_description">
+      <style dangerouslySetInnerHTML={{__html: `
+        /* Premium Card Layout */
+        .premium-rtd-card {
+          background: #ffffff;
+          border-radius: 16px;
+          border: 1px solid #f1f5f9;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+          overflow: hidden;
+          transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+          display: flex;
+          flex-direction: column;
+        }
+
+        .premium-rtd-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+          border-color: #ff914d;
+        }
+
+        /* Image Zoom Effect */
+        .rtd-img-wrapper {
+          width: 100%;
+          height: 280px;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .rtd-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .premium-rtd-card:hover .rtd-img {
+          transform: scale(1.08);
+        }
+
+        /* Content Area */
+        .rtd-content {
+          padding: 24px;
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Call to Action Button */
+        .rtd-btn {
+          margin-top: auto;
+          color: #ff914d;
+          display: inline-flex;
+          align-items: center;
+          transition: color 0.3s ease;
+        }
+
+        .rtd-arrow {
+          transition: transform 0.3s ease;
+        }
+
+        .premium-rtd-card:hover .rtd-arrow {
+          transform: translateX(6px);
+        }
+
+        /* Header Restructuring */
+        .rtd-header-text {
+          max-width: 800px;
+          margin: 0 auto;
+          line-height: 1.8;
+          color: #475569;
+        }
+      `}} />
+
+      <main className="bg-light pb-5">
+        
+        {/* --- PREMIUM HEADER SECTION --- */}
+        <section className="py-5 bg-white border-bottom shadow-sm mb-5">
+          <div className="container text-center">
+            <h1 className="font-outfit fw-bold text-dark mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
+              Ready To Go Design
+            </h1>
+            <p className="font-poppins rtd-header-text">
               Ready-To-Go Interior Design solutions, crafted to bring you
               beautifully designed spaces with ease. These pre-designed setups
               combine style and practicality, giving your home or office a
@@ -106,36 +183,54 @@ export default async function ReadyToGoDesign() {
               seamless transformation that reflects your taste and lifestyle.
             </p>
           </div>
+        </section>
+
+        {/* --- PREMIUM GRID SECTION --- */}
+        <section className="container">
           <div className="row g-4 mx-0">
             {exclusiveDesignData && exclusiveDesignData.length > 0 ? (
               exclusiveDesignData.map((design, index) => (
                 <div key={index} className="col-lg-6 col-md-6 col-12">
-                  <WallpaperCard
-                    linkTagWallpaper={`/ready-togo-design/gallery?id=${design?.id}`}
-                    wallpaperCard="wallpapercard"
-                    imgWallpaper={
-                      design?.child_content?.image ?? "/images/Bhk/1bhk.png"
-                    }
-                    wallpaperImgClass="wallpaperclass"
-                    altWallpaper={
-                      design?.child_content?.title ?? defaultAltText
-                    }
-                    portfolioTitle={design?.child_content?.title}
-                    wallpaperDescriptiion={design?.child_content?.description}
-                    descriptionClass="team_description mb-0"
-                    textBtnWallpaper="View Design"
-                    btnHrefWallpaper={`/ready-togo-design/gallery?id=${design?.id}`}
-                  />
+                  <Link 
+                    href={`/ready-togo-design/gallery?id=${design?.id}`} 
+                    className="premium-rtd-card text-decoration-none h-100"
+                  >
+                    
+                    <div className="rtd-img-wrapper">
+                      <img 
+                        src={design?.child_content?.image ?? "/images/Bhk/1bhk.png"} 
+                        alt={design?.child_content?.title ?? defaultAltText} 
+                        className="rtd-img"
+                        decoding="async"
+                        loading="lazy"
+                      />
+                    </div>
+                    
+                    <div className="rtd-content">
+                      <h3 className="font-outfit fw-bold text-dark h4 mb-2">
+                        {design?.child_content?.title}
+                      </h3>
+                      
+                      <p className="font-poppins text-muted small mb-4" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {design?.child_content?.description}
+                      </p>
+                      
+                      <div className="rtd-btn font-poppins fw-bold text-uppercase" style={{ fontSize: '13px', letterSpacing: '1px' }}>
+                        View Designs <FaArrowRight className="rtd-arrow ms-2" />
+                      </div>
+                    </div>
+
+                  </Link>
                 </div>
               ))
             ) : (
-              <div className="col-12 text-center">
-                <p>Loading designs...</p>
+              <div className="col-12 text-center py-5">
+                <p className="font-poppins text-muted">Loading exclusive designs...</p>
               </div>
             )}
           </div>
         </section>
-        <hr />
+
       </main>
     </MainLayout>
   );

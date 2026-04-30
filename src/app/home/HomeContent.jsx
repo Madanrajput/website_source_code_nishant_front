@@ -1,6 +1,10 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { MdKeyboardArrowRight } from "react-icons/md";
+import { 
+  FaShieldAlt, FaClock, FaCheckCircle, FaHome, 
+  FaMapMarkerAlt, FaGem, FaUser 
+} from "react-icons/fa"; // 🌟 ADDED: React Icons for Why Choose Us
 import React, { Fragment } from "react"; 
 
 // --- CLIENT IMPORTS ---
@@ -15,7 +19,6 @@ import BgImageCard from "../components/BgImageCard";
 import RoomOfice from "../components/RoomOfice";
 
 // --- DYNAMIC IMPORTS ---
-
 const Blogs = dynamic(() => import("../components/Blogs"));
 
 const SliderCard = dynamic(() => import("../components/SliderCard"), { 
@@ -33,25 +36,24 @@ const CounterRow = dynamic(() => import("../components/CounterRow"), {
   loading: () => <div style={{ height: "300px", background: "#f8f9fa", width: "100%" }} /> 
 });
 
-// --- MARQUEE DATA ---
+// 🌟 FIXED: Replaced Livspace images with React Icons to match your brand Orange
 const whyChooseUsData = [
-  { title: "Lifetime warranty¹", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/city-page/year-warranty-1775824886-iq5EB.png" },
-  { title: "45-day move-in guarantee²", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/unification-home-1663681501-pVo75/desktop-1663681517-hulYi/why-choose-us-1682067952-gXbOw/45-day-move-in-guarantee-1682070434-vYtgS.jpg" },
-  { title: "146 quality checks", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/unification-home-1663681501-pVo75/desktop-1663681517-hulYi/why-choose-us-1682067952-gXbOw/146-quality-checks-1682070435-krIlQ.jpg" },
-  { title: "1,00,000+ happy homes", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/unification-home-1663681501-pVo75/desktop-1663681517-hulYi/why-choose-us-1682067952-gXbOw/50000-happy-homes-1682070435-ih1Ir.jpg" },
-  { title: "100+ cities", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/unification-home-1663681501-pVo75/desktop-1663681517-hulYi/why-choose-us-1682067952-gXbOw/40-cities-1682070433-M7Q2t.jpg" },
-  { title: "20 lakh+ catalogue products", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/unification-home-1663681501-pVo75/desktop-1663681517-hulYi/why-choose-us-1682067952-gXbOw/20-lakhcatalogue-products-1682070432-CoDEa.jpg" },
-  { title: "2,000+ designers", img: "https://images.livspace-cdn.com/w:80/h:80/plain/https://d3gq2merok8n5r.cloudfront.net/bumblebee/in/unification-home-1663681501-pVo75/desktop-1663681517-hulYi/why-choose-us-1682067952-gXbOw/3500-designers-1682070430-eEvZq.jpg" }
+  { title: "Lifetime warranty¹", icon: FaShieldAlt },
+  { title: "45-day move-in guarantee²", icon: FaClock },
+  { title: "146 quality checks", icon: FaCheckCircle },
+  { title: "1,00,000+ happy homes", icon: FaHome },
+  { title: "100+ cities", icon: FaMapMarkerAlt },
+  { title: "20 lakh+ catalogue products", icon: FaGem },
+  { title: "2,000+ designers", icon: FaUser }
 ];
 
 
-// --- DATA FETCHING WITH FETCH (FIXED) ---
+// --- DATA FETCHING WITH FETCH ---
 async function getRemainingData() {
   const baseURL = process.env.NODE_ENV === "development" 
       ? process.env.NEXT_PUBLIC_API_DEV_URL 
       : process.env.NEXT_PUBLIC_API_BASE_URL;
 
-  // Helper to fetch with caching
   const fetchData = async (endpoint) => {
       try {
           const res = await fetch(`${baseURL}${endpoint}`, { next: { revalidate: 60 } });
@@ -100,8 +102,6 @@ export default async function HomeContent() {
 
   // Sort Descending (Newest First)
   const sortedDesignIdea = [...designIdea].sort((a, b) => b.id - a.id);
-  
-  // FIX: Take the First 5 (Newest)
   const staticRecords = sortedDesignIdea.slice(-5);
 
   const workProcessConfig = [
@@ -146,8 +146,8 @@ export default async function HomeContent() {
             padding-bottom: 20px !important;
             margin-bottom: 10px !important;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Firefox */
-            justify-content: flex-start !important; /* CRITICAL FIX: forces scroll from left */
+            scrollbar-width: none; 
+            justify-content: flex-start !important; 
           }
           .mobile-scroll-row::-webkit-scrollbar { display: none; }
           
@@ -169,7 +169,7 @@ export default async function HomeContent() {
             gap: 15px;
             margin-left: 0;
             margin-right: 0;
-            justify-content: flex-start !important; /* CRITICAL FIX: prevents items from bleeding off screen */
+            justify-content: flex-start !important; 
           }
           .mobile-process-row::-webkit-scrollbar { display: none; }
           
@@ -177,7 +177,7 @@ export default async function HomeContent() {
             flex: 0 0 85% !important;
             scroll-snap-align: center;
             display: flex;
-            flex-direction: column; /* Stack the number and text box vertically on mobile */
+            flex-direction: column; 
           }
           
           .process-mobile-wrap > div {
@@ -191,7 +191,7 @@ export default async function HomeContent() {
         
         @media (min-width: 769px) {
           .process-mobile-wrap {
-            display: contents; /* MAGIC: Keeps desktop grid perfectly intact */
+            display: contents; 
           }
         }
       `}} />
@@ -199,7 +199,6 @@ export default async function HomeContent() {
       {/* 2. About Us */}
       <section className="mt-2 mb-5 mt-lg-5 about_wrapper">
         <RowImage
-          /* Added d-none d-md-block to hide image column purely on mobile */
           imageColLg="6" imageColXl="6" imageColMd="6" imageCol="12 d-none d-md-block"
           ImgAbout={content[2]?.json_content?.image}
           ImgAboutClass={"aboout_img object-fit-contain w-100 d-none d-md-block"}
@@ -218,7 +217,6 @@ export default async function HomeContent() {
       {/* 3. Explore What We Offer */}
       <div className="my-5 oofer_card">
           <div className="container">
-            {/* Title moved outside row to not be caught in mobile scroll */}
             <h2 className="pb-3 font_about"><span className="font_stylish">Explore</span> What we Offer</h2>
             <div className="mx-0 row g-4 mobile-scroll-row">
               {[23, 24, 22, 21].map((index) => (
@@ -246,7 +244,6 @@ export default async function HomeContent() {
       <div className="way_wework">
           <div className="container">
             <h3 className="text-center font_about">The Way <span className="font_stylish">We Work</span></h3>
-            {/* Added mobile-process-row */}
             <div className="mx-0 row justify-content-center g-lg-0 mobile-process-row">
               {workProcessConfig.map((step) => (
                 <div className="process-mobile-wrap" key={step.id}>
@@ -281,19 +278,8 @@ export default async function HomeContent() {
           </div>
         </div>
 
-      {/* 5. Video Section */}
-      {/* <LazySection placeholderHeight="500px">
-        <div className="container my-5 video">
-          <div className="row mx-0">
-            <h3 className="pb-2 text-center"><span className="font_stylish">{content[0]?.json_content?.title}</span></h3>
-            <p className="pb-4 text-center">{content[0]?.json_content?.description}</p>
-            <div className="col-lg-12 col-md-6 col-12">
-              <VideoCardHome videoUrl={content[0]?.json_content?.designation} imageUrl={content[0]?.json_content?.image} />
-            </div>
-          </div>
-        </div>
-      </LazySection> */}
- <LazySection placeholderHeight="300px">
+      {/* 5. Why Choose Us (Infinite Marquee) */}
+      {/* <LazySection placeholderHeight="300px">
         <section className="my-5 py-5 overflow-hidden" style={{ backgroundColor: "#fafafa" }}>
           
           <div className="container mb-5">
@@ -305,26 +291,27 @@ export default async function HomeContent() {
           <div className="marquee-container position-relative w-100" style={{ overflow: "hidden" }}>
             <div className="marquee-track d-flex align-items-center gap-4">
               
-              {/* Render the array twice to create a seamless infinite loop */}
-              {[...whyChooseUsData, ...whyChooseUsData].map((item, idx) => (
-                <div 
-                  key={idx} 
-                  className="marquee-card bg-white p-4 rounded-4 shadow-sm d-flex flex-column align-items-center justify-content-center text-center flex-shrink-0" 
-                  style={{ width: "220px", height: "180px", border: "1px solid #f1f5f9" }}
-                >
-                  <img 
-                    src={item.img} 
-                    alt={item.title} 
-                    width="64" 
-                    height="64" 
-                    className="mb-3 object-fit-contain" 
-                    loading="lazy" 
-                  />
-                  <p className="mb-0 fw-bold font-poppins text-dark" style={{ fontSize: "15px" }}>
-                    {item.title}
-                  </p>
-                </div>
-              ))}
+              {[...whyChooseUsData, ...whyChooseUsData].map((item, idx) => {
+                const Icon = item.icon;
+                return (
+                  <div 
+                    key={idx} 
+                    className="marquee-card bg-white p-4 rounded-4 shadow-sm d-flex flex-column align-items-center justify-content-center text-center flex-shrink-0" 
+                    style={{ width: "220px", height: "180px", border: "1px solid #f1f5f9" }}
+                  >
+                    <div 
+                      className="mb-3 d-flex align-items-center justify-content-center" 
+                      style={{ width: "64px", height: "64px", backgroundColor: "#fff4ed", borderRadius: "50%" }}
+                    >
+                      <Icon size={32} color="#ff914d" />
+                    </div>
+                    
+                    <p className="mb-0 fw-bold font-poppins text-dark" style={{ fontSize: "15px" }}>
+                      {item.title}
+                    </p>
+                  </div>
+                );
+              })}
               
             </div>
           </div>
@@ -355,18 +342,23 @@ export default async function HomeContent() {
           `}} />
           
         </section>
-      </LazySection>
-      {/* Design Idea */}
+      </LazySection> */}
+
+      {/* 🌟 FIXED: Design Idea (Now slides smoothly on Mobile!) */}
       <LazySection placeholderHeight="700px">
         <div className="pt-5 my-5 designidea" style={{ backgroundImage: `url(${content[1]?.json_content?.image})` }}>
           <div className="container">
-            <div className="mx-0 row ">
-              <h2 className="pb-5 text-center font_about">{content[1]?.json_content?.title} <span className="font_stylish">{content[1]?.json_content?.description}</span></h2>
-              <div className="mb-5 col-lg-6 col-md-6 col-12 mb-lg-0">
-                <RoomOfice cardRoomOffice={"card card_room border-0"} badge_circle="badge_circleblack" arrowIcon="images/arrow_icon.png" altArrow="arrow" width="80" imageRoom_Office={content[15]?.json_content?.image} roomImg="residential_imgs" altImage="room" cardBody="card_body office_card_body" cardTitle={content[15]?.json_content?.title} cardText={content[15]?.json_content?.description} btnText="Know More " btnLink={content[15]?.json_content?.designation} btnClass={"btn_knowmoreblack"} />
+            {/* Heading pulled out of the row so it stays centered above the slider */}
+            <h2 className="pb-4 text-center font_about">
+              {content[1]?.json_content?.title} <span className="font_stylish">{content[1]?.json_content?.description}</span>
+            </h2>
+            
+            <div className="row g-4 mobile-scroll-row">
+              <div className="col-lg-6 col-md-6 col-12">
+                <RoomOfice cardRoomOffice={"card card_room border-0 h-100"} badge_circle="badge_circleblack" arrowIcon="images/arrow_icon.png" altArrow="arrow" width="80" imageRoom_Office={content[15]?.json_content?.image} roomImg="residential_imgs" altImage="room" cardBody="card_body office_card_body" cardTitle={content[15]?.json_content?.title} cardText={content[15]?.json_content?.description} btnText="Know More " btnLink={content[15]?.json_content?.designation} btnClass={"btn_knowmoreblack"} />
               </div>
-              <div className="col-lg-6 col-md-6 col-12 mt-4 mt-lg-0">
-                <RoomOfice cardRoomOffice={"card card_room border-0"} badge_circle="badge_circleblack" arrowIcon="images/arrow_icon.png" altArrow="arrow" width="80" imageRoom_Office={content[14]?.json_content?.image} roomImg="residential_imgs" altImage="room" cardBody="card_body office_card_body" cardTitle={content[14]?.json_content?.title} cardText={content[14]?.json_content?.description} btnText="Know More " btnLink={content[14]?.json_content?.designation} btnClass={"btn_knowmoreblack"} />
+              <div className="col-lg-6 col-md-6 col-12">
+                <RoomOfice cardRoomOffice={"card card_room border-0 h-100"} badge_circle="badge_circleblack" arrowIcon="images/arrow_icon.png" altArrow="arrow" width="80" imageRoom_Office={content[14]?.json_content?.image} roomImg="residential_imgs" altImage="room" cardBody="card_body office_card_body" cardTitle={content[14]?.json_content?.title} cardText={content[14]?.json_content?.description} btnText="Know More " btnLink={content[14]?.json_content?.designation} btnClass={"btn_knowmoreblack"} />
               </div>
             </div>
           </div>
@@ -379,16 +371,10 @@ export default async function HomeContent() {
           <div className="container">
             <div className="mx-0 mb-4 row justify-content-center text-center">
               <div className="col-12 d-flex flex-column align-items-center">
-                <span 
-                  className="font_stylish" 
-                  style={{ marginBottom: "-15px", zIndex: 1 }}
-                >
+                <span className="font_stylish" style={{ marginBottom: "-15px", zIndex: 1 }}>
                   Ready To Go Designs
                 </span>
-                <h2 
-                  className="h3 font_about position-relative" 
-                  style={{ zIndex: 2 }}
-                >
+                <h2 className="h3 font_about position-relative" style={{ zIndex: 2 }}>
                   with Our Exclusive Design Choices
                 </h2>
               </div>
@@ -406,7 +392,6 @@ export default async function HomeContent() {
               <span className="pb-0 mb-0 font_stylish d-grid ms-lg-5 designer">Designer&apos;s Choice:</span>
               <h3 className="pb-4 w-auto font_about excluisive_home_heading">Exclusive Design Specials</h3>
             </div>
-            {/* Added mobile-scroll-row */}
             <div className="mt-4 row g-4 mx-0 mobile-scroll-row">
               {staticRecords.map((record, i) => (
                 <div className={`col-lg-${i === 0 || i === 3 ? '5' : i === 4 ? '12' : '7'} col-md-6 col-12`} key={record.id}>
@@ -469,7 +454,6 @@ export default async function HomeContent() {
               <h3 className="mb-0"><span className="font_stylish">{content[8]?.json_content?.title}</span></h3>
               <h3 className="pb-0 pb-lg-4 font_about mt-0 designs_lets">{content[8]?.json_content?.description}</h3>
             </div>
-            {/* Added mobile-scroll-row */}
             <div className="mx-0 row g-4 justify-content-center mobile-scroll-row">
               {h3d_gallery.map((hd_gallery, index) => (
                 <div key={index} className="col-lg-4 col-md-6 col-12">
@@ -489,7 +473,7 @@ export default async function HomeContent() {
         </div>
       </LazySection>
 
-      {/* 🚀 Get Estimate Section (Livspace Style Rotating Cube - Fixed Overlap) */}
+      {/* 🚀 Get Estimate Section (Livspace Style Rotating Cube) */}
       <LazySection placeholderHeight="300px">
         <section className="my-5 py-5" style={{ backgroundColor: "#fff9f9", borderTop: "1px solid #ffeeee", borderBottom: "1px solid #ffeeee" }}>
           <div className="container text-center">
@@ -498,7 +482,6 @@ export default async function HomeContent() {
                 Calculate the cost of your
               </h2>
               
-              {/* Animated 3D Cube Container */}
               <div className="cube-container" style={{ height: "50px", width: "190px", perspective: "1000px" }}>
                 <div className="cube-spinner" style={{ position: "relative", width: "100%", height: "100%", transformStyle: "preserve-3d", animation: "spinCube 7.5s infinite cubic-bezier(0.2, 0.8, 0.2, 1)" }}>
                   
@@ -506,12 +489,10 @@ export default async function HomeContent() {
                        style={{ transform: "rotateX(0deg) translateZ(15px)", color: "#ff914d", fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: "50px", backfaceVisibility: "hidden" }}>
                     Kitchen
                   </div>
-                  
                   <div className="cube-face position-absolute w-100 h-100 fw-bold" 
                        style={{ transform: "rotateX(120deg) translateZ(15px)", color: "#ff914d", fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: "50px", backfaceVisibility: "hidden" }}>
                     Wardrobe
                   </div>
-                  
                   <div className="cube-face position-absolute w-100 h-100 fw-bold" 
                        style={{ transform: "rotateX(240deg) translateZ(15px)", color: "#ff914d", fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: "50px", backfaceVisibility: "hidden" }}>
                     Full Home
@@ -529,7 +510,6 @@ export default async function HomeContent() {
               Get Free Estimate <MdKeyboardArrowRight size={24} className="ms-1" />
             </a>
 
-            {/* Injected Keyframes for Clean Flipping */}
             <style dangerouslySetInnerHTML={{__html: `
               @keyframes spinCube {
                 0%, 22% { transform: translateZ(-15px) rotateX(0deg); }
@@ -555,9 +535,7 @@ export default async function HomeContent() {
       <LazySection placeholderHeight="500px">
         <div className="my-5 blogs_wrapper">
           <div className="container">
-            {/* Title moved outside row */}
             <h3 className="pb-2 pb-lg-4 text-center font_about">Blogs</h3>
-            {/* Added mobile-scroll-row */}
             <div className="row g-2 g-lg-4 justify-content-center mx-1 mobile-scroll-row">
               {blogs.map((blog, index) => (
                 <div key={index} className="col-lg-4 col-md-6 col-12">
@@ -590,11 +568,6 @@ export default async function HomeContent() {
           <VideoTestimonialSlider />
         </section>
       </LazySection>
-      
-      <hr />
-      
-      {/* 🚀 Why Choose Us (Infinite Marquee) */}
-      
       
       <hr />
 

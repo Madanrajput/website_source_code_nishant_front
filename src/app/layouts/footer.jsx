@@ -8,14 +8,13 @@ import {
   FaYoutube,
   FaPinterest
 } from "react-icons/fa";
-import axios from "axios"; 
 import api from "@/utils/api";
 import { useEffect, useState } from "react";
 
 const Footer = () => {
   const [footerlink, setData] = useState([]);
   const [settings, setSettings] = useState({});
-  const currentYear = new Date().getFullYear(); // Dynamic Year
+  const currentYear = new Date().getFullYear(); 
   
   useEffect(() => {
     // 1. Fetch Footer Links
@@ -23,7 +22,6 @@ const Footer = () => {
       try {
         const response = await api.get("/footer-link");
         
-        // List of city names in the order you want them to appear
         const priorityOrder = [
           "Noida", 
           "Ghaziabad", 
@@ -35,7 +33,6 @@ const Footer = () => {
           "Manesar"
         ];
 
-        // Sort based on whether the Title includes the city name
         const sortedLinks = response.data.sort((a, b) => {
           const indexA = priorityOrder.findIndex(city => 
             a.title.toLowerCase().includes(city.toLowerCase())
@@ -56,11 +53,10 @@ const Footer = () => {
       }
     };
 
-    // 2. Fetch Site Settings (Social Links, etc) using direct clean URL
+    // 2. Fetch Site Settings
     const fetchSiteSettings = async () => {
       try {
         const response = await api.get("/site-settings");
-        // Handle both Next.js/Axios standard responses and NestJS nested { data: [...] } objects
         let rawData = response.data?.data || response.data;
         const settingsData = Array.isArray(rawData) ? rawData[0] : rawData;
         
@@ -78,7 +74,7 @@ const Footer = () => {
 
   return (
     <>
-      {/* INJECTED STYLES FOR SOCIAL MEDIA ICONS (Footer specific scoped styles) */}
+      {/* INJECTED STYLES FOR FOOTER SPECIFICS */}
       <style dangerouslySetInnerHTML={{__html: `
         .footer-social-btn {
           display: flex;
@@ -92,47 +88,24 @@ const Footer = () => {
           text-decoration: none;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .footer-social-btn:hover {
-          transform: translateY(-4px);
-        }
+        .footer-social-btn:hover { transform: translateY(-4px); }
         .footer-social-btn.fb:hover { background-color: #1877F2; color: white; box-shadow: 0 6px 12px rgba(24, 119, 242, 0.3); }
         .footer-social-btn.ig:hover { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); color: white; box-shadow: 0 6px 12px rgba(214, 36, 159, 0.3); }
         .footer-social-btn.tw:hover { background-color: #000000; color: white; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); }
         .footer-social-btn.in:hover { background-color: #0A66C2; color: white; box-shadow: 0 6px 12px rgba(10, 102, 194, 0.3); }
         .footer-social-btn.pi:hover { background-color: #E60023; color: white; box-shadow: 0 6px 12px rgba(230, 0, 35, 0.3); }
         .footer-social-btn.yt:hover { background-color: #FF0000; color: white; box-shadow: 0 6px 12px rgba(255, 0, 0, 0.3); }
+        
+        .footer-address-link {
+          transition: color 0.3s ease;
+          color: #171717;
+          text-decoration: none;
+        }
+        .footer-address-link:hover {
+          color: #ff914d !important;
+        }
       `}} />
 
-      {/* <div
-        className="mt-4 ms-auto me-0"
-        style={{
-          position: "fixed",
-          top: "65%",
-          right: "0",
-          transform: "translateY(-50%)",
-          zIndex: "9999",
-        }}
-      >
-        <a
-          href="https://api.whatsapp.com/send?phone=919560277787"
-          className=""
-          title="WhatsApp"
-          aria-label="Chat with us on WhatsApp"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <div>
-            <Image
-              src="/images/Whatsapp-icon.png"
-              width={40}
-              height={40}
-              alt="WhatsApp Icon"
-              priority
-              data-no-lazy="1"
-            />
-          </div>
-        </a>
-      </div> */}
       <div className="footer_wrapper pb-0 position-relative">
         <div className="container">
           <div className="py-5 pb-0 mx-0 row justify-content-center">
@@ -152,76 +125,45 @@ const Footer = () => {
                     </a>
                   </div>
                   <div className="pt-3">
-                    <h6>EMAIL US</h6>
-                    <a href={`mailto:${settings?.email || 'Info@hcinterior.in'}`} className="text_mail p-2 m-n2 d-inline-block">
-                      {settings?.email || 'Info@hcinterior.in'}
-                    </a>
+                    <h6 className="font-outfit fw-bold text-dark">EMAIL US</h6>
+                    <p className="mb-0">
+                      <a href={`mailto:${settings?.email || 'Info@hcinterior.in'}`} className="text-black p-2 m-n2 d-inline-block font-poppins">
+                        {settings?.email || 'Info@hcinterior.in'}
+                      </a>
+                    </p>
                   </div>
                   <div>
-                    <h6 className="pt-3">FOR QUERY</h6>
+                    <h6 className="pt-3 font-outfit fw-bold text-dark">FOR QUERY</h6>
+                    {/* Fixed missing hover effect by wrapping in p tags to match globals.css logic */}
                     <p className="mb-0">
-                      <a href={`tel:${settings?.phone || '+918527750562'}`} className="text-black p-2 m-n2 d-inline-block fw-medium">
+                      <a href={`tel:${settings?.phone || '+918527750562'}`} className="text-black p-2 m-n2 d-inline-block fw-medium font-poppins">
                         {settings?.phone || '+91 8527750562'}
                       </a>
                     </p>
-                    <a href="tel:+917070701373" className="text-black p-2 m-n2 d-inline-block fw-medium">
-                      +91 7070701373
-                    </a>
+                    <p className="mb-0 mt-1">
+                      <a href="tel:+917070701373" className="text-black p-2 m-n2 d-inline-block fw-medium font-poppins">
+                        +91 7070701373
+                      </a>
+                    </p>
                   </div>
                 </div>
                 <div className="col-lg-2 col-md-3 col-6">
-                  <h4 className="footer_heading">High creation</h4>
-                  <ul className="list-unstyled ps-0">
-                    <li className="footer_li">
-                      <a href="/about-us/" className="text-black">
-                        About Us
-                      </a>
-                    </li>
-                    <li className="footer_li">
-                      <a href="/services/" className="text-black">
-                        Service area
-                      </a>
-                    </li>
-                    <li className="footer_li">
-                      <a href="/how-its-works/" className="text-black">
-                        How Its Works
-                      </a>
-                    </li>
-                    <li className="footer_li">
-                      <a href="/team/" className="text-black">
-                        Team
-                      </a>
-                    </li>
-                    <li className="footer_li">
-                      <a href="/career/" className="text-black">
-                        Career
-                      </a>
-                    </li>
-                    <li className="footer_li">
-                      <a href="/contact/" className="text-black">
-                        Contact Us
-                      </a>
-                    </li>
-                    <li className="footer_li">
-                      <a href="/refer-and-earn/" className="text-black">
-                        Refer And Earn
-                      </a>
-                    </li>
-                    <li className="footer_li">
-                      <a href="/faq/" className="text-black">
-                        FAQ
-                      </a>
-                    </li>
-                    <li className="footer_li">
-                      <a href="/blog" className="text-black">
-                        Blogs
-                      </a>
-                    </li>
+                  <h4 className="footer_heading font-outfit fw-bold text-dark">High creation</h4>
+                  <ul className="list-unstyled ps-0 font-poppins">
+                    <li className="footer_li"><a href="/about-us/" className="text-black">About Us</a></li>
+                    <li className="footer_li"><a href="/services/" className="text-black">Service area</a></li>
+                    <li className="footer_li"><a href="/how-its-works/" className="text-black">How Its Works</a></li>
+                    <li className="footer_li"><a href="/team/" className="text-black">Team</a></li>
+                    <li className="footer_li"><a href="/career/" className="text-black">Career</a></li>
+                    <li className="footer_li"><a href="/contact/" className="text-black">Contact Us</a></li>
+                    <li className="footer_li"><a href="/refer-and-earn/" className="text-black">Refer And Earn</a></li>
+                    <li className="footer_li"><a href="/faq/" className="text-black">FAQ</a></li>
+                    <li className="footer_li"><a href="/blog" className="text-black">Blogs</a></li>
                   </ul>
                 </div>
                 <div className="col-lg-3 ps-lg-4 col-md-3 col-6">
-                  <h4 className="footer_heading">Gallery</h4>
-                  <ul className="list-unstyled ps-0">
+                  <h4 className="footer_heading font-outfit fw-bold text-dark">Gallery</h4>
+                  <ul className="list-unstyled ps-0 font-poppins">
                     {footerlink.map((query, index) => (
                       <li key={index} className="footer_li">
                         <a href={query.web_url} className="text-black">
@@ -232,18 +174,18 @@ const Footer = () => {
                   </ul>
                 </div>
                 <div className="col-lg-3 col-md-12 col-6">
-                  <h4 className="footer_heading">Branch Office</h4>
-                  <ul className="list-unstyled">
+                  <h4 className="footer_heading font-outfit fw-bold text-dark">Branch Office</h4>
+                  <ul className="list-unstyled font-poppins">
                     
                     {/* Corporate Office */}
                     <li className="footer_li pb-1 pt-2">
-                      <h6 className="mb-1 text-black fw-bold" style={{ fontSize: "14px" }}>Corporate Office:</h6>
+                      <h6 className="mb-1 text-dark fw-bold font-outfit" style={{ fontSize: "15px" }}>Corporate Office:</h6>
                       <a
                         href="https://share.google/NsJByald2Vm8Q2DRJ"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-black d-block pb-2"
-                        style={{ lineHeight: "1.4" }}
+                        className="footer-address-link d-block pb-2"
+                        style={{ lineHeight: "1.5", fontSize: "14px" }}
                       >
                         H-56, 1st Floor, Sector-63, Noida, Uttar Pradesh- 201301
                       </a>
@@ -251,20 +193,19 @@ const Footer = () => {
 
                     {/* Experience Centers */}
                     <li className="footer_li pb-1 pt-2">
-                      <h6 className="mb-1 text-black fw-bold" style={{ fontSize: "14px" }}>Experience Center:</h6>
+                      <h6 className="mb-1 text-dark fw-bold font-outfit" style={{ fontSize: "15px" }}>Experience Center:</h6>
                       
                       <a
                         href="https://share.google/LMhkJflVZey0KDXS8"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-black d-block pb-2"
-                        style={{ lineHeight: "1.4" }}
+                        className="footer-address-link d-block pb-2"
+                        style={{ lineHeight: "1.5", fontSize: "14px" }}
                       >
                         H101, LGF, Sector-63, Noida, Uttar Pradesh- 201301
                       </a>
                       
-                      {/* NO LINK FOR THIS LOCATION AS REQUESTED */}
-                      <span className="text-black d-block pb-2" style={{ lineHeight: "1.4" }}>
+                      <span className="text-dark d-block pb-2" style={{ lineHeight: "1.5", fontSize: "14px" }}>
                         4th Floor, Jmd Galleria Mall, Unit Nos. 402, Sector-47 & 48, Sohna - Gurgaon Rd, Gurugram, Haryana 122001
                       </span>
 
@@ -272,8 +213,8 @@ const Footer = () => {
                         href="https://share.google/C9uQKfphGOlrhlUuM"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-black d-block pb-2"
-                        style={{ lineHeight: "1.4" }}
+                        className="footer-address-link d-block pb-2"
+                        style={{ lineHeight: "1.5", fontSize: "14px" }}
                       >
                         DDC Arcade, 1st Floor, Plot No 1 Main, Sector 48 Road, Badshahpur Sohna Rd, Opposite Vipul Business Park, Gurugram, Haryana 122018
                       </a>
@@ -282,8 +223,8 @@ const Footer = () => {
                         href="https://share.google/mJMlqcOZ0249JEpN6"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-black d-block pb-2"
-                        style={{ lineHeight: "1.4" }}
+                        className="footer-address-link d-block pb-2"
+                        style={{ lineHeight: "1.5", fontSize: "14px" }}
                       >
                         1st Floor, Plot No 24, near old Faridabad Metro Station, Sector 20A, Faridabad, Haryana 121002
                       </a>
@@ -291,8 +232,8 @@ const Footer = () => {
 
                     {/* Workshop */}
                     <li className="footer_li pb-2 pt-2">
-                      <h6 className="mb-1 text-black fw-bold" style={{ fontSize: "14px" }}>Workshop:</h6>
-                      <span className="text-black d-block" style={{ lineHeight: "1.4" }}>
+                      <h6 className="mb-1 text-dark fw-bold font-outfit" style={{ fontSize: "15px" }}>Workshop:</h6>
+                      <span className="text-dark d-block" style={{ lineHeight: "1.5", fontSize: "14px" }}>
                         Plot No-3, Sorkha Village , Sector-115, Noida, Uttar Pradesh- 201301
                       </span>
                     </li>
@@ -307,7 +248,7 @@ const Footer = () => {
           <div className="footer_copyright pt-0 mt-0 px-3 px-lg-0 position-relative">
             <div className="d-flex justify-content-between align-items-center flex-wrap">
               <div>
-                <ul className="list-unstyled d-flex mb-0">
+                <ul className="list-unstyled d-flex mb-0 font-poppins">
                   <li className="footer_li pe-3 border-end">
                     <a href="/privacy-policy/" className="footer-policy-link">
                       Privacy Policy
@@ -327,7 +268,7 @@ const Footer = () => {
               </div>
               
               <div>
-                <p className="mb-0 team_description text-center pt-2 pt-lg-0">
+                <p className="mb-0 team_description text-center pt-2 pt-lg-0 font-poppins" style={{ fontSize: "13px" }}>
                   All Rights Reserved ©{currentYear} High Creation Interior Projects Private Limited
                 </p>
               </div>
@@ -369,7 +310,7 @@ const Footer = () => {
             </div>
             <hr />
 
-            <p className="text-lg-end text-center team_description text-dark">
+            <p className="text-lg-end text-center team_description text-dark font-poppins" style={{ fontSize: "13px" }}>
              {`Designed By ` } 
               <a href="#" className="text-black fw-bold text-decoration-none">
                 HC Interior

@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 
 import { SidebarForm, BottomContactForm } from "./CityForms";
+import { getPageSEO } from "@/utils/getSEO";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://apidev.hcinterior.in";
 
 const cityUrlMap = {
@@ -86,33 +87,50 @@ const parseJsonSafe = (data) => {
   if (Array.isArray(data)) return data;
   try { return JSON.parse(data); } catch (e) { return []; }
 };
-
 // --- SEO METADATA ---
 export async function generateMetadata({ searchParams }) {
   const city = searchParams?.city && searchParams.city !== "undefined" ? searchParams.city : "delhi";
-  const pageData = await getCityData(city);
   const fallbackPath = cityUrlMap[city] || `/services-detail/${city}`;
-  const canonicalUrl = getCanonicalUrl({ canonicalUrl: pageData?.seo_content?.canonical_url, fallbackPath });
+  
+  // 👈 2. Fetch both Page Data and SEO Data concurrently
+  const [pageData, seoData] = await Promise.all([
+    getCityData(city),
+    getPageSEO(fallbackPath).catch(() => null)
+  ]);
+
+  const canonicalUrl = getCanonicalUrl({ 
+    canonicalUrl: seoData?.alternates?.canonical || pageData?.seo_content?.canonical_url, 
+    fallbackPath 
+  });
 
   if (!pageData) return { title: "Services", robots: { index: false, follow: true } };
 
   return {
-    title: pageData?.seo_content?.meta_title ?? `${pageData.main_title} - Services`,
-    description: pageData?.seo_content?.meta_description ?? "Best Interior Design Services",
-    keywords: pageData?.seo_content?.meta_keywords ?? "",
+    title: seoData?.title || pageData?.seo_content?.meta_title || `${pageData.main_title} - Services`,
+    description: seoData?.description || pageData?.seo_content?.meta_description || "Best Interior Design Services",
+    keywords: seoData?.keywords || pageData?.seo_content?.meta_keywords || "",
     alternates: { canonical: canonicalUrl },
-    robots: getRobotsDirectives(pageData?.seo_content),
+    robots: seoData?.robots || getRobotsDirectives(pageData?.seo_content),
+    openGraph: seoData?.openGraph || null,
+    twitter: seoData?.twitter || null,
   };
 }
 
 const ServicesDetailPage = async ({ searchParams }) => {
   const city = searchParams?.city && searchParams.city !== "undefined" ? searchParams.city : "delhi";
-  const pageData = await getCityData(city);
+  const fallbackPath = cityUrlMap[city] || `/services-detail/${city}`;
+
+  // 👈 3. Fetch Data + Global SEO schemas concurrently for the component
+  const [pageData, recentBlogs, seoData] = await Promise.all([
+    getCityData(city),
+    getRecentBlogs(),
+    getPageSEO(fallbackPath).catch(() => null)
+  ]);
   
   if (!pageData) notFound(); 
 
-  const recentBlogs = await getRecentBlogs();
-  
+  // 👈 4. Extract the custom schemas
+  const customSchema = seoData?.customSchema;
   const safeDescription = pageData?.main_description ? DOMPurify.sanitize(pageData.main_description) : "";
   const safeSideDescription = pageData?.side_description ? DOMPurify.sanitize(pageData.side_description) : "";
   
@@ -128,6 +146,27 @@ const ServicesDetailPage = async ({ searchParams }) => {
 
   return (
     <MainLayout>
+      {/* 👈 5. Inject the Custom Schema from the Global SEO Tag Manager */}
+      {customSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ 
+            __html: typeof customSchema === 'string' 
+              ? customSchema.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '') 
+              : JSON.stringify(customSchema)
+          }}
+        />
+      )}
+
+      {/* 👈 6. Legacy Fallback (Inner Custom Code) */}
+      {pageData?.seo_content?.custom_code && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ 
+            __html: pageData.seo_content.custom_code.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '') 
+          }}
+        />
+      )}
       <style dangerouslySetInnerHTML={{__html: `
         :root { --hc-primary: #ff914d; --hc-dark: #0f172a; }
         .font-outfit { font-family: var(--font-outfit), sans-serif; }

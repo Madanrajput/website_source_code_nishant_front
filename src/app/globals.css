@@ -1,3 +1,14 @@
+main {
+  padding-top: 45px; /* Adjust this if your desktop header gets thicker/thinner */
+}
+
+/* 🌟 Mobile-specific spacing fix */
+@media (max-width: 991px) {
+  main {
+    padding-top: 40px; /* Reduces the gap specifically for mobile */
+  }
+}
+
 .dashboard-container {
   padding: 2rem;
   display: flex;
