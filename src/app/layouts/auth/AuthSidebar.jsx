@@ -178,7 +178,11 @@ function AuthSidebar() {
                                     3D Gallery
                                 </a>  
                             </li>
-
+                            <li>
+                                <a className={`${isActive('/cms/manage-why-choose-us')}`} href="/cms/manage-why-choose-us">
+                                    Why Choose Us
+                                </a>
+                            </li>
                             <li>
                                 <a className={`${isActive('/cms/award-gallery')}`} href="/cms/award-gallery">
                                    Award Gallery

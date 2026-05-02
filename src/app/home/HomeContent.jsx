@@ -3,8 +3,15 @@ import Image from "next/image";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { 
   FaShieldAlt, FaClock, FaCheckCircle, FaHome, 
-  FaMapMarkerAlt, FaGem, FaUser 
-} from "react-icons/fa"; // 🌟 ADDED: React Icons for Why Choose Us
+  FaMapMarkerAlt, FaGem, FaUser, FaTools, 
+  FaStar, FaAward, FaTrophy
+} from "react-icons/fa";
+
+const ICON_MAP = {
+  FaShieldAlt, FaClock, FaCheckCircle, FaHome, 
+  FaMapMarkerAlt, FaGem, FaUser, FaTools, 
+  FaStar, FaAward, FaTrophy
+};
 import React, { Fragment } from "react"; 
 
 // --- CLIENT IMPORTS ---
@@ -67,18 +74,26 @@ async function getRemainingData() {
   };
 
   try {
-    const [designIdea, h3d_gallery, contentData, blogsData] = await Promise.all([
+    const [designIdea, h3d_gallery, contentData, blogsData, whyChooseUsRaw] = await Promise.all([
       fetchData("/cms-parent-child/designer_choice"),
       fetchData("/cms-parent-child/h3d_gallery"),
       fetchData("/cms-content/home_page_content_what_we_are"),
       fetchData("/cms-blog"),
+      fetchData("/cms-content/home_page_content_why_choose_us"),
     ]);
-
+    
+    let whyChooseUsData = [];
+    if (whyChooseUsRaw) {
+      const record = Array.isArray(whyChooseUsRaw) ? whyChooseUsRaw[0] : whyChooseUsRaw;
+      whyChooseUsData = record?.json_content || [];
+    }
+    
     return {
       designIdea: designIdea || [],
       h3d_gallery: h3d_gallery || [],
       content: contentData || [], 
       blogs: Array.isArray(blogsData) ? blogsData.slice(0, 3) : [],
+      whyChooseUsData
     };
   } catch (err) {
     console.error("Server Fetch Error (Remaining Data):", err);
@@ -98,7 +113,7 @@ const formatDate = (dateString) => {
 };
 
 export default async function HomeContent() {
-  const { designIdea, h3d_gallery, content, blogs } = await getRemainingData();
+  const { designIdea, h3d_gallery, content, blogs ,  whyChooseUsData } = await getRemainingData();
 
   // Sort Descending (Newest First)
   const sortedDesignIdea = [...designIdea].sort((a, b) => b.id - a.id);
@@ -131,6 +146,18 @@ export default async function HomeContent() {
       col2Class: "col-lg-2 col-md-3 col-6 ps-0 mt-lg-3", dataBoxClass: "box5_data",
     },
   ];
+
+  const defaultWhyChooseUs = [
+    { title: "Lifetime warranty¹", icon: "FaShieldAlt" },
+    { title: "45-day move-in guarantee²", icon: "FaClock" },
+    { title: "146 quality checks", icon: "FaCheckCircle" },
+  ];
+  
+  const activeWhyChooseUsData =
+    Array.isArray(whyChooseUsData) && whyChooseUsData.length > 0
+      ? whyChooseUsData
+      : defaultWhyChooseUs;
+
 
   return (
     <>
@@ -343,6 +370,40 @@ export default async function HomeContent() {
           
         </section>
       </LazySection> */}
+
+<LazySection placeholderHeight="300px">
+  <section className="my-5 py-5 overflow-hidden" style={{ backgroundColor: "#fafafa" }}>
+    
+    <div className="container mb-5">
+      <h2 className="text-center font_about fw-bold mb-0">
+        Why <span className="font_stylish" style={{ color: "#ff914d" }}>choose us</span>
+      </h2>
+    </div>
+
+    <div className="marquee-container position-relative w-100" style={{ overflow: "hidden" }}>
+      <div className="marquee-track d-flex align-items-center gap-4">
+
+        {[...activeWhyChooseUsData, ...activeWhyChooseUsData].map((item, idx) => {
+          const IconComponent = ICON_MAP[item.icon] || FaCheckCircle;
+
+          return (
+            <div key={idx} className="marquee-card bg-white p-4 rounded-4 shadow-sm text-center flex-shrink-0"
+                 style={{ width: "220px", height: "180px" }}>
+              
+              <div style={{ width: "64px", height: "64px", backgroundColor: "#fff4ed", borderRadius: "50%" }}>
+                <IconComponent size={32} color="#ff914d" />
+              </div>
+
+              <p className="fw-bold mt-2">{item.title}</p>
+              {item.description && <p className="small text-muted">{item.description}</p>}
+            </div>
+          );
+        })}
+
+      </div>
+    </div>
+  </section>
+</LazySection>
 
       {/* 🌟 FIXED: Design Idea (Now slides smoothly on Mobile!) */}
       <LazySection placeholderHeight="700px">
