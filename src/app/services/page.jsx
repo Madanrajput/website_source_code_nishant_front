@@ -1,9 +1,12 @@
 import MainLayout from "../layouts/MainLayout";
 import BackgroundImageRow from "../components/BackgroundImageRow";
-import ServicesLeftOriginal from "../components/ServicesLeftOriginal"; // Updated import
-import ServicesRightRow from "../components/ServicesRightRow";
 import { defaultAltText } from "@/utils/helper";
-import ServicesRightOriginal from "../components/ServicesRightOriginal";
+import Image from "next/image";
+import Link from "next/link";
+import { FaArrowRight } from "react-icons/fa";
+
+// 🌟 IMPORT OUR GLOBAL PREMIUM TEXT EXPANDER
+import ExpandableRichText from "../components/ModernPara";
 
 // --- CONFIGURATION ---
 export const revalidate = 60; // Regenerate page every 60 seconds
@@ -47,7 +50,6 @@ async function getSeoData() {
 
     const allTags = await res.json();
 
-    // Match the specific page URL for Services
     if (Array.isArray(allTags)) {
       return allTags.find(
         (tag) =>
@@ -91,7 +93,6 @@ export default async function Services() {
   const rawPageDataList = await getServiceData();
 
   // --- CLIENT REQUEST: SORTING LOGIC START ---
-  // Define the strict order requested by the client
   const desiredOrder = [
     "noida",
     "ghaziabad",
@@ -103,7 +104,6 @@ export default async function Services() {
     "manesar"
   ];
 
-  // Create a copy and sort the list based on city_type matches
   let pageDataList = [];
   if (rawPageDataList && Array.isArray(rawPageDataList)) {
     pageDataList = [...rawPageDataList].sort((a, b) => {
@@ -113,24 +113,17 @@ export default async function Services() {
       const indexA = desiredOrder.indexOf(cityA);
       const indexB = desiredOrder.indexOf(cityB);
 
-      // If both cities are in the desired list, sort by their index
       if (indexA !== -1 && indexB !== -1) {
         return indexA - indexB;
       }
-
-      // If only A is in the list, it comes first
       if (indexA !== -1) return -1;
-      
-      // If only B is in the list, it comes first
       if (indexB !== -1) return 1;
 
-      // If neither are in the list, keep original API order
       return 0;
     });
   }
   // --- CLIENT REQUEST: SORTING LOGIC END ---
 
-  // Fallback images from your original code to ensure visual consistency if API images are missing
   const fallbackImages = [
     "/images/services/1-min.png",
     "/images/services/2-min.png",
@@ -144,6 +137,74 @@ export default async function Services() {
 
   return (
     <MainLayout>
+      {/* --- INJECT PREMIUM MODERN STYLES --- */}
+      <style dangerouslySetInnerHTML={{__html: `
+        :root { --hc-primary: #ff914d; --hc-dark: #0f172a; }
+        .font-outfit { font-family: var(--font-outfit), sans-serif; }
+        .font-poppins { font-family: var(--font-poppins), sans-serif; }
+        
+        .modern-service-row { padding: 4rem 0; border-bottom: 1px solid #f1f5f9; transition: background 0.3s ease; }
+        .modern-service-row:hover { background: #fdfdfd; }
+        .modern-service-row:last-child { border-bottom: none; }
+        
+        .service-img-wrapper { 
+            position: relative; 
+            width: 100%; 
+            aspect-ratio: 4/3; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06); 
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease;
+        }
+        .modern-service-row:hover .service-img-wrapper {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 50px rgba(0,0,0,0.12);
+        }
+
+        .service-img-wrapper img {
+            transition: transform 0.7s ease;
+        }
+        .modern-service-row:hover .service-img-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .service-badge { 
+            display: inline-block; 
+            padding: 6px 16px; 
+            background: #fff4ed; 
+            color: var(--hc-primary); 
+            border-radius: 30px; 
+            font-size: 13px; 
+            font-weight: 700; 
+            letter-spacing: 1px; 
+            text-transform: uppercase; 
+            margin-bottom: 1rem; 
+        }
+
+        .btn-modern-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--hc-dark) 0%, #1e293b 100%);
+            color: white !important;
+            font-weight: 600;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
+        }
+        .btn-modern-primary:hover {
+            background: linear-gradient(135deg, var(--hc-primary) 0%, #ff5722 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(255, 145, 77, 0.25);
+        }
+
+        /* Protect CMS content inside services */
+        .service-rich-text { font-family: var(--font-poppins); color: #475569; line-height: 1.8; }
+        .service-rich-text img { max-width: 100%; height: auto; border-radius: 12px; }
+      `}} />
+
       <main>
         <BackgroundImageRow
           sectionBgImages={"sectionbg services"}
@@ -153,65 +214,72 @@ export default async function Services() {
           secBgDesClass="secbgbesclass"
         />
 
-        {pageDataList && pageDataList.length > 0 ? (
-          pageDataList.map((service, index) => {
-            const fallbackImg =
-              fallbackImages[index] ||
-              fallbackImages[index % fallbackImages.length];
+        <div className="container py-5">
+          {pageDataList && pageDataList.length > 0 ? (
+            pageDataList.map((service, index) => {
+              const fallbackImg = fallbackImages[index] || fallbackImages[index % fallbackImages.length];
+              const isEven = index % 2 === 0;
 
-            // --- URL ROUTING LOGIC ---
-            const cityValue = service?.city_type?.toLowerCase().trim() || "";
-            let citySlug = cityValue.replace(/[\s_]+/g, '-');
-            
-            // Redirect Gurugram to Gurgaon
-            if (citySlug === "gurugram") {
-              citySlug = "gurgaon";
-            }
-            
-            const targetLink = `/interior-designers-in-${citySlug}`;
+              // --- URL ROUTING LOGIC ---
+              const cityValue = service?.city_type?.toLowerCase().trim() || "";
+              let citySlug = cityValue.replace(/[\s_]+/g, '-');
+              
+              if (citySlug === "gurugram") {
+                citySlug = "gurgaon";
+              }
+              
+              const targetLink = `/interior-designers-in-${citySlug}`;
+              const safeDescription = service?.main_description || "";
 
-            // Render Left Row for Even indices (0, 2, 4...)
-            if (index % 2 === 0) {
               return (
-                <ServicesLeftOriginal
-                  key={service.id || index}
-                  column1={"col-lg-6 d-flex align-items-center"}
-                  ServicesImgUrl={service?.location_image ?? fallbackImg}
-                  servicesImgAlt={service?.main_title ?? defaultAltText}
-                  servicesImgClass="services_img"
-                  column2={"col-lg-6"}
-                  ServicesHeading={service?.main_title ?? ""}
-                  ServicesDescription={service?.main_description ?? ""}
-                  textBtnServices="Read More"
-                  linkBtnServices={targetLink}
-                />
+                <div className="modern-service-row" key={service.id || index}>
+                  <div className="row g-5 align-items-center">
+                    
+                    {/* IMAGE COLUMN */}
+                    <div className={`col-lg-6 ${isEven ? 'order-lg-1' : 'order-lg-2'}`}>
+                      <div className="service-img-wrapper">
+                        <Image 
+                          src={service?.location_image ?? fallbackImg} 
+                          alt={service?.main_title ?? defaultAltText}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          style={{ objectFit: 'cover' }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* CONTENT COLUMN */}
+                    <div className={`col-lg-6 ${isEven ? 'order-lg-2' : 'order-lg-1'} ps-lg-5`}>
+                      <span className="service-badge font-poppins">Premium Interiors</span>
+                      <h2 className="font-outfit fw-bold text-dark mb-4" style={{ fontSize: 'clamp(2rem, 3vw, 2.5rem)', lineHeight: '1.2' }}>
+                        {service?.main_title ?? `Interior Designers in ${cityValue.toUpperCase()}`}
+                      </h2>
+                      
+                      {/* 🌟 GOD TIER EXPANDABLE TEXT COMPONENT 🌟 */}
+                      <ExpandableRichText 
+                        htmlContent={safeDescription} 
+                        className="service-rich-text"
+                        maxHeight={180} // Specifically setting height to keep UI incredibly clean before expand
+                      />
+
+                      <div className="mt-4">
+                        <Link href={targetLink} className="btn-modern-primary font-poppins">
+                          Explore Designs <FaArrowRight />
+                        </Link>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
               );
-            } 
-            // Render Right Row for Odd indices (1, 3, 5...)
-            else {
-              return (
-                <ServicesRightOriginal
-                  key={service.id || index}
-                  sectionServices={"services_sec_wrapper1"}
-                  colum1="col-lg-6"
-                  ServicesImgUrlRight={service?.location_image ?? fallbackImg}
-                  servicesImgAltRight={service?.main_title ?? defaultAltText}
-                  servicesImgClass="services_img"
-                  colum2={"col-lg-6 align-items-center d-flex"}
-                  ServicesHeadingRight={service?.main_title ?? ""}
-                  ServicesDescriptionRight={service?.main_description ?? ""}
-                  descrClass={"team_description"}
-                  textBtnServicesRight="Read More"
-                  linkBtnServices={targetLink}
-                />
-              );
-            }
-          })
-        ) : (
-          <div className="text-center my-5">
-            <p>Loading services...</p>
-          </div>
-        )}
+            })
+          ) : (
+            <div className="text-center my-5 py-5">
+              <div className="spinner-border text-primary mb-3" role="status"></div>
+              <p className="font-poppins text-muted">Loading premium services...</p>
+            </div>
+          )}
+        </div>
       </main>
     </MainLayout>
   );

@@ -22,8 +22,8 @@ import {
 } from "@/utils/schemaGenerator";
 import { getCanonicalUrl, getRobotsDirectives } from "@/utils/seoHelpers";
 
-// 1. Import getPageSEO to access the global SEO manager
 import { getPageSEO } from "@/utils/getSEO"; 
+import ExpandableRichText from "../components/ModernPara";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -105,7 +105,6 @@ async function getCmsPageData(slug) {
   }
 }
 
-// 2. Update generateMetadata to merge page data with the global SEO Tag data
 export async function generateMetadata({ params }) {
   headers();
   const slug = params.blog;
@@ -169,7 +168,6 @@ const DynamicRootPage = async ({ params }) => {
     notFound();
   }
 
-  // 3. Fetch global SEO tags for this specific slug
   const seoData = await getPageSEO(`/${slug}`);
   const customSchema = seoData?.customSchema;
   const recentBlogs = await getRecentBlogs();
@@ -214,7 +212,6 @@ const DynamicRootPage = async ({ params }) => {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBizSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
-      {/* 4. Inject the Custom Schema from the Global SEO Tag Manager */}
       {customSchema && (
         <script
           type="application/ld+json"
@@ -226,7 +223,6 @@ const DynamicRootPage = async ({ params }) => {
         />
       )}
 
-      {/* Legacy Fallback: Inject Custom Schema from the Page's inner SEO panel */}
       {pageData?.seo_content?.custom_code && (
         <script
           type="application/ld+json"
@@ -269,7 +265,26 @@ const DynamicRootPage = async ({ params }) => {
         .hero-main-title { font-size: clamp(2.4rem, 5vw, 3.8rem); line-height: 1.1; letter-spacing: -0.02em; }
         
         .city-main-container { margin-top: -80px; position: relative; z-index: 10; }
-        .premium-card { background: #ffffff; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.04); padding: 40px; margin-bottom: 40px; border: 1px solid rgba(0,0,0,0.02); }
+        .premium-card { background: #ffffff; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.04); padding: 40px; margin-bottom: 40px; border: 1px solid rgba(0,0,0,0.02); overflow: hidden; }
+        
+        /* CMS CONTENT PROTECTION & STRICT IMAGE POSITIONING */
+        .rich-text-content { width: 100%; word-break: break-word; overflow-wrap: anywhere; }
+        
+        /* FIX: Natural image sizing that perfectly centers and doesn't stretch */
+        .rich-text-content img { 
+          max-width: 100% !important; 
+          height: auto !important; 
+          border-radius: 12px; 
+          display: block !important; 
+          margin: 2rem auto !important; /* Force exact center */
+        }
+        
+        .rich-text-content iframe, .rich-text-content video, .rich-text-content table { 
+          max-width: 100% !important; 
+          overflow-x: auto; 
+          display: block !important; 
+          margin: 2rem auto !important; 
+        }
         
         .rich-text-content h2, .rich-text-content h3 { font-family: var(--font-outfit), sans-serif; font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: 700; color: #0f172a; margin-top: 2rem; margin-bottom: 1rem; }
         .rich-text-content p { font-family: var(--font-poppins), sans-serif; font-size: 1rem; line-height: 1.8; color: #475569; margin-bottom: 1.2rem; }
@@ -277,12 +292,6 @@ const DynamicRootPage = async ({ params }) => {
         .rich-text-content li { background: #fdfdfd; border: 1px solid #f1f5f9; padding: 1rem; border-radius: 12px; display: flex; align-items: flex-start; font-weight: 500; font-family: var(--font-poppins), sans-serif; transition: 0.3s; }
         .rich-text-content li:hover { border-color: var(--hc-primary); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255,145,77,0.1); }
         .rich-text-content li::before { content: '✓'; color: var(--hc-primary); margin-right: 12px; font-size: 1.2rem; line-height: 1; }
-
-        /* Process Steps */
-        .process-step { display: flex; align-items: flex-start; margin-bottom: 30px; position: relative; }
-        .process-step:last-child { margin-bottom: 0; }
-        .process-icon { width: 50px; height: 50px; min-width: 50px; background: #fff4ed; color: #ff914d; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 20px; z-index: 2; }
-        .process-step:not(:last-child)::after { content: ''; position: absolute; left: 24px; top: 50px; bottom: -30px; width: 2px; background: #ffe4d6; z-index: 1; }
 
         /* Excellence Stats */
         .excellence-stat { text-align: center; padding: 20px; position: relative; }
@@ -311,26 +320,26 @@ const DynamicRootPage = async ({ params }) => {
         /* Premium FAQs */
         .faq-premium-item { border: none !important; margin-bottom: 16px; border-radius: 16px !important; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04); background: #ffffff; border: 1px solid #f1f5f9 !important; }
         .faq-premium-btn { width: 100%; text-align: left; background: white; border: none; padding: clamp(16px, 4vw, 24px); font-weight: 700; font-size: clamp(1.05rem, 3.5vw, 1.2rem); color: var(--hc-dark); display: flex; justify-content: space-between; align-items: center; box-shadow: none !important; line-height: 1.4; gap: 15px; }
+        
+        /* FIX: Remove the ugly default Bootstrap accordion cross/arrow that overlaps with our custom icon */
+        .faq-premium-btn::after { display: none !important; }
+        
         .faq-premium-btn:not(.collapsed) { color: var(--hc-primary); background: #fffcf9; }
         .faq-icon-toggle { transition: transform 0.3s ease; color: var(--hc-primary); flex-shrink: 0; }
         .faq-premium-btn:not(.collapsed) .faq-icon-toggle { transform: rotate(45deg); color: #ff5722; }
         .faq-premium-body { padding: 0 clamp(16px, 4vw, 24px) 20px; color: #475569; font-size: clamp(0.95rem, 3vw, 1.05rem); line-height: 1.7; background: #fffcf9; }
         
-        /* New Sidebar Blog Cards */
         .sidebar-blog-card { padding: 12px; border-radius: 12px; transition: all 0.3s ease; border: 1px solid transparent; }
         .sidebar-blog-card:hover { background-color: #f8fafc; border-color: #e2e8f0; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
       `}} />
 
       <main className="bg-light pb-5">
         
-        {/* =========================================
-            UI FOR BLOG POSTS (New Premium Layout)
-        ========================================= */}
         {pageType === "blog" && (
           <div className="container py-5 mt-4">
             <div className="row g-5">
 
-              {/* LEFT MAIN CONTENT (Stacks to top on mobile) */}
+              {/* Standard 66% width matching service details */}
               <div className="col-lg-8 order-1">
                 <div className="premium-card bg-white">
 
@@ -338,7 +347,6 @@ const DynamicRootPage = async ({ params }) => {
                     {pageData.title}
                   </h1>
 
-                  {/* Author & Social Block */}
                   <div className="author-date-social-block d-flex flex-wrap justify-content-between align-items-center border-bottom pb-3 mb-4">
                     <div className="text-muted fst-italic fs-6 mb-3 mb-md-0 d-flex align-items-center font-poppins">
                       <FaUserCircle className="me-2 text-secondary" size={20} />
@@ -351,55 +359,42 @@ const DynamicRootPage = async ({ params }) => {
                     </div>
 
                     <div className="social-links d-flex gap-2">
-                        {siteSettings?.facebook_url && (
-                            <a href={siteSettings.facebook_url} target="_blank" rel="noopener noreferrer" className="social-btn fb" aria-label="Facebook"><FaFacebookF size={18} /></a>
-                        )}
-                        {siteSettings?.instagram_url && (
-                            <a href={siteSettings.instagram_url} target="_blank" rel="noopener noreferrer" className="social-btn ig" aria-label="Instagram"><FaInstagram size={18} /></a>
-                        )}
-                        {siteSettings?.twitter_url && (
-                            <a href={siteSettings.twitter_url} target="_blank" rel="noopener noreferrer" className="social-btn tw" aria-label="X (Twitter)"><FaTwitter size={18} /></a>
-                        )}
-                        {siteSettings?.linkedin_url && (
-                            <a href={siteSettings.linkedin_url} target="_blank" rel="noopener noreferrer" className="social-btn in" aria-label="LinkedIn"><FaLinkedin size={18} /></a>
-                        )}
-                        {siteSettings?.pinterest_url && (
-                            <a href={siteSettings.pinterest_url} target="_blank" rel="noopener noreferrer" className="social-btn pi" aria-label="Pinterest"><FaPinterest size={18} /></a>
-                        )}
-                        {siteSettings?.youtube_url && (
-                            <a href={siteSettings.youtube_url} target="_blank" rel="noopener noreferrer" className="social-btn yt" aria-label="YouTube"><FaYoutube size={18} /></a>
-                        )}
+                        {siteSettings?.facebook_url && <a href={siteSettings.facebook_url} target="_blank" rel="noopener noreferrer" className="social-btn fb" aria-label="Facebook"><FaFacebookF size={18} /></a>}
+                        {siteSettings?.instagram_url && <a href={siteSettings.instagram_url} target="_blank" rel="noopener noreferrer" className="social-btn ig" aria-label="Instagram"><FaInstagram size={18} /></a>}
+                        {siteSettings?.twitter_url && <a href={siteSettings.twitter_url} target="_blank" rel="noopener noreferrer" className="social-btn tw" aria-label="X (Twitter)"><FaTwitter size={18} /></a>}
+                        {siteSettings?.linkedin_url && <a href={siteSettings.linkedin_url} target="_blank" rel="noopener noreferrer" className="social-btn in" aria-label="LinkedIn"><FaLinkedin size={18} /></a>}
+                        {siteSettings?.pinterest_url && <a href={siteSettings.pinterest_url} target="_blank" rel="noopener noreferrer" className="social-btn pi" aria-label="Pinterest"><FaPinterest size={18} /></a>}
+                        {siteSettings?.youtube_url && <a href={siteSettings.youtube_url} target="_blank" rel="noopener noreferrer" className="social-btn yt" aria-label="YouTube"><FaYoutube size={18} /></a>}
                     </div>
                   </div>
 
                   {pageData.image && (
-                    <div className="position-relative w-100 mb-5 rounded-4 overflow-hidden shadow-sm" style={{ minHeight: '450px' }}>
+                    <div className="w-100 mb-5 d-flex justify-content-center">
+                      {/* FIX: Ensure main image is absolutely perfectly centered and responsive */}
                       <Image
                         src={pageData.image}
                         alt={pageData.image_alt || pageData.title || defaultAltText}
-                        fill
+                        width={1200}
+                        height={675}
                         priority={true}
-                        sizes="(max-width: 768px) 100vw, 800px"
-                        style={{ objectFit: 'cover', objectPosition: 'center' }}
+                        style={{ maxWidth: '100%', height: 'auto', objectFit: 'cover', borderRadius: '1rem', display: 'block', margin: '0 auto' }}
+                        className="shadow-sm"
                       />
                     </div>
                   )}
 
-                  <div className="details font-poppins rich-text-content">
-                    <div dangerouslySetInnerHTML={{ __html: pageData.description }} />
-                  </div>
+                 {/* REPLACED WITH NEW COMPONENT */}
+                 <ExpandableRichText htmlContent={pageData.description} className="details font-poppins rich-text-content" />
 
                 </div>
               </div>
 
-              {/* RIGHT SIDEBAR (Stacks to bottom on mobile) */}
+              {/* Standard 33% width matching service details */}
               <div className="col-lg-4 order-2">
                 <div className="dual-sticky-wrapper">
 
-                  {/* Form */}
                   <SidebarForm city={slug} />
 
-                  {/* Relatable/Recent Blogs */}
                   {recentBlogs && recentBlogs.length > 0 && (
                     <div className="sidebar-widget mt-4 lazy-render">
                       <h4 className="widget-title">Related Articles</h4>
@@ -407,10 +402,11 @@ const DynamicRootPage = async ({ params }) => {
                         {recentBlogs.map((blog, idx) => (
                           <Link key={idx} href={`/${blog.seo_content?.slug || `blog-detail?id=${blog.id}`}`} className="text-decoration-none">
                             <div className="sidebar-blog-card d-flex align-items-center gap-3">
+                              {/* FIX: Added flex-shrink-0 to prevent these thumbnails from squishing! */}
                               <img 
                                 src={blog.image || "/images/default.jpg"} 
                                 alt={blog.title} 
-                                className="rounded object-fit-cover shadow-sm" 
+                                className="rounded object-fit-cover shadow-sm flex-shrink-0" 
                                 style={{ width: "70px", height: "70px" }} 
                               />
                               <div>
@@ -428,7 +424,6 @@ const DynamicRootPage = async ({ params }) => {
                     </div>
                   )}
 
-                  {/* Service Areas */}
                   <div className="sidebar-widget mt-4">
                     <h4 className="widget-title">Service Areas</h4>
                     <div className="d-flex flex-column">
@@ -448,12 +443,8 @@ const DynamicRootPage = async ({ params }) => {
           </div>
         )}
 
-        {/* =========================================
-            UI FOR CUSTOM CMS PAGES (New Premium Layout)
-        ========================================= */}
         {pageType === "cms-page" && (
           <>
-            {/* --- HERO SECTION --- */}
             <div className="city-hero w-100">
               <Image 
                 src={pageData?.image || '/images/wework_bgImage.jpg'} 
@@ -472,12 +463,10 @@ const DynamicRootPage = async ({ params }) => {
             <div className="container city-main-container">
               <div className="row g-5">
                 
-                {/* --- LEFT COLUMN: CONTENT HUB --- */}
                 <div className="col-lg-8">
                   <div className="dual-sticky-wrapper">
                     
                     <div className="premium-card mb-4">
-                      {/* Author & Social Block */}
                       {pageData.show_author_date && (
                         <div className="author-date-social-block d-flex flex-wrap justify-content-between align-items-center border-bottom pb-3 mb-4">
                             <div className="text-muted fst-italic fs-6 mb-3 mb-md-0 d-flex align-items-center">
@@ -491,49 +480,40 @@ const DynamicRootPage = async ({ params }) => {
                             </div>
 
                             <div className="social-links d-flex gap-2">
-                                {siteSettings?.facebook_url && (
-                                    <a href={siteSettings.facebook_url} target="_blank" rel="noopener noreferrer" className="social-btn fb" aria-label="Facebook"><FaFacebookF size={18} /></a>
-                                )}
-                                {siteSettings?.instagram_url && (
-                                    <a href={siteSettings.instagram_url} target="_blank" rel="noopener noreferrer" className="social-btn ig" aria-label="Instagram"><FaInstagram size={18} /></a>
-                                )}
-                                {siteSettings?.twitter_url && (
-                                    <a href={siteSettings.twitter_url} target="_blank" rel="noopener noreferrer" className="social-btn tw" aria-label="X (Twitter)"><FaTwitter size={18} /></a>
-                                )}
-                                {siteSettings?.linkedin_url && (
-                                    <a href={siteSettings.linkedin_url} target="_blank" rel="noopener noreferrer" className="social-btn in" aria-label="LinkedIn"><FaLinkedin size={18} /></a>
-                                )}
-                                {siteSettings?.pinterest_url && (
-                                    <a href={siteSettings.pinterest_url} target="_blank" rel="noopener noreferrer" className="social-btn pi" aria-label="Pinterest"><FaPinterest size={18} /></a>
-                                )}
-                                {siteSettings?.youtube_url && (
-                                    <a href={siteSettings.youtube_url} target="_blank" rel="noopener noreferrer" className="social-btn yt" aria-label="YouTube"><FaYoutube size={18} /></a>
-                                )}
+                                {siteSettings?.facebook_url && <a href={siteSettings.facebook_url} target="_blank" rel="noopener noreferrer" className="social-btn fb" aria-label="Facebook"><FaFacebookF size={18} /></a>}
+                                {siteSettings?.instagram_url && <a href={siteSettings.instagram_url} target="_blank" rel="noopener noreferrer" className="social-btn ig" aria-label="Instagram"><FaInstagram size={18} /></a>}
+                                {siteSettings?.twitter_url && <a href={siteSettings.twitter_url} target="_blank" rel="noopener noreferrer" className="social-btn tw" aria-label="X (Twitter)"><FaTwitter size={18} /></a>}
+                                {siteSettings?.linkedin_url && <a href={siteSettings.linkedin_url} target="_blank" rel="noopener noreferrer" className="social-btn in" aria-label="LinkedIn"><FaLinkedin size={18} /></a>}
+                                {siteSettings?.pinterest_url && <a href={siteSettings.pinterest_url} target="_blank" rel="noopener noreferrer" className="social-btn pi" aria-label="Pinterest"><FaPinterest size={18} /></a>}
+                                {siteSettings?.youtube_url && <a href={siteSettings.youtube_url} target="_blank" rel="noopener noreferrer" className="social-btn yt" aria-label="YouTube"><FaYoutube size={18} /></a>}
                             </div>
                         </div>
                       )}
 
-                      <h2 className="font-outfit fw-bold h3 mb-4 text-dark">
-                        Discover Excellence
-                      </h2>
+                      {(pageData.heading || pageData.sub_heading) && (
+                        <h2 className="font-outfit fw-bold h3 mb-4 text-dark">
+                          {pageData.heading || pageData.sub_heading}
+                        </h2>
+                      )}
+                      
                       <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: pageData.content }} />
                     </div>
 
-                    {/* --- 2. DESIGN PROCESS GRID --- */}
+                    {/* FIX: Redesigned the weird vertical process list into a beautiful 2x2 desktop grid! */}
                     <div className="lazy-render">
-                      <div className="premium-card bg-white border-0">
+                      <div className="premium-card bg-transparent shadow-none px-0 py-0 mb-4 border-0">
                         <h2 className="font-outfit fw-bold h3 mb-4 text-dark">Our Proven Design Process</h2>
-                        <div className="mobile-slider-wrapper">
+                        <div className="row g-4 mobile-slider-wrapper">
                           {[
                             { icon: <FaUser />, title: "Consultation & Ideation", desc: `We meet at your property to understand your vision.` },
                             { icon: <FaDraftingCompass />, title: "3D Concept & Planning", desc: "Walking through your home with detailed 3D renders before we build." },
                             { icon: <FaHardHat />, title: "Precision Execution", desc: "Expert execution with 146 quality checks and zero compromises." },
                             { icon: <FaHome />, title: "The Grand Handover", desc: "A flawless move-in within 45 guaranteed days. Welcome home." }
                           ].map((step, i) => (
-                            <div className="process-step" key={i}>
-                              <div className="process-icon">{step.icon}</div>
-                              <div>
-                                <h4 className="font-outfit h5 fw-bold mb-1">{i + 1}. {step.title}</h4>
+                            <div className="col-md-6" key={i}>
+                              <div className="modern-card p-4 h-100 d-flex flex-column bg-white border">
+                                <div className="modern-card-icon mb-3" style={{width:'50px', height:'50px'}}>{step.icon}</div>
+                                <h4 className="font-outfit h5 fw-bold mb-2">{i + 1}. {step.title}</h4>
                                 <p className="text-muted font-poppins small mb-0">{step.desc}</p>
                               </div>
                             </div>
@@ -542,7 +522,6 @@ const DynamicRootPage = async ({ params }) => {
                       </div>
                     </div>
 
-                    {/* Recent Blogs Block */}
                     {recentBlogs.length > 0 && (
                       <div className="lazy-render">
                         <div className="premium-card border-0 px-0 pt-0">
@@ -552,7 +531,8 @@ const DynamicRootPage = async ({ params }) => {
                               <div className="col-md-6" key={idx}>
                                 <Link href={`/${blog.seo_content?.slug || `blog-detail?id=${blog.id}`}`} className="text-decoration-none">
                                   <div className="d-flex align-items-center border p-3 rounded-4 bg-white shadow-sm h-100 transition-all hover:shadow-md">
-                                    <img src={blog.image || "/images/default.jpg"} alt={blog.title} className="rounded" style={{ width: "80px", height: "80px", objectFit: "cover" }} loading="lazy" />
+                                    {/* FIX: flex-shrink-0 keeps these square */}
+                                    <img src={blog.image || "/images/default.jpg"} alt={blog.title} className="rounded flex-shrink-0" style={{ width: "80px", height: "80px", objectFit: "cover" }} loading="lazy" />
                                     <div className="ms-3">
                                       <h6 className="text-dark fw-bold mb-1" style={{ fontSize: '14px' }}>{blog.title.length > 45 ? `${blog.title.substring(0, 45)}...` : blog.title}</h6>
                                       <small className="text-gradient fw-bold">READ ARTICLE <FaArrowRight size={10} /></small>
@@ -566,7 +546,6 @@ const DynamicRootPage = async ({ params }) => {
                       </div>
                     )}
 
-                    {/* --- 3. EXCELLENCE STATS --- */}
                     <div className="lazy-render">
                       <div className="premium-card shadow-sm" style={{ background: 'linear-gradient(to right, #ffffff, #fff9f5)' }}>
                         <div className="row align-items-center mobile-slider-wrapper">
@@ -589,7 +568,6 @@ const DynamicRootPage = async ({ params }) => {
                       </div>
                     </div>
 
-                    {/* --- 4. WHY CHOOSE US (Modern Cards) --- */}
                     <div className="lazy-render">
                       <div className="premium-card bg-transparent border-0 shadow-none px-0 py-0 mb-4">
                         <div className="text-center mb-4">
@@ -628,7 +606,6 @@ const DynamicRootPage = async ({ params }) => {
                       </div>
                     </div>
 
-                    {/* Content Blocks */}
                     {contentBlocks.length > 0 && (
                       <div className="content-blocks-section lazy-render mb-4">
                         {contentBlocks.map((block, idx) => (
@@ -653,8 +630,9 @@ const DynamicRootPage = async ({ params }) => {
                                       src={block.data.image_url} 
                                       alt={block.data.image_alt || block.data.heading || defaultAltText} 
                                       className="img-fluid rounded-4 shadow-sm" 
-                                      style={{ maxHeight: '350px', objectFit: 'cover' }} 
-                                    decoding="async"  loading="lazy" />
+                                      style={{ maxHeight: '350px', objectFit: 'cover', width: '100%' }} 
+                                      loading="lazy" 
+                                    />
                                   )}
                                 </div>
                               </div>
@@ -670,7 +648,6 @@ const DynamicRootPage = async ({ params }) => {
                       </div>
                     )}
 
-                    {/* Accordions */}
                     {accordions.length > 0 && (
                       <div className="lazy-render mb-4">
                         <div className="premium-card border-0 px-0">
@@ -694,7 +671,6 @@ const DynamicRootPage = async ({ params }) => {
                       </div>
                     )}
 
-                    {/* Premium FAQs */}
                     {faqs.length > 0 && (
                       <div className="lazy-render">
                         <div className="premium-card border-0 px-0">
@@ -721,7 +697,6 @@ const DynamicRootPage = async ({ params }) => {
                   </div>
                 </div>
 
-                {/* --- RIGHT COLUMN: SIDEBAR --- */}
                 <div className="col-lg-4">
                   <div className="dual-sticky-wrapper">
                     

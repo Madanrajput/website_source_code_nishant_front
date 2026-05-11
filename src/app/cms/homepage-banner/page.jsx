@@ -5,246 +5,260 @@ import AuthMainLayout from "../../layouts/auth/AuthMainLayout";
 import api from "@/utils/api";
 import { toast } from "react-toastify";
 
-
 const CmsHomepageBanner = () => {
-
     const authToken = useSelector((state) => state.auth.authToken);
     const [pagesList, setPagesList] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({
-        title: "",
-        sub_title: "",
-        top_slogan: "",
-        top_icon: null,
-        banner_image: null,
-        item_index: null,
-    });
+    const [draggedItemIndex, setDraggedItemIndex] = useState(null);
     const [selectedId, setSelectedId] = useState(null);
 
+    const [formData, setFormData] = useState({
+        title: "", sub_title: "", top_slogan: "", description: "", 
+        button_text: "", button_link: "", top_icon: null, banner_image: null, 
+        item_index: null, action: "add", is_active: true
+    });
+    
     const fetchContentManagerPages = useCallback(async () => {
+        setLoading(true);
         try {
             const response = await api.get('/cms-content/homepage_banner', {
-                headers: {
-                    Authorization: `Bearer ${authToken}`, // Send auth token
-                },
+                headers: { Authorization: `Bearer ${authToken}` },
             });
-
             if (response.data && response.data.json_content) {
                 setPagesList(response.data.json_content);
                 setSelectedId(response.data.id);
-                setLoading(false);
             }
-
-
         } catch (err) {
-            toast.error(err.message || "Failed to fetch data. Please try again.");
+            toast.error(err.message || "Failed to fetch data.");
+        } finally {
             setLoading(false);
         }
     }, [authToken]);
 
-    useEffect(() => {
-        fetchContentManagerPages();
-    }, [fetchContentManagerPages]);
+    useEffect(() => { fetchContentManagerPages(); }, [fetchContentManagerPages]);
 
-    // Handle input change for text fields and image
     const handleInputChange = (e) => {
-        const { name, value, files } = e.target;
-        if (name === "top_icon" && files.length > 0 || name === "banner_image" && files.length > 0) {
-            setFormData((prevData) => ({ ...prevData, [name]: files[0] }));
+        const { name, value, files, type, checked } = e.target;
+        if ((name === "top_icon" || name === "banner_image") && files.length > 0) {
+            setFormData((prev) => ({ ...prev, [name]: files[0] }));
+        } else if (type === 'checkbox') {
+            setFormData((prev) => ({ ...prev, [name]: checked }));
         } else {
-            setFormData((prevData) => ({ ...prevData, [name]: value }));
+            setFormData((prev) => ({ ...prev, [name]: value }));
         }
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         const formDataToSend = new FormData();
-        formDataToSend.append("title", formData.title);
-        formDataToSend.append("sub_title", formData.sub_title);
-        formDataToSend.append("top_slogan", formData.top_slogan);
-        formDataToSend.append("item_index", formData.item_index);
-        if (formData.top_icon) {
-            formDataToSend.append("top_icon", formData.top_icon);
-        }
-        if (formData.banner_image) {
-            formDataToSend.append("banner_image", formData.banner_image);
-        }
+        Object.keys(formData).forEach(key => {
+            if (formData[key] !== null) formDataToSend.append(key, formData[key]);
+        });
 
         try {
-            // Send POST request to save form data
             const response = await api.patch(`/cms-content/update-json-homepage-banner/${selectedId}`, formDataToSend, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${authToken}`, // Send auth token
-                },
+                headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${authToken}` },
             });
-
-            // Handle success response
             if (response.status === 200) {
                 fetchContentManagerPages();
-                toast.success("Form submitted successfully.");
-                setFormData({
-                    title: "",
-                    sub_title: "",
-                    top_slogan: "",
-                    top_icon: null,
-                    banner_image: null,
-                    item_index: null,
-                });
-
-                // Close modal
+                toast.success(formData.action === 'add' ? "Banner added." : "Banner updated.");
                 document.getElementById('addNewpageModalClose').click();
-
-            } else {
-                toast.error("Error submitting form. Please try again.");
             }
-        } catch (error) {
-            toast.error(error.message ?? "Error submitting form. Please try again.");
-            console.error("Error:", error);
+        } catch (error) { toast.error("Error saving banner."); }
+    };
+
+    // 🌟 FAST TOGGLE: Turn slide ON/OFF instantly without modal
+    const handleToggleActive = async (index, currentStatus) => {
+        const formDataToSend = new FormData();
+        formDataToSend.append("action", "toggle_active");
+        formDataToSend.append("item_index", index);
+        formDataToSend.append("is_active", (!currentStatus).toString());
+
+        try {
+            await api.patch(`/cms-content/update-json-homepage-banner/${selectedId}`, formDataToSend, {
+                headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${authToken}` },
+            });
+            fetchContentManagerPages();
+            toast.success(!currentStatus ? "Slide is now Visible!" : "Slide is now Hidden!");
+        } catch (error) { toast.error("Error updating visibility."); }
+    };
+
+    // 🌟 DRAG & DROP LOGIC
+    const handleReorder = async (fromIndex, toIndex) => {
+        if (fromIndex === toIndex) return;
+        
+        // Optimistic UI update for smoothness
+        const newList = [...pagesList];
+        const [moved] = newList.splice(fromIndex, 1);
+        newList.splice(toIndex, 0, moved);
+        setPagesList(newList);
+
+        const formDataToSend = new FormData();
+        formDataToSend.append("action", "reorder");
+        formDataToSend.append("from_index", fromIndex);
+        formDataToSend.append("to_index", toIndex);
+
+        try {
+            await api.patch(`/cms-content/update-json-homepage-banner/${selectedId}`, formDataToSend, {
+                headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${authToken}` },
+            });
+            toast.success("Order updated successfully!");
+        } catch (error) { 
+            toast.error("Error updating order.");
+            fetchContentManagerPages(); // Revert on failure
         }
     };
 
-    // Set form data when edit button is clicked
+    const handleDelete = async (index) => {
+        if(!window.confirm("Are you sure you want to delete this banner?")) return;
+        const formDataToSend = new FormData();
+        formDataToSend.append("item_index", index);
+        formDataToSend.append("action", "delete");
+        try {
+            await api.patch(`/cms-content/update-json-homepage-banner/${selectedId}`, formDataToSend, {
+                headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${authToken}` },
+            });
+            fetchContentManagerPages();
+            toast.success("Banner deleted.");
+        } catch (error) { toast.error("Error deleting banner."); }
+    };
+
     const handleEditClick = (item, index) => {
         setFormData({
-            title: item.title,
-            sub_title: item.sub_title,
-            top_slogan: item.top_slogan,
-            top_icon: null,
-            banner_image: null,
-            item_index: index,
+            ...item, item_index: index, action: "update", top_icon: null, banner_image: null, 
+            is_active: item.is_active !== false
         });
     };
 
-
-
+    const handleAddNewClick = () => {
+        setFormData({
+            title: "", sub_title: "", top_slogan: "", description: "", button_text: "", button_link: "",
+            top_icon: null, banner_image: null, item_index: pagesList.length, action: "add", is_active: true
+        });
+    };
 
     return (
         <AuthMainLayout>
             <div className="container my-5">
-                <h1 className="mb-4 text-center">CMS - Homepage Banner</h1>
-                {loading ? (
-                    <div className="text-center">Loading...</div>
-                ) : (
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h1 className="text-center mb-0">CMS - Homepage Banner</h1>
+                    <button onClick={handleAddNewClick} className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNewpageModal" style={{ backgroundColor: '#ff914d', borderColor: '#ff914d' }}>
+                        + Add New Banner
+                    </button>
+                </div>
+
+                {loading ? <div className="text-center">Loading...</div> : (
                     <div className="table-responsive">
-                        <table
-                            id="usersTable"
-                            className="table display table-striped table-bordered"
-                            style={{ width: "100%" }}
-                        >
-                            <thead>
+                        <table className="table table-hover table-bordered" style={{ width: "100%", verticalAlign: 'middle' }}>
+                            <thead className="table-light">
                                 <tr>
-                                    <th>SN</th>
-                                    <th>Title</th>
-                                    <th>Sub Title</th>
-                                    <th>Top Slogan</th>
-                                    <th width="80">Top Icon</th>
-                                    <th width="80">Banner Image</th>
+                                    <th width="50">Drag</th>
+                                    <th>Status (Show on site)</th>
+                                    <th>Content</th>
+                                    <th>Media</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {pagesList && pagesList?.map((item, index) => (
-                                    <tr key={index}>
-                                        <td>{index + 1}</td>
-                                        <td>{item.title}</td>
-                                        <td>{item.sub_title}</td>
-                                        <td>{item.top_slogan}</td>
-                                        <td>
-                                            <img src={item?.top_icon} alt={item.title} height="80" decoding="async"  loading="lazy" />
-                                        </td>
-                                        <td>
-                                            <img src={item?.banner_image} alt={item.title} height="80" decoding="async"  loading="lazy" />
-                                        </td>
-                                        <td>
-                                            <button onClick={() => handleEditClick(item, index)} type="button" className="read_morebtn" data-bs-toggle="modal" data-bs-target="#addNewpageModal">
-                                                Edit
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {pagesList && pagesList?.map((item, index) => {
+                                    const isVideo = item?.banner_image?.match(/\.(mp4|webm|ogg)$/i);
+                                    const isActive = item.is_active !== false;
+                                    
+                                    return (
+                                        <tr 
+                                            key={index} 
+                                            draggable 
+                                            onDragStart={() => setDraggedItemIndex(index)}
+                                            onDragOver={(e) => e.preventDefault()}
+                                            onDrop={() => handleReorder(draggedItemIndex, index)}
+                                            style={{ backgroundColor: draggedItemIndex === index ? '#f8f9fa' : 'white', opacity: isActive ? 1 : 0.6 }}
+                                        >
+                                            <td style={{ cursor: 'grab', fontSize: '20px', textAlign: 'center', color: '#888' }}>
+                                                ☰ {/* Drag Handle Icon */}
+                                            </td>
+                                            <td>
+                                                <div className="form-check form-switch d-flex justify-content-center">
+                                                    <input 
+                                                        className="form-check-input" 
+                                                        type="checkbox" 
+                                                        checked={isActive}
+                                                        onChange={() => handleToggleActive(index, isActive)}
+                                                        style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
+                                                    />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <strong>{item.title || '(No Title)'}</strong><br/>
+                                                <small className="text-muted">{item.sub_title}</small>
+                                            </td>
+                                            <td>
+                                                {isVideo ? (
+                                                    <video src={item?.banner_image} height="60" muted playsInline />
+                                                ) : (
+                                                    <img src={item?.banner_image} alt="Banner" height="60" decoding="async" loading="lazy" style={{ objectFit: 'cover', borderRadius: '4px' }} />
+                                                )}
+                                            </td>
+                                            <td>
+                                                <button onClick={() => handleEditClick(item, index)} className="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#addNewpageModal">Edit</button>
+                                                <button onClick={() => handleDelete(index)} className="btn btn-sm btn-outline-danger">Delete</button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
+                        <small className="text-muted">💡 Hint: Click and drag the <b>☰</b> icon to reorder slides.</small>
                     </div>
                 )}
             </div>
 
-            <div className="modal fade" id="addNewpageModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div className="modal-dialog">
+            {/* Modal remains mostly the same, just ensuring checkbox syncs */}
+            <div className="modal fade" id="addNewpageModal" tabIndex="-1" aria-hidden="true">
+                <div className="modal-dialog modal-lg">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h1 className="modal-title fs-5" id="exampleModalLabel">Edit</h1>
-                            <button type="button" className="btn-close" id="addNewpageModalClose" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h1 className="modal-title fs-5">{formData.action === 'add' ? 'Add New Banner' : 'Edit Banner'}</h1>
+                            <button type="button" className="btn-close" id="addNewpageModalClose" data-bs-dismiss="modal"></button>
                         </div>
                         <form onSubmit={handleSubmit}>
                             <div className="modal-body row">
-
-                                <div className="mb-3 col-md-12">
+                                <div className="mb-3 col-md-12 d-flex align-items-center">
+                                    <div className="form-check form-switch">
+                                        <input className="form-check-input" type="checkbox" name="is_active" id="isActiveSwitch" checked={formData.is_active} onChange={handleInputChange} />
+                                        <label className="form-check-label ms-2" htmlFor="isActiveSwitch"><b>Show this banner on the Website</b></label>
+                                    </div>
+                                </div>
+                                <div className="mb-3 col-md-6">
                                     <label className="form-label">Title</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name="title"
-                                        placeholder="Title"
-                                        value={formData.title}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
+                                    <input type="text" className="form-control" name="title" value={formData.title} onChange={handleInputChange} required />
                                 </div>
-                                <div className="mb-3 col-md-12">
+                                <div className="mb-3 col-md-6">
                                     <label className="form-label">Sub Title</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name="sub_title"
-                                        placeholder="Sub Title"
-                                        value={formData.sub_title}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
+                                    <input type="text" className="form-control" name="sub_title" value={formData.sub_title} onChange={handleInputChange} />
                                 </div>
-
                                 <div className="mb-3 col-md-12">
                                     <label className="form-label">Top Slogan</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name="top_slogan"
-                                        placeholder="Top Slogan"
-                                        value={formData.top_slogan}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
+                                    <input type="text" className="form-control" name="top_slogan" value={formData.top_slogan} onChange={handleInputChange} />
                                 </div>
-
                                 <div className="mb-3 col-md-12">
-                                    <label className="form-label">Top Icon</label>
-                                    <input
-                                        type="file"
-                                        className="form-control"
-                                        name="top_icon"
-                                        accept="image/*"
-                                        onChange={handleInputChange}
-                                    />
+                                    <label className="form-label">Description</label>
+                                    <textarea className="form-control" name="description" rows="2" value={formData.description} onChange={handleInputChange}></textarea>
                                 </div>
-
-                                <div className="mb-3 col-md-12">
-                                    <label className="form-label">Upload Files</label>
-                                    <input
-                                        type="file"
-                                        className="form-control"
-                                        name="banner_image"
-                                        accept="*"
-                                        onChange={handleInputChange}
-                                    />
+                                <div className="mb-3 col-md-6">
+                                    <label className="form-label">Button Text</label>
+                                    <input type="text" className="form-control" name="button_text" value={formData.button_text} onChange={handleInputChange} placeholder="e.g. Explore More" />
                                 </div>
-
-                                <div className="m-auto mt-2 col-12 d-flex justify-content-center">
-                                    <button className="px-5 read_morebtn" type="submit">
-                                        Save Changes
-                                    </button>
+                                <div className="mb-3 col-md-6">
+                                    <label className="form-label">Button Link</label>
+                                    <input type="text" className="form-control" name="button_link" value={formData.button_link} onChange={handleInputChange} placeholder="e.g. /portfolio" />
+                                </div>
+                                <div className="mb-3 col-md-12 border-top pt-3">
+                                    <label className="form-label text-danger">Banner Image / Video</label>
+                                    <input type="file" className="form-control" name="banner_image" accept="image/*,video/mp4,video/webm" onChange={handleInputChange} required={formData.action === 'add'} />
+                                    <small className="text-muted">Images (JPG/PNG) or Video (MP4)</small>
+                                </div>
+                                <div className="m-auto mt-4 col-12 d-flex justify-content-center">
+                                    <button className="px-5 btn btn-primary py-2" type="submit" style={{ backgroundColor: '#ff914d', borderColor: '#ff914d' }}>Save Changes</button>
                                 </div>
                             </div>
                         </form>

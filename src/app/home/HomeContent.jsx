@@ -24,6 +24,8 @@ import Card from "../components/Card";
 import VideoCardHome from "../components/VideoCardHome";
 import BgImageCard from "../components/BgImageCard";
 import RoomOfice from "../components/RoomOfice";
+import HomeAbout3D from "../components/HomeAbout3D";
+import EstimateCalculator from "./clientHome/EstimateCalculator";
 
 // --- DYNAMIC IMPORTS ---
 const Blogs = dynamic(() => import("../components/Blogs"));
@@ -43,18 +45,6 @@ const CounterRow = dynamic(() => import("../components/CounterRow"), {
   loading: () => <div style={{ height: "300px", background: "#f8f9fa", width: "100%" }} /> 
 });
 
-// 🌟 FIXED: Replaced Livspace images with React Icons to match your brand Orange
-const whyChooseUsData = [
-  { title: "Lifetime warranty¹", icon: FaShieldAlt },
-  { title: "45-day move-in guarantee²", icon: FaClock },
-  { title: "146 quality checks", icon: FaCheckCircle },
-  { title: "1,00,000+ happy homes", icon: FaHome },
-  { title: "100+ cities", icon: FaMapMarkerAlt },
-  { title: "20 lakh+ catalogue products", icon: FaGem },
-  { title: "2,000+ designers", icon: FaUser }
-];
-
-
 // --- DATA FETCHING WITH FETCH ---
 async function getRemainingData() {
   const baseURL = process.env.NODE_ENV === "development" 
@@ -65,8 +55,10 @@ async function getRemainingData() {
       try {
           const res = await fetch(`${baseURL}${endpoint}`, { next: { revalidate: 60 } });
           if (!res.ok) return [];
-          const json = await res.json();
-          return json; 
+          // const json = await res.json();
+          // return json; 
+          const text = await res.text();
+          return text ? JSON.parse(text) : [];
       } catch (e) {
           console.error(`Error fetching ${endpoint}:`, e);
           return [];
@@ -74,12 +66,14 @@ async function getRemainingData() {
   };
 
   try {
-    const [designIdea, h3d_gallery, contentData, blogsData, whyChooseUsRaw] = await Promise.all([
+    const [designIdea, h3d_gallery, contentData, blogsData, whyChooseUsRaw,estimateBannerRaw , estimateCardsRaw] = await Promise.all([
       fetchData("/cms-parent-child/designer_choice"),
       fetchData("/cms-parent-child/h3d_gallery"),
       fetchData("/cms-content/home_page_content_what_we_are"),
       fetchData("/cms-blog"),
       fetchData("/cms-content/home_page_content_why_choose_us"),
+      fetchData("/cms-content/home_page_estimate_banner"),
+      fetchData("/cms-content/home_page_estimate_cards") // 🌟 NEW FETCH
     ]);
     
     let whyChooseUsData = [];
@@ -88,16 +82,32 @@ async function getRemainingData() {
       whyChooseUsData = record?.json_content || [];
     }
     
+    // Process Estimate Banner Data
+    let estimateBannerData = null;
+    if (estimateBannerRaw) {
+        const record = Array.isArray(estimateBannerRaw) ? estimateBannerRaw[0] : estimateBannerRaw;
+        estimateBannerData = record?.json_content;
+    }
+
+    // Process Estimate Cards Data
+    let estimateCardsData = [];
+    if (estimateCardsRaw) {
+        const record = Array.isArray(estimateCardsRaw) ? estimateCardsRaw[0] : estimateCardsRaw;
+        estimateCardsData = record?.json_content || [];
+    }
+
     return {
       designIdea: designIdea || [],
       h3d_gallery: h3d_gallery || [],
       content: contentData || [], 
       blogs: Array.isArray(blogsData) ? blogsData.slice(0, 3) : [],
-      whyChooseUsData
+      whyChooseUsData,
+      estimateBannerData,
+      estimateCardsData // 🌟 NEW RETURN VAR
     };
   } catch (err) {
     console.error("Server Fetch Error (Remaining Data):", err);
-    return { designIdea: [], h3d_gallery: [], content: [], blogs: [] };
+    return { designIdea: [], h3d_gallery: [], content: [], blogs: [], whyChooseUsData: [], estimateBannerData: null };
   }
 }
 
@@ -113,8 +123,9 @@ const formatDate = (dateString) => {
 };
 
 export default async function HomeContent() {
-  const { designIdea, h3d_gallery, content, blogs ,  whyChooseUsData } = await getRemainingData();
+  const { designIdea, h3d_gallery, content, blogs, whyChooseUsData, estimateBannerData,estimateCardsData } = await getRemainingData();
 
+  const safeEstimateCards = Array.isArray(estimateCardsData) ? estimateCardsData : [];
   // Sort Descending (Newest First)
   const sortedDesignIdea = [...designIdea].sort((a, b) => b.id - a.id);
   const staticRecords = sortedDesignIdea.slice(-5);
@@ -159,12 +170,32 @@ export default async function HomeContent() {
       : defaultWhyChooseUs;
 
 
+  // 🌟 Estimate Section Configuration
+  const activeEstimateBanner = estimateBannerData || {
+    is_active: true,
+    heading: "Calculate the cost of your",
+    rotating_words: "Kitchen, Wardrobe, Full Home, Living Room",
+    description: "Get a personalized, transparent estimate for your interior project in just a few clicks. No hidden costs.",
+    button_text: "Get Free Estimate",
+  };
+
+  // 🌟 Filter Gallery for the Marquee (Excluding 1 BHK, keeping 5 items)
+  const estimateMarqueeCards = h3d_gallery
+    .filter(item => !item.child_content?.title?.toLowerCase().includes("1 bhk"))
+    .slice(0, 5);
+
+    // 🌟 SMART FALLBACK: If CMS is empty, use the old h3d_gallery filter so the site doesn't break
+  // const activeEstimateCards = estimateCardsData?.filter(card => card?.is_active !== false) || [];
+  const activeEstimateCards = safeEstimateCards.filter(card => card?.is_active !== false); 
+  const finalMarqueeCards = activeEstimateCards.length > 0 
+    ? activeEstimateCards 
+    : h3d_gallery.filter(item => !item.child_content?.title?.toLowerCase().includes("1 bhk")).slice(0, 5);
+
   return (
     <>
       {/* --- INJECTED CSS FOR MOBILE HORIZONTAL SLIDERS --- */}
       <style dangerouslySetInnerHTML={{__html: `
         @media (max-width: 768px) {
-          /* Generic Mobile Slider */
           .mobile-scroll-row {
             display: flex !important;
             flex-wrap: nowrap !important;
@@ -177,14 +208,11 @@ export default async function HomeContent() {
             justify-content: flex-start !important; 
           }
           .mobile-scroll-row::-webkit-scrollbar { display: none; }
-          
           .mobile-scroll-row > [class*="col-"] {
             flex: 0 0 85% !important;
             max-width: 85% !important;
             scroll-snap-align: center;
           }
-
-          /* The Way We Work specific mobile slider */
           .mobile-process-row {
             display: flex !important;
             flex-wrap: nowrap !important;
@@ -199,14 +227,12 @@ export default async function HomeContent() {
             justify-content: flex-start !important; 
           }
           .mobile-process-row::-webkit-scrollbar { display: none; }
-          
           .process-mobile-wrap {
             flex: 0 0 85% !important;
             scroll-snap-align: center;
             display: flex;
             flex-direction: column; 
           }
-          
           .process-mobile-wrap > div {
             width: 100% !important;
             max-width: 100% !important;
@@ -215,31 +241,13 @@ export default async function HomeContent() {
             padding-right: 0 !important;
           }
         }
-        
         @media (min-width: 769px) {
-          .process-mobile-wrap {
-            display: contents; 
-          }
+          .process-mobile-wrap { display: contents; }
         }
       `}} />
 
       {/* 2. About Us */}
-      <section className="mt-2 mb-5 mt-lg-5 about_wrapper">
-        <RowImage
-          imageColLg="6" imageColXl="6" imageColMd="6" imageCol="12 d-none d-md-block"
-          ImgAbout={content[2]?.json_content?.image}
-          ImgAboutClass={"aboout_img object-fit-contain w-100 d-none d-md-block"}
-          imgAlt="About High Creation"
-          titleHeading={content[2]?.json_content?.title}
-          subHeading={content[2]?.json_content?.description}
-          subHeadingClass="font_stylish ps-3"
-          description={content[2]?.json_content?.designation}
-          textAboutBtn="Read More About Us"
-          btnLink="/about-us"
-          textAboutBtnCLass="read_morebtn"
-          priority={true}
-        />
-      </section>
+      <HomeAbout3D />
 
       {/* 3. Explore What We Offer */}
       <div className="my-5 oofer_card">
@@ -306,40 +314,36 @@ export default async function HomeContent() {
         </div>
 
       {/* 5. Why Choose Us (Infinite Marquee) */}
-      {/* <LazySection placeholderHeight="300px">
+      <LazySection placeholderHeight="300px">
         <section className="my-5 py-5 overflow-hidden" style={{ backgroundColor: "#fafafa" }}>
           
           <div className="container mb-5">
-            <h2 className="text-center font_about fw-bold mb-0" style={{ fontSize: "clamp(2rem, 4vw, 2.8rem)" }}>
+            <h2 className="text-center font_about fw-bold mb-0">
               Why <span className="font_stylish" style={{ color: "#ff914d" }}>choose us</span>
             </h2>
           </div>
 
           <div className="marquee-container position-relative w-100" style={{ overflow: "hidden" }}>
             <div className="marquee-track d-flex align-items-center gap-4">
-              
-              {[...whyChooseUsData, ...whyChooseUsData].map((item, idx) => {
-                const Icon = item.icon;
+
+              {[...activeWhyChooseUsData, ...activeWhyChooseUsData].map((item, idx) => {
+                const IconComponent = ICON_MAP[item.icon] || FaCheckCircle;
+
                 return (
-                  <div 
-                    key={idx} 
-                    className="marquee-card bg-white p-4 rounded-4 shadow-sm d-flex flex-column align-items-center justify-content-center text-center flex-shrink-0" 
-                    style={{ width: "220px", height: "180px", border: "1px solid #f1f5f9" }}
-                  >
-                    <div 
-                      className="mb-3 d-flex align-items-center justify-content-center" 
-                      style={{ width: "64px", height: "64px", backgroundColor: "#fff4ed", borderRadius: "50%" }}
-                    >
-                      <Icon size={32} color="#ff914d" />
-                    </div>
+                  <div key={idx} className="marquee-card bg-white p-4 rounded-4 shadow-sm text-center flex-shrink-0"
+                       style={{ width: "220px", height: "180px" }}>
                     
-                    <p className="mb-0 fw-bold font-poppins text-dark" style={{ fontSize: "15px" }}>
-                      {item.title}
-                    </p>
+                    <div className="mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style={{ width: "64px", height: "64px", backgroundColor: "#fff4ed", borderRadius: "50%" }}>
+                      <IconComponent size={32} color="#ff914d" />
+                    </div>
+
+                    <p className="fw-bold mt-2 font-poppins text-dark" style={{ fontSize: "15px" }}>{item.title}</p>
+                    {item.description && <p className="small text-muted mb-0">{item.description}</p>}
                   </div>
                 );
               })}
-              
+
             </div>
           </div>
 
@@ -347,69 +351,31 @@ export default async function HomeContent() {
             .marquee-container {
               mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
               -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+              padding: 1rem 0; 
             }
             .marquee-track {
-              animation: scrollMarquee 30s linear infinite;
+              display: flex;
               width: max-content;
+              animation: scrollMarquee 30s linear infinite;
             }
-            .marquee-track:hover {
-              animation-play-state: paused;
-            }
-            .marquee-card {
-              transition: transform 0.3s ease, box-shadow 0.3s ease;
-            }
+            .marquee-track:hover { animation-play-state: paused; }
+            .marquee-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
             .marquee-card:hover {
               transform: translateY(-5px);
               box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
             }
             @keyframes scrollMarquee {
               0% { transform: translateX(0); }
-              100% { transform: translateX(-50%); } 
+              100% { transform: translateX(-50%); }
             }
           `}} />
-          
         </section>
-      </LazySection> */}
+      </LazySection>
 
-<LazySection placeholderHeight="300px">
-  <section className="my-5 py-5 overflow-hidden" style={{ backgroundColor: "#fafafa" }}>
-    
-    <div className="container mb-5">
-      <h2 className="text-center font_about fw-bold mb-0">
-        Why <span className="font_stylish" style={{ color: "#ff914d" }}>choose us</span>
-      </h2>
-    </div>
-
-    <div className="marquee-container position-relative w-100" style={{ overflow: "hidden" }}>
-      <div className="marquee-track d-flex align-items-center gap-4">
-
-        {[...activeWhyChooseUsData, ...activeWhyChooseUsData].map((item, idx) => {
-          const IconComponent = ICON_MAP[item.icon] || FaCheckCircle;
-
-          return (
-            <div key={idx} className="marquee-card bg-white p-4 rounded-4 shadow-sm text-center flex-shrink-0"
-                 style={{ width: "220px", height: "180px" }}>
-              
-              <div style={{ width: "64px", height: "64px", backgroundColor: "#fff4ed", borderRadius: "50%" }}>
-                <IconComponent size={32} color="#ff914d" />
-              </div>
-
-              <p className="fw-bold mt-2">{item.title}</p>
-              {item.description && <p className="small text-muted">{item.description}</p>}
-            </div>
-          );
-        })}
-
-      </div>
-    </div>
-  </section>
-</LazySection>
-
-      {/* 🌟 FIXED: Design Idea (Now slides smoothly on Mobile!) */}
+      {/* Design Idea */}
       <LazySection placeholderHeight="700px">
         <div className="pt-5 my-5 designidea" style={{ backgroundImage: `url(${content[1]?.json_content?.image})` }}>
           <div className="container">
-            {/* Heading pulled out of the row so it stays centered above the slider */}
             <h2 className="pb-4 text-center font_about">
               {content[1]?.json_content?.title} <span className="font_stylish">{content[1]?.json_content?.description}</span>
             </h2>
@@ -507,90 +473,71 @@ export default async function HomeContent() {
         </div>
       </LazySection>
 
-      {/* Gallery (Let's Save Time) */}
+      {/* 🌟 FIXED: Let's Save Time (With proper container wrappers) */}
       <LazySection placeholderHeight="600px">
-        <div className="savedesign">
+        <div className="savedesign my-5">
           <div className="container">
             <div className="mb-5 position-relative text-center">
               <h3 className="mb-0"><span className="font_stylish">{content[8]?.json_content?.title}</span></h3>
               <h3 className="pb-0 pb-lg-4 font_about mt-0 designs_lets">{content[8]?.json_content?.description}</h3>
             </div>
-            <div className="mx-0 row g-4 justify-content-center mobile-scroll-row">
-              {h3d_gallery.map((hd_gallery, index) => (
-                <div key={index} className="col-lg-4 col-md-6 col-12">
+          </div>
+          
+          <div className="estimate-marquee-container position-relative w-100">
+            <div className="estimate-marquee-track d-flex align-items-center gap-4 px-3">
+              
+              {/* Duplicating array to ensure a seamless infinite scrolling loop */}
+              {/* Duplicating array to ensure a seamless infinite scrolling loop */}
+              {[...finalMarqueeCards, ...finalMarqueeCards].map((card, index) => (
+                <div key={index} className="flex-shrink-0" style={{ width: "320px" }}>
                   <Card 
-                    cardLinkName={`/design-idea/gallery?id=${hd_gallery?.id}`} 
-                    cardNameALl="cardoffer" 
-                    imgSrc={hd_gallery.child_content?.image} 
-                    imgAlt={"room"} 
-                    imgClass={"bhkimg"} 
-                    titleCard={hd_gallery.child_content.title} 
-                    titleClass="text-center mb-0 pb-0" 
+                    cardLinkName={card?.link || `/estimator-for-home`} // Uses CMS link, defaults to estimator
+                    cardNameALl="cardoffer shadow-sm border-0 bg-white h-100" 
+                    imgSrc={card?.image || card?.child_content?.image} // Uses CMS image or fallback image
+                    imgAlt={card?.title || card?.child_content?.title} 
+                    imgClass={"bhkimg rounded-top-3"} 
+                    titleCard={card?.title || card?.child_content?.title} // Uses CMS title or fallback title
+                    titleClass="text-center mb-0 pb-3 pt-3 fw-bold fs-6 text-dark" 
                   />
                 </div>
               ))}
+
             </div>
           </div>
+
+          {/* Injected CSS for the seamless infinite Marquee */}
+          <style dangerouslySetInnerHTML={{__html: `
+            .estimate-marquee-container {
+              mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+              -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+              overflow: hidden;
+              padding: 10px 0;
+            }
+            .estimate-marquee-track {
+              animation: scrollEstimateMarquee 35s linear infinite;
+              width: max-content;
+            }
+            .estimate-marquee-track:hover {
+              animation-play-state: paused;
+            }
+            @keyframes scrollEstimateMarquee {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); } 
+            }
+          `}} />
         </div>
       </LazySection>
 
-      {/* 🚀 Get Estimate Section (Livspace Style Rotating Cube) */}
-      <LazySection placeholderHeight="300px">
-        <section className="my-5 py-5" style={{ backgroundColor: "#fff9f9", borderTop: "1px solid #ffeeee", borderBottom: "1px solid #ffeeee" }}>
-          <div className="container text-center">
-            <div className="d-flex flex-column flex-md-row justify-content-center align-items-center gap-2 gap-md-3 mb-4">
-              <h2 className="font_about text-dark mb-0" style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)" }}>
-                Calculate the cost of your
-              </h2>
-              
-              <div className="cube-container" style={{ height: "50px", width: "190px", perspective: "1000px" }}>
-                <div className="cube-spinner" style={{ position: "relative", width: "100%", height: "100%", transformStyle: "preserve-3d", animation: "spinCube 7.5s infinite cubic-bezier(0.2, 0.8, 0.2, 1)" }}>
-                  
-                  <div className="cube-face position-absolute w-100 h-100 fw-bold" 
-                       style={{ transform: "rotateX(0deg) translateZ(15px)", color: "#ff914d", fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: "50px", backfaceVisibility: "hidden" }}>
-                    Kitchen
-                  </div>
-                  <div className="cube-face position-absolute w-100 h-100 fw-bold" 
-                       style={{ transform: "rotateX(120deg) translateZ(15px)", color: "#ff914d", fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: "50px", backfaceVisibility: "hidden" }}>
-                    Wardrobe
-                  </div>
-                  <div className="cube-face position-absolute w-100 h-100 fw-bold" 
-                       style={{ transform: "rotateX(240deg) translateZ(15px)", color: "#ff914d", fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: "50px", backfaceVisibility: "hidden" }}>
-                    Full Home
-                  </div>
 
-                </div>
-              </div>
-            </div>
-
-            <p className="text-muted mb-4 font-poppins mx-auto" style={{ fontSize: "1.1rem", maxWidth: "600px" }}>
-              Get a personalized, transparent estimate for your interior project in just a few clicks. No hidden costs.
-            </p>
-            
-            <a href="/estimator-for-home" className="btn text-white fw-bold px-5 py-3 rounded-pill shadow-sm" style={{ backgroundColor:"#ff914d", fontSize: "1.1rem", transition: "all 0.3s ease" }}>
-              Get Free Estimate <MdKeyboardArrowRight size={24} className="ms-1" />
-            </a>
-
-            <style dangerouslySetInnerHTML={{__html: `
-              @keyframes spinCube {
-                0%, 22% { transform: translateZ(-15px) rotateX(0deg); }
-                33%, 55% { transform: translateZ(-15px) rotateX(-120deg); }
-                66%, 88% { transform: translateZ(-15px) rotateX(-240deg); }
-                100% { transform: translateZ(-15px) rotateX(-360deg); }
-              }
-              .cube-face {
-                 display: flex;
-                 align-items: center;
-                 justify-content: center;
-              }
-              @media (min-width: 768px) {
-                 .cube-face { justify-content: flex-start; }
-                 .cube-container { width: 230px !important; }
-              }
-            `}} />
-          </div>
-        </section>
-      </LazySection>
+      {/* 🌟 DYNAMIC CMS ESTIMATE SECTION */}
+      {activeEstimateBanner.is_active !== false && (
+        <LazySection placeholderHeight="600px">
+          <section className="my-5 py-5" style={{ backgroundColor: "#fff9f9", borderTop: "1px solid #ffeeee", borderBottom: "1px solid #ffeeee" }}>
+            {/* Interactive Livspace Style Calculator (With Rotating Words) */}
+            <EstimateCalculator cmsData={activeEstimateBanner} />
+          </section>
+        </LazySection>
+      )}
 
       {/* Blogs */}
       <LazySection placeholderHeight="500px">

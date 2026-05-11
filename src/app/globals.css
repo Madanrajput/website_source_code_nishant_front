@@ -369,3 +369,40 @@ img, video, iframe {
   transform: translateY(-2px); /* Slight lift effect */
   display: inline-block;
 }
+
+
+/* ==========================================================================
+   WHY CHOOSE US - INFINITE SCROLL MARQUEE
+   ========================================================================== */
+   .why-choose-marquee {
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    padding: 1rem 0; /* Ensures box-shadows don't get clipped */
+  }
+  
+  .why-choose-track {
+    display: flex;
+    width: max-content;
+    animation: scrollMarquee 30s linear infinite;
+  }
+  
+  /* Pause the animation when the user hovers over the cards */
+  .why-choose-track:hover {
+    animation-play-state: paused;
+  }
+  
+  .why-choose-set {
+    display: flex;
+    gap: 1.5rem;
+    padding-right: 1.5rem; /* Matches the gap to ensure a seamless loop */
+  }
+  
+  @keyframes scrollMarquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }

@@ -1,18 +1,15 @@
 "use client";
 import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 
 export default function HeroCarousel({ bannerData }) {
-  // Strictly limit to 3 slides total
-  const firstBanner = bannerData?.[0];
-  const restBanners = bannerData?.slice(1, 3) || [];
-
   const [showRest, setShowRest] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  // 🌟 FIXED: Smooth sliding motion with 5-second explicitly set intervals
+  // Smooth sliding motion with 5-second explicitly set intervals
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, duration: 60 }, 
     [Autoplay({ delay: 5000, stopOnInteraction: false })]
@@ -32,8 +29,8 @@ export default function HeroCarousel({ bannerData }) {
     }
   }, []);
 
-  // Filter out any potential undefined/null banners
-  const activeBanners = (showRest ? [firstBanner, ...restBanners] : [firstBanner]).filter(Boolean);
+  // Filter out undefined banners and dynamically render all available slides
+  const activeBanners = (showRest ? bannerData : bannerData?.slice(0, 1) || []).filter(Boolean);
 
   // Inform Embla when we add the remaining slides to the DOM so it loops properly
   useEffect(() => {
@@ -41,7 +38,7 @@ export default function HeroCarousel({ bannerData }) {
     emblaApi.reInit();
   }, [emblaApi, activeBanners.length]);
 
-  if (!firstBanner) return null;
+  if (!bannerData || bannerData.length === 0) return null;
 
   return (
     <section className="position-relative w-100" style={{ backgroundColor: '#f0f0f0' }}>
@@ -52,18 +49,47 @@ export default function HeroCarousel({ bannerData }) {
         .embla__slide { flex: 0 0 100%; min-width: 0; position: relative; }
         .banner-media { object-fit: cover; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
         
+        /* 🌟 UPGRADED OVERLAY: Livspace-style bottom gradient */
         .banner-overlay { 
             position: absolute; 
             z-index: 10; 
             inset: 0; 
             display: flex; 
             flex-direction: column; 
-            justify-content: center; 
-            padding: 5%; 
+            justify-content: flex-end; /* Push to bottom */
+            align-items: center;       /* Center horizontally */
+            padding-bottom: 6%;        /* Breathing room at the bottom */
             pointer-events: none;
-            text-shadow: 0px 2px 10px rgba(0,0,0,0.6); 
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0) 100%);
+            text-align: center;
+        }
+        
+        .banner-overlay * {
+            pointer-events: auto; /* Re-enable clicks for buttons inside overlay */
         }
 
+        .banner-content-wrapper {
+            max-width: 900px; /* Prevent text from spanning the whole screen */
+            width: 90%;
+            padding: 0 15px;
+        }
+
+        /* 🌟 MODERN BUTTON STYLING */
+        .banner-btn {
+            background-color: #ff914d;
+            border: none;
+            box-shadow: 0 4px 15px rgba(255, 145, 77, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .banner-btn:hover {
+            background-color: #e67d3c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 145, 77, 0.6);
+        }
+
+        /* Navigation Arrows */
         .embla__nav-btn {
             position: absolute;
             top: 50%;
@@ -95,10 +121,9 @@ export default function HeroCarousel({ bannerData }) {
       <div className="embla" ref={emblaRef}>
         <div className="embla__container">
           {activeBanners.map((banner, index) => {
-            const isVideo = banner?.banner_image?.endsWith(".mp4");
+            const isVideo = banner?.banner_image?.match(/\.(mp4|webm|ogg)$/i);
             const isFirstSlide = index === 0;
 
-            {/* 🌟 FIXED: Media is permanently rendered so Embla creates perfect clones for a seamless loop */}
             return (
               <div className="embla__slide" key={banner.id || index}>
                 {isVideo ? (
@@ -108,7 +133,7 @@ export default function HeroCarousel({ bannerData }) {
                     loop
                     muted
                     playsInline
-                    preload="auto"
+                    preload={isFirstSlide ? "auto" : "metadata"}
                     poster={banner?.banner_image_poster || ""}
                   >
                     <source src={banner?.banner_image} type="video/mp4" />
@@ -117,24 +142,53 @@ export default function HeroCarousel({ bannerData }) {
                   <Image
                     src={banner?.banner_image ?? "/images/home-banner-1.png"}
                     className="banner-media"
-                    alt={banner?.title?.trim() || "High Creation Interior"}
+                    alt={banner?.title?.trim() || "High Creation Interior Banner"}
                     fill
-                    priority={true} // Prioritize rendering so the loop doesn't snap to an unloaded image
-                    sizes="100vw"
+                    priority={isFirstSlide}       // Performance boost: load immediately
+                    fetchPriority={isFirstSlide ? "high" : "auto"} // Performance boost: hint browser 
+                    quality={isFirstSlide ? 90 : 75} // Sharper image for LCP
+                    sizes="(max-width: 768px) 100vw, 100vw"
                   />
                 )}
 
-                <div className="banner-overlay text-white carousel-caption d-md-block text-start pt-0">
-                  <div className="fw-lighter fs-3 home_subhead">{banner?.top_slogan}</div>
-                  <div className="d-lg-flex">
-                    <div>
-                      {isFirstSlide ? (
-                        <h1 className="letheading home_banner_heading">{banner?.title}</h1>
-                      ) : (
-                        <h2 className="letheading home_banner_heading">{banner?.title}</h2>
-                      )}
-                      <div className="font_stylish_home">{banner?.sub_title}</div>
-                    </div>
+                {/* 🌟 RESTRUCTURED OVERLAY FOR BOTTOM-CENTER */}
+                <div className="banner-overlay text-white">
+                  <div className="banner-content-wrapper">
+                    {banner?.top_slogan && (
+                       <div className="fw-lighter fs-4 mb-2 text-uppercase" style={{ letterSpacing: '2px' }}>
+                         {banner.top_slogan}
+                       </div>
+                    )}
+                    
+                    {isFirstSlide ? (
+                      <h1 className="letheading home_banner_heading fw-bold mb-2 text-shadow">
+                        {banner?.title}
+                      </h1>
+                    ) : (
+                      <h2 className="letheading home_banner_heading fw-bold mb-2 text-shadow">
+                        {banner?.title}
+                      </h2>
+                    )}
+                    
+                    {banner?.sub_title && (
+                       <div className="font_stylish_home mb-2 fs-3 text-shadow">
+                         {banner.sub_title}
+                       </div>
+                    )}
+                    
+                    {banner?.description && (
+                       <p className="fs-5 mb-4 mx-auto text-light" style={{ maxWidth: '700px', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                         {banner.description}
+                       </p>
+                    )}
+                    
+                    {banner?.button_text && banner?.button_link && (
+                       <div className="mt-3 mb-2">
+                         <Link href={banner.button_link} className="btn btn-primary rounded-pill px-5 py-3 fs-5 fw-bold banner-btn">
+                           {banner.button_text}
+                         </Link>
+                       </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -143,7 +197,7 @@ export default function HeroCarousel({ bannerData }) {
         </div>
       </div>
 
-      {isMounted && activeBanners.length > 1 && (
+      {isMounted && bannerData.length > 1 && (
         <>
           <button className="embla__nav-btn prev" onClick={scrollPrev} aria-label="Previous slide">
             <svg className="embla__nav-icon" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>

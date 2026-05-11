@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { CiCirclePlus, CiCircleMinus } from "react-icons/ci";
+import { useSearchParams } from "next/navigation";
 import TooltipComponent from "../components/TooltipComponent";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import api from "@/utils/api";
@@ -25,6 +26,7 @@ const RoomCounter = ({ title, count, onAdd, onRemove }) => (
 );
 
 const EstimatorClient = () => {
+  const searchParams = useSearchParams();
   const [otpSent, setOtpSent] = useState(false);
   const [bedrooms, setBedrooms] = useState(0);
   const [bathrooms, setBathrooms] = useState(0);
@@ -70,6 +72,30 @@ const EstimatorClient = () => {
     { id: 11, name: "3BHK Flat" },
     { id: 12, name: "4BHK Flat" },
   ];
+
+  useEffect(() => {
+    const urlHome = searchParams?.get('home');
+    const urlBhk = searchParams?.get('bhk');
+
+    if (urlHome && urlBhk) {
+      setHome(urlHome);
+      setSelectedBHK(urlBhk);
+
+      // Auto-fill sensible default rooms based on BHK selection
+      const count = parseInt(urlBhk.charAt(0)) || 1;
+      setBedrooms(count);
+      setBathrooms(count === 1 ? 1 : count - 1); // e.g., 3BHK gets 3 beds, 2 baths
+      setLiving(1);
+      setKitchen(1);
+      
+      // Sensible defaults so they aren't stuck
+      setMovableFurniture(false); 
+      setPackageName("Standard");
+
+      // Auto-advance to Step 2 (Package Selection)
+      setStep(2);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (otpSent) {
