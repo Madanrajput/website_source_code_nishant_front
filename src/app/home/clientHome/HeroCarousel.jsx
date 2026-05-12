@@ -49,27 +49,28 @@ export default function HeroCarousel({ bannerData }) {
         .embla__slide { flex: 0 0 100%; min-width: 0; position: relative; }
         .banner-media { object-fit: cover; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
         
-        /* 🌟 UPGRADED OVERLAY: Livspace-style bottom gradient */
+        /* 🌟 UPGRADED OVERLAY: Much softer bottom gradient */
         .banner-overlay { 
             position: absolute; 
             z-index: 10; 
             inset: 0; 
             display: flex; 
             flex-direction: column; 
-            justify-content: flex-end; /* Push to bottom */
-            align-items: center;       /* Center horizontally */
-            padding-bottom: 6%;        /* Breathing room at the bottom */
+            justify-content: flex-end; 
+            align-items: center;       
+            padding-bottom: 6%;        
             pointer-events: none;
-            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0) 100%);
+            /* Changed from 0.85 black to 0.4 black for a brighter feel */
+            background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0) 100%);
             text-align: center;
         }
         
         .banner-overlay * {
-            pointer-events: auto; /* Re-enable clicks for buttons inside overlay */
+            pointer-events: auto; 
         }
 
         .banner-content-wrapper {
-            max-width: 900px; /* Prevent text from spanning the whole screen */
+            max-width: 900px; 
             width: 90%;
             padding: 0 15px;
         }
@@ -144,40 +145,41 @@ export default function HeroCarousel({ bannerData }) {
                     className="banner-media"
                     alt={banner?.title?.trim() || "High Creation Interior Banner"}
                     fill
-                    priority={isFirstSlide}       // Performance boost: load immediately
-                    fetchPriority={isFirstSlide ? "high" : "auto"} // Performance boost: hint browser 
-                    quality={isFirstSlide ? 90 : 75} // Sharper image for LCP
+                    priority={isFirstSlide}       
+                    fetchPriority={isFirstSlide ? "high" : "auto"} 
+                    quality={isFirstSlide ? 90 : 75} 
                     sizes="(max-width: 768px) 100vw, 100vw"
                   />
                 )}
 
-                {/* 🌟 RESTRUCTURED OVERLAY FOR BOTTOM-CENTER */}
                 <div className="banner-overlay text-white">
                   <div className="banner-content-wrapper">
                     {banner?.top_slogan && (
-                       <div className="fw-lighter fs-4 mb-2 text-uppercase" style={{ letterSpacing: '2px' }}>
+                       <div className="fw-lighter fs-4 mb-2 text-uppercase" style={{ letterSpacing: '2px', textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
                          {banner.top_slogan}
                        </div>
                     )}
                     
+                    {/* Removed heavy text-shadow classes, replaced with a subtle soft drop shadow */}
                     {isFirstSlide ? (
-                      <h1 className="letheading home_banner_heading fw-bold mb-2 text-shadow">
+                      <h1 className="letheading home_banner_heading fw-bold mb-2" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
                         {banner?.title}
                       </h1>
                     ) : (
-                      <h2 className="letheading home_banner_heading fw-bold mb-2 text-shadow">
+                      <h2 className="letheading home_banner_heading fw-bold mb-2" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
                         {banner?.title}
                       </h2>
                     )}
                     
                     {banner?.sub_title && (
-                       <div className="font_stylish_home mb-2 fs-3 text-shadow">
+                       <div className="font_stylish_home mb-2 fs-3" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
                          {banner.sub_title}
                        </div>
                     )}
                     
+                    {/* Reduced paragraph text shadow to be barely visible just for readability */}
                     {banner?.description && (
-                       <p className="fs-5 mb-4 mx-auto text-light" style={{ maxWidth: '700px', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                       <p className="fs-5 mb-4 mx-auto text-light" style={{ maxWidth: '700px', textShadow: '0 1px 4px rgba(0,0,0,0.3)' }}>
                          {banner.description}
                        </p>
                     )}

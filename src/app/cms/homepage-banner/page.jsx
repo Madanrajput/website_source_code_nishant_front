@@ -14,7 +14,8 @@ const CmsHomepageBanner = () => {
 
     const [formData, setFormData] = useState({
         title: "", sub_title: "", top_slogan: "", description: "", 
-        button_text: "", button_link: "", top_icon: null, banner_image: null, 
+        button_text: "", button_link: "", text_color: "#ffffff", 
+        top_icon: null, banner_image: null, mobile_banner_image: null, // 🌟 Added mobile_banner_image
         item_index: null, action: "add", is_active: true
     });
     
@@ -39,7 +40,8 @@ const CmsHomepageBanner = () => {
 
     const handleInputChange = (e) => {
         const { name, value, files, type, checked } = e.target;
-        if ((name === "top_icon" || name === "banner_image") && files.length > 0) {
+        // 🌟 Check for new mobile_banner_image input
+        if ((name === "top_icon" || name === "banner_image" || name === "mobile_banner_image") && files.length > 0) {
             setFormData((prev) => ({ ...prev, [name]: files[0] }));
         } else if (type === 'checkbox') {
             setFormData((prev) => ({ ...prev, [name]: checked }));
@@ -67,7 +69,6 @@ const CmsHomepageBanner = () => {
         } catch (error) { toast.error("Error saving banner."); }
     };
 
-    // 🌟 FAST TOGGLE: Turn slide ON/OFF instantly without modal
     const handleToggleActive = async (index, currentStatus) => {
         const formDataToSend = new FormData();
         formDataToSend.append("action", "toggle_active");
@@ -83,11 +84,8 @@ const CmsHomepageBanner = () => {
         } catch (error) { toast.error("Error updating visibility."); }
     };
 
-    // 🌟 DRAG & DROP LOGIC
     const handleReorder = async (fromIndex, toIndex) => {
         if (fromIndex === toIndex) return;
-        
-        // Optimistic UI update for smoothness
         const newList = [...pagesList];
         const [moved] = newList.splice(fromIndex, 1);
         newList.splice(toIndex, 0, moved);
@@ -105,7 +103,7 @@ const CmsHomepageBanner = () => {
             toast.success("Order updated successfully!");
         } catch (error) { 
             toast.error("Error updating order.");
-            fetchContentManagerPages(); // Revert on failure
+            fetchContentManagerPages(); 
         }
     };
 
@@ -125,15 +123,21 @@ const CmsHomepageBanner = () => {
 
     const handleEditClick = (item, index) => {
         setFormData({
-            ...item, item_index: index, action: "update", top_icon: null, banner_image: null, 
+            ...item, 
+            item_index: index, 
+            action: "update", 
+            top_icon: null, 
+            banner_image: null, 
+            mobile_banner_image: null, // Ensure file inputs are clean
+            text_color: item.text_color || "#ffffff",
             is_active: item.is_active !== false
         });
     };
 
     const handleAddNewClick = () => {
         setFormData({
-            title: "", sub_title: "", top_slogan: "", description: "", button_text: "", button_link: "",
-            top_icon: null, banner_image: null, item_index: pagesList.length, action: "add", is_active: true
+            title: "", sub_title: "", top_slogan: "", description: "", button_text: "", button_link: "", text_color: "#ffffff",
+            top_icon: null, banner_image: null, mobile_banner_image: null, item_index: pagesList.length, action: "add", is_active: true
         });
     };
 
@@ -153,15 +157,16 @@ const CmsHomepageBanner = () => {
                             <thead className="table-light">
                                 <tr>
                                     <th width="50">Drag</th>
-                                    <th>Status (Show on site)</th>
+                                    <th>Status</th>
                                     <th>Content</th>
-                                    <th>Media</th>
+                                    <th>Media Preview</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {pagesList && pagesList?.map((item, index) => {
                                     const isVideo = item?.banner_image?.match(/\.(mp4|webm|ogg)$/i);
+                                    const isMobileVideo = item?.mobile_banner_image?.match(/\.(mp4|webm|ogg)$/i);
                                     const isActive = item.is_active !== false;
                                     
                                     return (
@@ -174,7 +179,7 @@ const CmsHomepageBanner = () => {
                                             style={{ backgroundColor: draggedItemIndex === index ? '#f8f9fa' : 'white', opacity: isActive ? 1 : 0.6 }}
                                         >
                                             <td style={{ cursor: 'grab', fontSize: '20px', textAlign: 'center', color: '#888' }}>
-                                                ☰ {/* Drag Handle Icon */}
+                                                ☰
                                             </td>
                                             <td>
                                                 <div className="form-check form-switch d-flex justify-content-center">
@@ -192,10 +197,26 @@ const CmsHomepageBanner = () => {
                                                 <small className="text-muted">{item.sub_title}</small>
                                             </td>
                                             <td>
-                                                {isVideo ? (
-                                                    <video src={item?.banner_image} height="60" muted playsInline />
-                                                ) : (
-                                                    <img src={item?.banner_image} alt="Banner" height="60" decoding="async" loading="lazy" style={{ objectFit: 'cover', borderRadius: '4px' }} />
+                                                {/* 🌟 Desktop Preview */}
+                                                <div className="d-flex align-items-center gap-2 mb-2">
+                                                    <span className="badge bg-secondary">Desktop</span>
+                                                    {isVideo ? (
+                                                        <video src={item?.banner_image} height="40" muted playsInline />
+                                                    ) : (
+                                                        <img src={item?.banner_image} alt="Desktop Banner" height="40" decoding="async" loading="lazy" style={{ objectFit: 'cover', borderRadius: '4px' }} />
+                                                    )}
+                                                </div>
+                                                
+                                                {/* 🌟 Mobile Preview */}
+                                                {item?.mobile_banner_image && (
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        <span className="badge bg-info">Mobile</span>
+                                                        {isMobileVideo ? (
+                                                            <video src={item?.mobile_banner_image} height="40" muted playsInline />
+                                                        ) : (
+                                                            <img src={item?.mobile_banner_image} alt="Mobile Banner" height="40" decoding="async" loading="lazy" style={{ objectFit: 'cover', borderRadius: '4px' }} />
+                                                        )}
+                                                    </div>
                                                 )}
                                             </td>
                                             <td>
@@ -212,7 +233,6 @@ const CmsHomepageBanner = () => {
                 )}
             </div>
 
-            {/* Modal remains mostly the same, just ensuring checkbox syncs */}
             <div className="modal fade" id="addNewpageModal" tabIndex="-1" aria-hidden="true">
                 <div className="modal-dialog modal-lg">
                     <div className="modal-content">
@@ -252,11 +272,39 @@ const CmsHomepageBanner = () => {
                                     <label className="form-label">Button Link</label>
                                     <input type="text" className="form-control" name="button_link" value={formData.button_link} onChange={handleInputChange} placeholder="e.g. /portfolio" />
                                 </div>
+                                
                                 <div className="mb-3 col-md-12 border-top pt-3">
-                                    <label className="form-label text-danger">Banner Image / Video</label>
-                                    <input type="file" className="form-control" name="banner_image" accept="image/*,video/mp4,video/webm" onChange={handleInputChange} required={formData.action === 'add'} />
-                                    <small className="text-muted">Images (JPG/PNG) or Video (MP4)</small>
+                                    <label className="form-label fw-bold">Banner Text Color</label>
+                                    <div className="d-flex align-items-center gap-3">
+                                        <input 
+                                            type="color" 
+                                            className="form-control form-control-color" 
+                                            name="text_color" 
+                                            value={formData.text_color} 
+                                            onChange={handleInputChange} 
+                                            title="Choose your text color" 
+                                            style={{ width: '60px', padding: '0.2rem', cursor: 'pointer' }}
+                                        />
+                                        <span className="text-muted border rounded px-2 py-1 bg-light">
+                                            {formData.text_color.toUpperCase()}
+                                        </span>
+                                    </div>
+                                    <small className="text-muted d-block mt-1">This color will apply to the Title, Subtitle, Slogan, and Description for this slide.</small>
                                 </div>
+
+                                {/* 🌟 Split Uploads for Desktop & Mobile */}
+                                <div className="mb-3 col-md-6 border-top pt-3">
+                                    <label className="form-label text-danger fw-bold">Desktop Media <small>(16:9)</small></label>
+                                    <input type="file" className="form-control" name="banner_image" accept="image/*,video/mp4,video/webm" onChange={handleInputChange} required={formData.action === 'add'} />
+                                    <small className="text-muted d-block mt-1">Images (JPG/PNG) or Video (MP4)</small>
+                                </div>
+
+                                <div className="mb-3 col-md-6 border-top pt-3">
+                                    <label className="form-label text-primary fw-bold">Mobile Media <small>(Optional Portrait)</small></label>
+                                    <input type="file" className="form-control" name="mobile_banner_image" accept="image/*,video/mp4,video/webm" onChange={handleInputChange} />
+                                    <small className="text-muted d-block mt-1">Custom image/video for phones.</small>
+                                </div>
+
                                 <div className="m-auto mt-4 col-12 d-flex justify-content-center">
                                     <button className="px-5 btn btn-primary py-2" type="submit" style={{ backgroundColor: '#ff914d', borderColor: '#ff914d' }}>Save Changes</button>
                                 </div>

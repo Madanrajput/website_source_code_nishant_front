@@ -55,8 +55,6 @@ async function getRemainingData() {
       try {
           const res = await fetch(`${baseURL}${endpoint}`, { next: { revalidate: 60 } });
           if (!res.ok) return [];
-          // const json = await res.json();
-          // return json; 
           const text = await res.text();
           return text ? JSON.parse(text) : [];
       } catch (e) {
@@ -73,7 +71,7 @@ async function getRemainingData() {
       fetchData("/cms-blog"),
       fetchData("/cms-content/home_page_content_why_choose_us"),
       fetchData("/cms-content/home_page_estimate_banner"),
-      fetchData("/cms-content/home_page_estimate_cards") // 🌟 NEW FETCH
+      fetchData("/cms-content/home_page_estimate_cards") 
     ]);
     
     let whyChooseUsData = [];
@@ -103,7 +101,7 @@ async function getRemainingData() {
       blogs: Array.isArray(blogsData) ? blogsData.slice(0, 3) : [],
       whyChooseUsData,
       estimateBannerData,
-      estimateCardsData // 🌟 NEW RETURN VAR
+      estimateCardsData
     };
   } catch (err) {
     console.error("Server Fetch Error (Remaining Data):", err);
@@ -179,13 +177,6 @@ export default async function HomeContent() {
     button_text: "Get Free Estimate",
   };
 
-  // 🌟 Filter Gallery for the Marquee (Excluding 1 BHK, keeping 5 items)
-  const estimateMarqueeCards = h3d_gallery
-    .filter(item => !item.child_content?.title?.toLowerCase().includes("1 bhk"))
-    .slice(0, 5);
-
-    // 🌟 SMART FALLBACK: If CMS is empty, use the old h3d_gallery filter so the site doesn't break
-  // const activeEstimateCards = estimateCardsData?.filter(card => card?.is_active !== false) || [];
   const activeEstimateCards = safeEstimateCards.filter(card => card?.is_active !== false); 
   const finalMarqueeCards = activeEstimateCards.length > 0 
     ? activeEstimateCards 
@@ -444,22 +435,30 @@ export default async function HomeContent() {
                 ImgCounterClass="w-100" 
                 imgAltCounter={content[13]?.json_content?.title} 
                 divClassCounter="text-end" 
+                
                 counterStart="0" 
                 counterEnd={content[12]?.json_content?.title} 
+                label1={content[12]?.json_content?.designation} // 🌟 Dynamic Label 1
                 counterDuration="5" 
                 counterSuffix="" 
+                
                 counterStart2="0" 
                 counterEnd2={content[11]?.json_content?.title} 
+                label2={content[11]?.json_content?.designation} // 🌟 Dynamic Label 2
                 counterDuration2="5" 
                 counterSuffix2="" 
+                
                 counterStart3="0" 
                 counterEnd3={content[10]?.json_content?.title} 
+                label3={content[10]?.json_content?.designation} // 🌟 Dynamic Label 3
                 counterDuration3="5" 
                 counterSuffix3="" 
+                
                 counterStart4="0" 
                 counterEnd4={content[9]?.json_content?.title} 
+                label4={content[9]?.json_content?.designation} // 🌟 Dynamic Label 4
                 counterDuration4="5" 
-                er="" 
+                
                 descriptionCounter={content[13]?.json_content?.description} 
                 textAboutBtnCounter="View Our Projects" 
                 btnLink="/residential-projects" 
@@ -473,7 +472,7 @@ export default async function HomeContent() {
         </div>
       </LazySection>
 
-      {/* 🌟 FIXED: Let's Save Time (With proper container wrappers) */}
+      {/* 🌟 UPGRADED: Let's Save Time (Now a Grid Layout) */}
       <LazySection placeholderHeight="600px">
         <div className="savedesign my-5">
           <div className="container">
@@ -481,59 +480,36 @@ export default async function HomeContent() {
               <h3 className="mb-0"><span className="font_stylish">{content[8]?.json_content?.title}</span></h3>
               <h3 className="pb-0 pb-lg-4 font_about mt-0 designs_lets">{content[8]?.json_content?.description}</h3>
             </div>
-          </div>
-          
-          <div className="estimate-marquee-container position-relative w-100">
-            <div className="estimate-marquee-track d-flex align-items-center gap-4 px-3">
-              
-              {/* Duplicating array to ensure a seamless infinite scrolling loop */}
-              {/* Duplicating array to ensure a seamless infinite scrolling loop */}
-              {[...finalMarqueeCards, ...finalMarqueeCards].map((card, index) => (
-                <div key={index} className="flex-shrink-0" style={{ width: "320px" }}>
-                  <Card 
-                    cardLinkName={card?.link || `/estimator-for-home`} // Uses CMS link, defaults to estimator
-                    cardNameALl="cardoffer shadow-sm border-0 bg-white h-100" 
-                    imgSrc={card?.image || card?.child_content?.image} // Uses CMS image or fallback image
-                    imgAlt={card?.title || card?.child_content?.title} 
-                    imgClass={"bhkimg rounded-top-3"} 
-                    titleCard={card?.title || card?.child_content?.title} // Uses CMS title or fallback title
-                    titleClass="text-center mb-0 pb-3 pt-3 fw-bold fs-6 text-dark" 
-                  />
+            
+            {/* Grid Layout (3 on top, 2 on bottom on Desktop) */}
+            {/* Added mobile-scroll-row so it stays consistent on mobile devices */}
+            <div className="row justify-content-center g-4 mx-0 mobile-scroll-row">
+              {finalMarqueeCards.slice(0, 5).map((card, index) => (
+                <div key={index} className="col-lg-4 col-md-6 col-12">
+                  {/* Container wrapper to ensure cards do not stretch uncontrollably */}
+                  <div className="mx-auto" style={{ maxWidth: "380px", height: "100%" }}>
+                    <Card 
+                      cardLinkName={card?.link || `/estimator-for-home`} 
+                      cardNameALl="cardoffer shadow-sm border-0 bg-white h-100 d-flex flex-column" 
+                      imgSrc={card?.image || card?.child_content?.image} 
+                      imgAlt={card?.title || card?.child_content?.title} 
+                      imgClass={"bhkimg rounded-top-3 w-100 object-fit-cover"} 
+                      titleCard={card?.title || card?.child_content?.title} 
+                      titleClass="text-center mb-0 pb-3 pt-3 fw-bold fs-6 text-dark flex-grow-1" 
+                    />
+                  </div>
                 </div>
               ))}
-
             </div>
-          </div>
 
-          {/* Injected CSS for the seamless infinite Marquee */}
-          <style dangerouslySetInnerHTML={{__html: `
-            .estimate-marquee-container {
-              mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-              -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-              overflow: hidden;
-              padding: 10px 0;
-            }
-            .estimate-marquee-track {
-              animation: scrollEstimateMarquee 35s linear infinite;
-              width: max-content;
-            }
-            .estimate-marquee-track:hover {
-              animation-play-state: paused;
-            }
-            @keyframes scrollEstimateMarquee {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-50%); } 
-            }
-          `}} />
+          </div>
         </div>
       </LazySection>
-
 
       {/* 🌟 DYNAMIC CMS ESTIMATE SECTION */}
       {activeEstimateBanner.is_active !== false && (
         <LazySection placeholderHeight="600px">
           <section className="my-5 py-5" style={{ backgroundColor: "#fff9f9", borderTop: "1px solid #ffeeee", borderBottom: "1px solid #ffeeee" }}>
-            {/* Interactive Livspace Style Calculator (With Rotating Words) */}
             <EstimateCalculator cmsData={activeEstimateBanner} />
           </section>
         </LazySection>
