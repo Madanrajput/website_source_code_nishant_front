@@ -9,6 +9,7 @@ export default function EstimateCalculator({ cmsData }) {
     const [selected, setSelected] = useState('3bhk');
 
     const options = [
+        // { id: '1bhk', label: '1 BHK', icon: <FaBuilding size={24} className="mb-2" />, home: 'apartment', bhk: '1bhk' },
         { id: '2bhk', label: '2 BHK', icon: <FaBuilding size={24} className="mb-2" />, home: 'apartment', bhk: '2bhk' },
         { id: '3bhk', label: '3 BHK', icon: <FaBuilding size={24} className="mb-2" />, home: 'apartment', bhk: '3bhk' },
         { id: '4bhk', label: '4 BHK', icon: <FaBuilding size={24} className="mb-2" />, home: 'apartment', bhk: '4bhk' },
@@ -21,8 +22,7 @@ export default function EstimateCalculator({ cmsData }) {
     };
 
     // 🌟 DYNAMIC 3D CUBE MATH 
-    // Defaults to 4 items now (including Farm House)
-    const rotatingWords = cmsData?.rotating_words ? cmsData.rotating_words.split(',').map(w => w.trim()) : ["Kitchen", "Wardrobe", "Full Home", "Farm House"];
+    const rotatingWords = cmsData?.rotating_words ? cmsData.rotating_words.split(',').map(w => w.trim()) : ["2BHK", "3BHK", "4BHK", "Villa"];
     const numWords = rotatingWords.length;
     
     // Calculate the perfect 3D polygon radius (translateZ) based on a 50px high face

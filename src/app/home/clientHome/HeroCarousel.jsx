@@ -83,11 +83,13 @@ export default function HeroCarousel({ bannerData }) {
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
+            color: #ffffff !important; /* Force white text on button */
         }
         .banner-btn:hover {
             background-color: #e67d3c;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(255, 145, 77, 0.6);
+            color: #ffffff !important;
         }
 
         /* Navigation Arrows */
@@ -155,31 +157,31 @@ export default function HeroCarousel({ bannerData }) {
                 <div className="banner-overlay text-white">
                   <div className="banner-content-wrapper">
                     {banner?.top_slogan && (
-                       <div className="fw-lighter fs-4 mb-2 text-uppercase" style={{ letterSpacing: '2px', textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+                       <div className="fw-lighter fs-4 mb-2 text-uppercase" style={{ letterSpacing: '2px', textShadow: '0 2px 8px rgba(0,0,0,0.2)', color: '#ffffff' }}>
                          {banner.top_slogan}
                        </div>
                     )}
                     
-                    {/* Removed heavy text-shadow classes, replaced with a subtle soft drop shadow */}
+                    {/* Replaced heavy text-shadow with a subtle soft drop shadow and enforced white color */}
                     {isFirstSlide ? (
-                      <h1 className="letheading home_banner_heading fw-bold mb-2" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+                      <h1 className="letheading home_banner_heading fw-bold mb-2" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)', color: '#ffffff' }}>
                         {banner?.title}
                       </h1>
                     ) : (
-                      <h2 className="letheading home_banner_heading fw-bold mb-2" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+                      <h2 className="letheading home_banner_heading fw-bold mb-2" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)', color: '#ffffff' }}>
                         {banner?.title}
                       </h2>
                     )}
                     
                     {banner?.sub_title && (
-                       <div className="font_stylish_home mb-2 fs-3" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+                       <div className="font_stylish_home mb-2 fs-3" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)', color: '#ffffff' }}>
                          {banner.sub_title}
                        </div>
                     )}
                     
-                    {/* Reduced paragraph text shadow to be barely visible just for readability */}
+                    {/* Enforced white color and kept minimal shadow for readability */}
                     {banner?.description && (
-                       <p className="fs-5 mb-4 mx-auto text-light" style={{ maxWidth: '700px', textShadow: '0 1px 4px rgba(0,0,0,0.3)' }}>
+                       <p className="fs-5 mb-4 mx-auto" style={{ maxWidth: '700px', textShadow: '0 1px 4px rgba(0,0,0,0.3)', color: '#ffffff' }}>
                          {banner.description}
                        </p>
                     )}

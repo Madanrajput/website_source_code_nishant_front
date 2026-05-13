@@ -205,9 +205,9 @@ const Footer = () => {
                         H101, LGF, Sector-63, Noida, Uttar Pradesh- 201301
                       </a>
                       
-                      <span className="text-dark d-block pb-2" style={{ lineHeight: "1.5", fontSize: "14px" }}>
+                      {/* <span className="text-dark d-block pb-2" style={{ lineHeight: "1.5", fontSize: "14px" }}>
                         4th Floor, Jmd Galleria Mall, Unit Nos. 402, Sector-47 & 48, Sohna - Gurgaon Rd, Gurugram, Haryana 122001
-                      </span>
+                      </span> */}
 
                       <a
                         href="https://share.google/C9uQKfphGOlrhlUuM"
@@ -233,8 +233,12 @@ const Footer = () => {
                     {/* Workshop */}
                     <li className="footer_li pb-2 pt-2">
                       <h6 className="mb-1 text-dark fw-bold font-outfit" style={{ fontSize: "15px" }}>Workshop:</h6>
-                      <span className="text-dark d-block" style={{ lineHeight: "1.5", fontSize: "14px" }}>
+                      <span className="text-dark d-block pb-2" style={{ lineHeight: "1.5", fontSize: "14px" }}>
                         Plot No-3, Sorkha Village , Sector-115, Noida, Uttar Pradesh- 201301
+                      </span>
+                      {/* NEW ADDRESS ADDED HERE */}
+                      <span className="text-dark d-block" style={{ lineHeight: "1.5", fontSize: "14px" }}>
+                      4th Floor, Jmd Galleria Mall, Unit Nos. 402, Sector-47 & 48, Sohna - Gurgaon Rd, Gurugram, Haryana 122001
                       </span>
                     </li>
 
