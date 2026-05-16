@@ -1,4 +1,5 @@
 import imageCompression from 'browser-image-compression';
+import api from '@/utils/api'; // Add this import
 
 const uploadedImageAltRegistry = new Map();
 
@@ -61,16 +62,10 @@ class MyUploadAdapter {
             formData.append('alt_text', altText.trim());
 
             // Step 3: Upload to backend
-            const response = await fetch(`${API_BASE_URL}/cms-parent-child/upload-image`, {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!response.ok) {
-                throw new Error('Server rejected the image upload.');
-            }
-
-            const result = await response.json();
+            const response = await api.post('/cms-parent-child/upload-image', formData);
+            
+            // Axios automatically parses the JSON into the `.data` property
+            const result = response.data;
 
             // Step 4: Ensure HTTPS URL
             const imageUrl = normalizeMediaUrl(result.url || '');

@@ -24,6 +24,7 @@ const ServicesLeftOriginal = (props) => {
                   alt={props.servicesImgAlt}
                   loading="lazy"
                   decoding="async"
+                  style={{ objectFit: 'contain', height: 'auto' }} 
                 />
               </div>
             </div>
@@ -34,4 +35,3 @@ const ServicesLeftOriginal = (props) => {
   };
   
   export default ServicesLeftOriginal;
-  

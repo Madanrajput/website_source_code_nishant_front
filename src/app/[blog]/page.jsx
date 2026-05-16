@@ -384,8 +384,9 @@ const DynamicRootPage = async ({ params }) => {
                   )}
 
                  {/* REPLACED WITH NEW COMPONENT */}
-                 <ExpandableRichText htmlContent={pageData.description} className="details font-poppins rich-text-content" />
-
+                 <div className="details font-poppins rich-text-content">
+                    <div dangerouslySetInnerHTML={{ __html: pageData.description }} />
+                  </div>
                 </div>
               </div>
 

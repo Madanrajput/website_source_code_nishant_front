@@ -11,6 +11,7 @@ const ServicesRightOriginal = (props) => {
                   alt={props.servicesImgAltRight}
                   loading="lazy"
                   decoding="async"
+                  style={{ objectFit: 'contain', height: 'auto' }} 
                 />
               </div>
               <div className={props.colum2}>
@@ -34,4 +35,3 @@ const ServicesRightOriginal = (props) => {
   };
   
   export default ServicesRightOriginal;
-  
