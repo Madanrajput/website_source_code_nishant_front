@@ -10,26 +10,6 @@ export async function generateMetadata() {
   return await getPageSEO("/home"); 
 }
 
-// export const metadata = {
-//   title: "Top Interior Designers In Delhi NCR For Home",
-//   description: "Home interior designers in Delhi NCR - Elevate your living space with best interior design company in Noida & Delhi NCR. Book free consultation today",
-//   alternates: { canonical: "https://hcinterior.in" },
-//   openGraph: {
-//     title: "Top Interior Designers In Delhi NCR For Home",
-//     description: "Home interior designers in Delhi NCR...",
-//     url: "https://hcinterior.in",
-//     siteName: "High Creation Interior",
-//     locale: "en_US",
-//     type: "website",
-//   },
-//   robots: {
-//     index: true, 
-//     follow: true,
-//     "max-snippet": -1,
-//     "max-video-preview": -1,
-//     "max-image-preview": "large",
-//   },
-// };
 
 const jsonLd = {
   "@context": "https://schema.org",

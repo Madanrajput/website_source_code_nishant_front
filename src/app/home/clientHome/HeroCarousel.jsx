@@ -9,7 +9,6 @@ export default function HeroCarousel({ bannerData }) {
   const [showRest, setShowRest] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Smooth sliding motion with 5-second explicitly set intervals
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, duration: 60 }, 
     [Autoplay({ delay: 5000, stopOnInteraction: false })]
@@ -18,7 +17,6 @@ export default function HeroCarousel({ bannerData }) {
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
 
-  // Load remaining slides on desktop after 2.5s to optimize Largest Contentful Paint
   useEffect(() => {
     setIsMounted(true);
     if (window.innerWidth >= 768) {
@@ -29,10 +27,8 @@ export default function HeroCarousel({ bannerData }) {
     }
   }, []);
 
-  // Filter out undefined banners and dynamically render all available slides
   const activeBanners = (showRest ? bannerData : bannerData?.slice(0, 1) || []).filter(Boolean);
 
-  // Inform Embla when we add the remaining slides to the DOM so it loops properly
   useEffect(() => {
     if (!emblaApi) return;
     emblaApi.reInit();
@@ -43,13 +39,23 @@ export default function HeroCarousel({ bannerData }) {
   return (
     <section className="position-relative w-100" style={{ backgroundColor: '#f0f0f0' }}>
       <style dangerouslySetInnerHTML={{ __html: `
-        .embla { overflow: hidden; width: 100%; aspect-ratio: 16/9; }
-        @media (min-width: 768px) { .embla { aspect-ratio: 192/85; } }
+        /* 🌟 TALLER MOBILE SHAPE (3/4 Ratio) */
+        .embla { 
+            overflow: hidden; 
+            width: 100%; 
+            aspect-ratio: 3/4; 
+            min-height: 500px; 
+        }
+        
+        @media (min-width: 768px) { 
+            .embla { aspect-ratio: 192/85; min-height: unset; } 
+        }
+        
         .embla__container { display: flex; height: 100%; }
         .embla__slide { flex: 0 0 100%; min-width: 0; position: relative; }
-        .banner-media { object-fit: cover; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        .banner-media { object-fit: cover; object-position: center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
         
-        /* 🌟 UPGRADED OVERLAY: Much softer bottom gradient */
+        /* 🌟 MOBILE OVERLAY: Pinned right to the bottom edge */
         .banner-overlay { 
             position: absolute; 
             z-index: 10; 
@@ -57,68 +63,111 @@ export default function HeroCarousel({ bannerData }) {
             display: flex; 
             flex-direction: column; 
             justify-content: flex-end; 
-            align-items: center;       
-            padding-bottom: 6%;        
+            align-items: center;      
+            padding-bottom: 1.5rem; /* Pulled all the way down */       
             pointer-events: none;
-            /* Changed from 0.85 black to 0.4 black for a brighter feel */
-            background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0) 100%);
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 35%, rgba(0,0,0,0) 80%);
             text-align: center;
         }
         
-        .banner-overlay * {
-            pointer-events: auto; 
+        .banner-overlay * { pointer-events: auto; }
+        
+        /* 🌟 FULL WIDTH WRAPPER FOR MOBILE */
+        .banner-content-wrapper { 
+            width: 100%; 
+            padding: 0 1.25rem; /* Keeps text from touching the literal edges of the phone */
         }
 
-        .banner-content-wrapper {
-            max-width: 900px; 
-            width: 90%;
-            padding: 0 15px;
+        /* 🌟 ZERO-GAP TYPOGRAPHY (Matches Livspace tightness) */
+        .banner-top-slogan { 
+            font-family: var(--font-poppins), sans-serif;
+            font-size: 0.7rem; 
+            font-weight: 500;
+            letter-spacing: 2px; 
+            margin-bottom: 0.25rem !important; /* Tiny gap */
+            text-transform: uppercase;
+            color: #ff914d !important; 
+        }
+        
+        .home_banner_heading { 
+            font-family: var(--font-outfit), sans-serif; 
+            font-size: 1.75rem; 
+            font-weight: 700;
+            line-height: 1.1; 
+            margin-bottom: 0 !important; /* ZERO margin to pull the script font up */
+        }
+        
+        .font_stylish_home { 
+            font-family: var(--font-great-vibes), cursive; 
+            font-size: 2.2rem; 
+            font-weight: 400;
+            color: #ffffff !important; 
+            margin-bottom: 0.25rem !important; 
+            line-height: 1;
+            margin-top: -0.2rem; /* Negative margin overlaps slightly for cohesion */
+        }
+        
+        .banner-desc { 
+            font-family: var(--font-poppins), sans-serif;
+            font-size: 0.8rem; 
+            line-height: 1.3; 
+            margin-bottom: 1.2rem !important; 
+            color: rgba(255, 255, 255, 0.85) !important; 
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        /* 🌟 MODERN BUTTON STYLING */
+        /* 🌟 APP-STYLE FULL-WIDTH BUTTON */
         .banner-btn {
             background-color: #ff914d;
             border: none;
+            font-family: var(--font-outfit), sans-serif;
+            font-weight: 600;
             box-shadow: 0 4px 15px rgba(255, 145, 77, 0.4);
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #ffffff !important; /* Force white text on button */
-        }
-        .banner-btn:hover {
-            background-color: #e67d3c;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 145, 77, 0.6);
             color: #ffffff !important;
+            padding: 14px 0 !important; 
+            font-size: 0.85rem !important;
+            border-radius: 8px; /* Using a modern 8px radius instead of pill for the full-width block */
+            display: block; 
+            width: 100%; /* Stretches edge to edge */
         }
+        .banner-btn:hover { background-color: #e67d3c; transform: translateY(-2px); }
 
-        /* Navigation Arrows */
-        .embla__nav-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 20;
-            width: 44px;
-            height: 44px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        /* HIDE ARROWS ON MOBILE (Users swipe on phones) */
+        .embla__nav-btn { display: none; }
+
+        /* SCALING UP FOR TABLET & DESKTOP */
+        @media (min-width: 768px) {
+            .banner-overlay { padding-bottom: 5%; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0) 100%); }
+            .banner-content-wrapper { width: 90%; max-width: 900px; padding: 0 10px; }
+            .banner-top-slogan { font-size: 1rem; margin-bottom: 0.75rem !important; color: #ffffff !important; }
+            .home_banner_heading { font-size: 3.5rem; margin-bottom: 0.5rem !important; }
+            .font_stylish_home { font-size: 4rem; margin-bottom: 1rem !important; margin-top: 0; color: #ff914d !important; }
+            .banner-desc { font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem !important; -webkit-line-clamp: unset; overflow: visible; color: #ffffff !important; }
+            
+            /* Revert button back to inline pill on Desktop */
+            .banner-btn { display: inline-block; width: auto; padding: 14px 45px !important; font-size: 1rem !important; border-radius: 50px; }
+            
+            /* Show Arrows on Desktop */
+            .embla__nav-btn {
+                display: flex;
+                position: absolute; top: 50%; transform: translateY(-50%); z-index: 20;
+                width: 44px; height: 44px; 
+                background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(4px);
+                border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%;
+                align-items: center; justify-content: center; color: white; cursor: pointer;
+            }
+            .embla__nav-btn:hover { background: rgba(255, 145, 77, 0.9); border-color: #ff914d; }
+            .embla__nav-btn.prev { left: 20px; }
+            .embla__nav-btn.next { right: 20px; }
         }
-        .embla__nav-btn:hover { 
-            background: rgba(255, 145, 77, 0.9); 
-            border-color: #ff914d; 
-            transform: translateY(-50%) scale(1.1);
-        }
-        .embla__nav-btn.prev { left: 20px; }
-        .embla__nav-btn.next { right: 20px; }
-        .embla__nav-icon { width: 24px; height: 24px; fill: currentColor; }
+        
+        .embla__nav-icon { width: 20px; height: 20px; fill: currentColor; }
       `}} />
 
       <div className="embla" ref={emblaRef}>
@@ -130,65 +179,46 @@ export default function HeroCarousel({ bannerData }) {
             return (
               <div className="embla__slide" key={banner.id || index}>
                 {isVideo ? (
-                  <video
-                    className="banner-media"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    preload={isFirstSlide ? "auto" : "metadata"}
-                    poster={banner?.banner_image_poster || ""}
-                  >
+                  <video className="banner-media" autoPlay loop muted playsInline preload={isFirstSlide ? "auto" : "metadata"} poster={banner?.banner_image_poster || ""}>
                     <source src={banner?.banner_image} type="video/mp4" />
                   </video>
                 ) : (
-                  <Image
-                    src={banner?.banner_image ?? "/images/home-banner-1.png"}
-                    className="banner-media"
-                    alt={banner?.title?.trim() || "High Creation Interior Banner"}
-                    fill
-                    priority={isFirstSlide}       
-                    fetchPriority={isFirstSlide ? "high" : "auto"} 
-                    quality={isFirstSlide ? 90 : 75} 
-                    sizes="(max-width: 768px) 100vw, 100vw"
-                  />
+                  <Image src={banner?.banner_image ?? "/images/home-banner-1.png"} className="banner-media" alt={banner?.title?.trim() || "High Creation Interior Banner"} fill priority={isFirstSlide} fetchPriority={isFirstSlide ? "high" : "auto"} quality={isFirstSlide ? 90 : 75} sizes="(max-width: 768px) 100vw, 100vw" />
                 )}
 
                 <div className="banner-overlay text-white">
                   <div className="banner-content-wrapper">
                     {banner?.top_slogan && (
-                       <div className="fw-lighter fs-4 mb-2 text-uppercase" style={{ letterSpacing: '2px', textShadow: '0 2px 8px rgba(0,0,0,0.2)', color: '#ffffff' }}>
+                       <div className="banner-top-slogan" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
                          {banner.top_slogan}
                        </div>
                     )}
                     
-                    {/* Replaced heavy text-shadow with a subtle soft drop shadow and enforced white color */}
                     {isFirstSlide ? (
-                      <h1 className="letheading home_banner_heading fw-bold mb-2" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)', color: '#ffffff' }}>
+                      <h1 className="home_banner_heading" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)', color: '#ffffff' }}>
                         {banner?.title}
                       </h1>
                     ) : (
-                      <h2 className="letheading home_banner_heading fw-bold mb-2" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)', color: '#ffffff' }}>
+                      <h2 className="home_banner_heading" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)', color: '#ffffff' }}>
                         {banner?.title}
                       </h2>
                     )}
                     
                     {banner?.sub_title && (
-                       <div className="font_stylish_home mb-2 fs-3" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)', color: '#ffffff' }}>
+                       <div className="font_stylish_home" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
                          {banner.sub_title}
                        </div>
                     )}
                     
-                    {/* Enforced white color and kept minimal shadow for readability */}
                     {banner?.description && (
-                       <p className="fs-5 mb-4 mx-auto" style={{ maxWidth: '700px', textShadow: '0 1px 4px rgba(0,0,0,0.3)', color: '#ffffff' }}>
+                       <p className="banner-desc mx-auto" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
                          {banner.description}
                        </p>
                     )}
                     
                     {banner?.button_text && banner?.button_link && (
-                       <div className="mt-3 mb-2">
-                         <Link href={banner.button_link} className="btn btn-primary rounded-pill px-5 py-3 fs-5 fw-bold banner-btn">
+                       <div className="mt-1 mb-1 w-100">
+                         <Link href={banner.button_link} className="btn banner-btn">
                            {banner.button_text}
                          </Link>
                        </div>

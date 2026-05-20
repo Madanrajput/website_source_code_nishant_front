@@ -1,148 +1,296 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { MdKeyboardArrowRight } from "react-icons/md";
-import { FaBuilding, FaHome } from "react-icons/fa";
 
-export default function EstimateCalculator({ cmsData }) {
+export default function EstimateCalculator({ estimateSectionData }) {
     const router = useRouter();
-    const [selected, setSelected] = useState('3bhk');
+    
+    // Track which specific card is currently processing
+    const [submittingId, setSubmittingId] = useState(null);
 
-    const options = [
-        // { id: '1bhk', label: '1 BHK', icon: <FaBuilding size={24} className="mb-2" />, home: 'apartment', bhk: '1bhk' },
-        { id: '2bhk', label: '2 BHK', icon: <FaBuilding size={24} className="mb-2" />, home: 'apartment', bhk: '2bhk' },
-        { id: '3bhk', label: '3 BHK', icon: <FaBuilding size={24} className="mb-2" />, home: 'apartment', bhk: '3bhk' },
-        { id: '4bhk', label: '4 BHK', icon: <FaBuilding size={24} className="mb-2" />, home: 'apartment', bhk: '4bhk' },
-        { id: 'villa', label: 'Villa', icon: <FaHome size={24} className="mb-2" />, home: 'villa', bhk: '3bhk' }
-    ];
+    // Dynamic rotating text for the heading
+    const rotatingWords = ["2BHK", "3BHK", "4BHK", "Villa"];
+    const [currentWordIndex, setCurrentWordIndex] = useState(0);
 
-    const handleCalculate = () => {
-        const config = options.find(opt => opt.id === selected);
-        if(config) router.push(`/estimator-for-home?home=${config.home}&bhk=${config.bhk}`);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentWordIndex((prevIndex) => (prevIndex + 1) % rotatingWords.length);
+        }, 2000); 
+        return () => clearInterval(interval);
+    }, []);
+
+    const handleCalculateClick = async (propertyType) => {
+        setSubmittingId(propertyType);
+        
+        // Simulate a slight loading state for premium feel
+        await new Promise(resolve => setTimeout(resolve, 600));
+        
+        setSubmittingId(null);
+        // Your original logic to move to the estimator flow
+        router.push('/estimator-for-home');
     };
 
-    // 🌟 DYNAMIC 3D CUBE MATH 
-    const rotatingWords = cmsData?.rotating_words ? cmsData.rotating_words.split(',').map(w => w.trim()) : ["2BHK", "3BHK", "4BHK", "Villa"];
-    const numWords = rotatingWords.length;
-    
-    // Calculate the perfect 3D polygon radius (translateZ) based on a 50px high face
-    // e.g., 4 words = 90deg, translateZ = 25px. 3 words = 120deg, translateZ = 14px.
-    const angle = 360 / numWords;
-    const tz = Math.round(25 / Math.tan(Math.PI / numWords)); 
-    const duration = numWords * 2.5; // 2.5 seconds per word
+    const headingBase = estimateSectionData?.heading || "Get an estimate for your";
+    const subHeading = estimateSectionData?.sub_heading || "Select your property type to calculate the cost of your interiors.";
 
-    // Dynamically generate the perfect CSS Keyframes for ANY amount of words
-    let keyframes = '';
-    const stepPct = 100 / numWords; 
-    const pausePct = stepPct * 0.8; // Hold the word for 80% of its timeslot
-    
-    for (let i = 0; i < numWords; i++) {
-        const start = i * stepPct;
-        const end = start + pausePct;
-        const currentAngle = -(i * angle);
-        keyframes += `${start}%, ${end}% { transform: translateZ(-${tz}px) rotateX(${currentAngle}deg); }\n`;
-    }
-    // Complete the 360 rotation to loop smoothly
-    keyframes += `100% { transform: translateZ(-${tz}px) rotateX(-360deg); }`;
+    // 🌟 UPGRADED, PREMIUM ARCHITECTURAL ICONS 🌟
+    const propertyCards = [
+        {
+            id: '2BHK',
+            title: '2 BHK',
+            description: 'Perfect for small families. Get a tailored estimate for your cozy space.',
+            icon: (
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 21h18"></path>
+                    <path d="M5 21V8l7-5 7 5v13"></path>
+                    <rect x="9" y="14" width="6" height="7"></rect>
+                </svg>
+            )
+        },
+        {
+            id: '3BHK',
+            title: '3 BHK',
+            description: 'Ideal for growing families needing that extra room and spacious layout.',
+            icon: (
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2 21h20"></path>
+                    <path d="M4 21V8l8-5 8 5v13"></path>
+                    <rect x="7" y="13" width="4" height="8"></rect>
+                    <rect x="13" y="13" width="4" height="8"></rect>
+                    <path d="M12 8v13"></path>
+                </svg>
+            )
+        },
+        {
+            id: '4BHK',
+            title: '4 BHK',
+            description: 'Luxurious space with plenty of room for guests, a home office, and more.',
+            icon: (
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2 21h20"></path>
+                    <path d="M4 21V6l8-4 8 4v15"></path>
+                    <rect x="6" y="10" width="4" height="4"></rect>
+                    <rect x="14" y="10" width="4" height="4"></rect>
+                    <path d="M9 21v-5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v5"></path>
+                </svg>
+            )
+        },
+        {
+            id: 'Villa',
+            title: 'Villa',
+            description: 'Ultimate premium living. Calculate interiors for expansive, multi-floor spaces.',
+            icon: (
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2 21h20"></path>
+                    <path d="M12 3L2 11h3v10h14V11h3L12 3z"></path>
+                    <path d="M10 21v-5a2 2 0 0 1 4 0v5"></path>
+                    <path d="M14 9h-4"></path>
+                    <path d="M7 11v3"></path>
+                    <path d="M17 11v3"></path>
+                </svg>
+            )
+        }
+    ];
 
     return (
-        <div className="container text-center mb-5 position-relative z-index-1">
-            
-            <style dangerouslySetInnerHTML={{__html: `
-                @keyframes spinDynamicCube {
-                    ${keyframes}
+        <section className="estimate-wrapper w-100 position-relative">
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .estimate-wrapper {
+                    background-color: #fafafa; /* Soft background to let white cards stand out */
+                    padding: 5rem 0;
+                    font-family: var(--font-poppins), sans-serif;
                 }
-                .cube-container {
+
+                .estimate-container {
+                    max-width: 1200px; /* Wider container to comfortably fit 4 descriptive cards */
+                    margin: 0 auto;
+                    padding: 0 20px;
+                    text-align: center;
+                }
+
+                .estimate-section-title {
+                    font-family: var(--font-outfit), sans-serif;
+                    font-size: 2.8rem;
+                    font-weight: 700;
+                    color: #111;
+                    margin-bottom: 0.5rem;
+                }
+
+                .estimate-subheading {
+                    font-size: 1.1rem;
+                    color: #666;
+                    margin-bottom: 3.5rem;
+                }
+
+                /* Rotating Text Animation */
+                .rotating-text-wrapper {
                     display: inline-block;
-                    height: 50px;
-                    width: 220px;
-                    perspective: 1000px;
+                    min-width: 120px;
+                    text-align: left;
                     vertical-align: bottom;
-                }
-                .cube-spinner {
+                    overflow: hidden;
+                    height: 1.2em;
                     position: relative;
-                    width: 100%;
-                    height: 100%;
-                    transform-style: preserve-3d;
-                    animation: spinDynamicCube ${duration}s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+                    top: 5px;
                 }
-                .cube-face {
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
+                
+                .rotating-text {
+                    color: #ff914d;
+                    display: block;
+                    animation: slideUp 2s infinite cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                }
+
+                @keyframes slideUp {
+                    0% { transform: translateY(100%); opacity: 0; }
+                    20% { transform: translateY(0); opacity: 1; }
+                    80% { transform: translateY(0); opacity: 1; }
+                    100% { transform: translateY(-100%); opacity: 0; }
+                }
+
+                /* 🌟 INDEPENDENT CARD GRID (Reference Match) */
+                .property-grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 24px;
+                }
+
+                /* 🌟 DETAILED CARD STYLING */
+                .property-card {
+                    background: #ffffff;
+                    border: 1px solid #eaeaea; 
+                    border-radius: 16px;
+                    padding: 35px 25px; 
+                    transition: all 0.3s ease;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+                }
+
+                .property-card:hover {
+                    transform: translateY(-8px);
+                    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+                    border-color: #ffc099;
+                }
+
+                /* Icon Wrapper styling */
+                .card-icon-wrapper {
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: #fff6f0; /* Soft orange tint behind icon */
+                    color: #ff914d;
                     display: flex;
                     align-items: center;
-                    justify-content: flex-start;
-                    color: #ff914d;
-                    font-weight: bold;
-                    font-size: clamp(1.5rem, 3vw, 2.2rem);
-                    line-height: 50px;
-                    backface-visibility: hidden;
-                    white-space: nowrap;
+                    justify-content: center;
+                    margin-bottom: 1.5rem;
+                    transition: all 0.3s ease;
                 }
+
+                .property-card:hover .card-icon-wrapper {
+                    background: #ff914d;
+                    color: #ffffff;
+                    transform: scale(1.05);
+                }
+
+                .card-title {
+                    font-family: var(--font-outfit), sans-serif;
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    color: #222;
+                    margin-bottom: 0.75rem;
+                }
+
+                .card-description {
+                    font-size: 0.9rem;
+                    color: #666;
+                    line-height: 1.5;
+                    margin-bottom: 2rem;
+                    flex-grow: 1; /* Pushes the button to the bottom evenly across all cards */
+                }
+
+                /* 🌟 IN-CARD CALCULATE BUTTON */
+                .btn-card-action {
+                    width: 100%;
+                    background: transparent;
+                    color: #ff914d;
+                    border: 2px solid #ff914d;
+                    padding: 12px 20px;
+                    border-radius: 8px; 
+                    font-family: var(--font-outfit), sans-serif;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+
+                .property-card:hover .btn-card-action {
+                    background: #ff914d;
+                    color: #ffffff;
+                }
+
+                .btn-card-action:disabled {
+                    background: #ffc099 !important;
+                    border-color: #ffc099 !important;
+                    color: #fff !important;
+                    cursor: not-allowed;
+                }
+
+                /* Mobile Responsiveness */
+                @media (max-width: 1024px) {
+                    .property-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+                }
+
                 @media (max-width: 768px) {
-                    .cube-container { width: 100%; display: block; margin-top: 5px; }
-                    .cube-face { justify-content: center; font-size: 1.8rem; }
+                    .estimate-section-title { font-size: 2.2rem; }
+                }
+
+                @media (max-width: 576px) {
+                    .property-grid { grid-template-columns: 1fr; } /* Stacks to 1 column on phones */
+                    .property-card { padding: 30px 20px; }
+                    .estimate-wrapper { padding: 4rem 0; }
                 }
             `}} />
 
-            <div className="bg-white rounded-4 shadow-sm p-4 p-md-5 mx-auto" style={{ maxWidth: '850px', border: '1px solid #ffeeee' }}>
+            <div className="estimate-container">
                 
-                {/* 🌟 THE RESTORED FLAWLESS 3D ANIMATION */}
-                <div className="d-flex flex-column flex-md-row justify-content-center align-items-center gap-2 mb-3">
-                    <h2 className="font_about text-dark mb-0" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", lineHeight: "50px" }}>
-                        {cmsData?.heading || "Calculate the cost of your"}
-                    </h2>
-                    
-                    <div className="cube-container">
-                        <div className="cube-spinner">
-                            {rotatingWords.map((word, index) => {
-                                const rotateX = index * angle;
-                                return (
-                                    <div 
-                                        key={index} 
-                                        className="cube-face" 
-                                        style={{ transform: `rotateX(${rotateX}deg) translateZ(${tz}px)` }}
-                                    >
-                                        {word}
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
-                </div>
-                
-                <p className="text-muted mb-4 mx-auto" style={{ maxWidth: "600px" }}>
-                    {cmsData?.description || "Select your floor plan to get a personalized, transparent estimate in seconds."}
-                </p>
+                <h2 className="estimate-section-title">
+                    {headingBase} <span className="rotating-text-wrapper">
+                        <span key={currentWordIndex} className="rotating-text">
+                            {rotatingWords[currentWordIndex]}
+                        </span>
+                    </span>
+                </h2>
+                <p className="estimate-subheading">{subHeading}</p>
 
-                <div className="d-flex flex-wrap justify-content-center gap-3 mb-4 pb-2">
-                    {options.map((opt) => {
-                        const isSelected = selected === opt.id;
+                {/* 🌟 FULL CARD STRUCTURE: Icon -> Title -> Desc -> Button 🌟 */}
+                <div className="property-grid">
+                    {propertyCards.map((card) => {
+                        const isThisCardLoading = submittingId === card.id;
+
                         return (
-                            <div 
-                                key={opt.id}
-                                onClick={() => setSelected(opt.id)}
-                                className="d-flex flex-column align-items-center justify-content-center rounded-3 p-3 transition-all"
-                                style={{
-                                    width: '100px', height: '100px', cursor: 'pointer',
-                                    border: isSelected ? '2px solid #ff914d' : '1px solid #e2e8f0',
-                                    backgroundColor: isSelected ? '#fff4ed' : '#ffffff',
-                                    color: isSelected ? '#ff914d' : '#64748b',
-                                    transition: 'all 0.2s ease-in-out'
-                                }}
-                            >
-                                {opt.icon}
-                                <span className="fw-bold" style={{ fontSize: '14px' }}>{opt.label}</span>
+                            <div key={card.id} className="property-card">
+                                <div className="card-icon-wrapper">
+                                    {card.icon}
+                                </div>
+                                <h3 className="card-title">{card.title}</h3>
+                                <p className="card-description">{card.description}</p>
+                                
+                                <button 
+                                    onClick={() => handleCalculateClick(card.id)} 
+                                    className="btn-card-action"
+                                    disabled={submittingId !== null}
+                                >
+                                    {isThisCardLoading ? 'Processing...' : 'Calculate Estimate'}
+                                </button>
                             </div>
                         );
                     })}
                 </div>
 
-                <button onClick={handleCalculate} className="btn text-white fw-bold px-5 py-3 rounded-pill shadow-sm" style={{ backgroundColor: "#ff914d", fontSize: "1.1rem", transition: "all 0.3s ease" }}>
-                    {cmsData?.button_text || "Get Free Estimate"} <MdKeyboardArrowRight size={24} className="ms-1" />
-                </button>
             </div>
-        </div>
+        </section>
     );
 }

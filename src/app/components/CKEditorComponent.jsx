@@ -1,5 +1,5 @@
 "use client";
-﻿import { CKEditor } from '@ckeditor/ckeditor5-react';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
 import DOMPurify from 'isomorphic-dompurify';
 import {
     Autoformat,
@@ -35,7 +35,7 @@ import {
     TableToolbar,
     Undo
 } from 'ckeditor5';
-import CustomUploadAdapterPlugin, { getUploadedImageAlt } from './CustomUploadAdapter';
+import CustomUploadAdapterPlugin, { getUploadedImageAlt, requireAltTextPrompt } from './CustomUploadAdapter';
 import 'ckeditor5/ckeditor5.css';
 
 function MandatoryAltTextPlugin(editor) {
@@ -46,27 +46,42 @@ function MandatoryAltTextPlugin(editor) {
         const changes = differ.getChanges();
 
         for (const entry of changes) {
+            // 1. Detect completely new images (e.g., Pasted from an external website)
             if (entry.type === 'insert' && (entry.name === 'imageBlock' || entry.name === 'imageInline')) {
                 const imageElement = entry.position.nodeAfter;
 
-                if (imageElement && !imageElement.getAttribute('alt')) {
-                    setTimeout(() => {
-                        const imageSource = imageElement.getAttribute('src');
-                        const uploadedAltText = imageSource ? getUploadedImageAlt(imageSource) : '';
-                        let altText = uploadedAltText;
+                if (!imageElement) continue;
 
-                        if (!altText) {
-                            altText = window.prompt('SEO REQUIREMENT: Please enter descriptive alt text for this image:');
-                        }
+                // 🌟 CRITICAL FIX: If the image is currently being uploaded via our CustomUploadAdapter,
+                // do NOT prompt here! The adapter handles its own modern prompt before uploading.
+                if (imageElement.hasAttribute('uploadId') || imageElement.hasAttribute('uploadStatus')) {
+                    continue;
+                }
 
-                        while (altText === null || altText.trim() === '') {
-                            altText = window.prompt('Alt text is mandatory for SEO and accessibility. Please enter a description:');
-                        }
-
+                // If it bypassed the upload adapter (like copy-pasting an external web image) and has no alt text
+                if (!imageElement.getAttribute('alt')) {
+                    requireAltTextPrompt().then(altText => {
                         editor.model.change((writer) => {
-                            writer.setAttribute('alt', altText.trim(), imageElement);
+                            writer.setAttribute('alt', altText, imageElement);
                         });
-                    }, 100);
+                    });
+                }
+            }
+
+            // 2. Detect when an uploaded image gets its final URL applied by the adapter
+            if (entry.type === 'attribute' && entry.attributeKey === 'src') {
+                const imageElement = entry.range.start.nodeAfter;
+                
+                if (imageElement && (imageElement.is('element', 'imageBlock') || imageElement.is('element', 'imageInline'))) {
+                    const newSrc = entry.attributeNewValue;
+                    const uploadedAlt = getUploadedImageAlt(newSrc);
+                    
+                    // Silently apply the remembered alt text to the final model
+                    if (uploadedAlt && imageElement.getAttribute('alt') !== uploadedAlt) {
+                        editor.model.change((writer) => {
+                            writer.setAttribute('alt', uploadedAlt, imageElement);
+                        });
+                    }
                 }
             }
         }
