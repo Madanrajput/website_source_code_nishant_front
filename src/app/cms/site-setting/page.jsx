@@ -1,3 +1,4 @@
+// src/app/cms/site-setting/page.jsx
 "use client";
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -6,6 +7,12 @@ import AuthMainLayout from "../../layouts/auth/AuthMainLayout";
 import api from "@/utils/api";
 import { toast } from "react-toastify";
 import { getCmsAccess } from "@/utils/cmsAccess";
+
+// Define the fonts you want available in the dropdown
+const FONT_OPTIONS = [
+  "Poppins", "Outfit", "Roboto", "Open Sans", "Montserrat", 
+  "Lato", "Playfair Display", "Merriweather", "Nunito", "Raleway"
+];
 
 const GlobalSettings = () => {
     const router = useRouter();
@@ -17,7 +24,9 @@ const GlobalSettings = () => {
     const [formData, setFormData] = useState({
         phone: "", email: "", address: "", 
         facebook_url: "", instagram_url: "", 
-        twitter_url: "", linkedin_url: "", pinterest_url: "", youtube_url: ""
+        twitter_url: "", linkedin_url: "", pinterest_url: "", youtube_url: "",
+        heading_font: "Poppins", // 🌟 Added Default
+        paragraph_font: "Poppins" // 🌟 Added Default
     });
 
     useEffect(() => {
@@ -70,12 +79,53 @@ const GlobalSettings = () => {
                 <div className="card shadow-sm border-0">
                     <div className="card-header bg-dark text-white py-3">
                         <h4 className="mb-0">Global Site Settings</h4>
-                        <small>This information automatically updates your SEO Schemas and Social Links across the site.</small>
+                        <small>This information automatically updates your SEO Schemas, Typography, and Social Links.</small>
                     </div>
                     <div className="card-body p-4">
                         {loading ? <div className="text-center py-5">Loading...</div> : (
                             <form onSubmit={handleSave} className="row g-4">
-                                <div className="col-md-12 mb-2"><h5 className="border-bottom pb-2 text-primary">Contact Details</h5></div>
+                                
+                                {/* 🌟 NEW TYPOGRAPHY SECTION */}
+                                <div className="col-md-12 mb-2"><h5 className="border-bottom pb-2 text-primary">Typography Settings</h5></div>
+                                <div className="col-md-6">
+                                    <label className="form-label fw-bold">Heading Font (H1 - H6)</label>
+                                    <select className="form-select" name="heading_font" value={formData.heading_font || 'Poppins'} onChange={handleInputChange}>
+                                        {FONT_OPTIONS.map(font => (
+                                            <option key={font} value={font}>{font}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="col-md-6">
+                                    <label className="form-label fw-bold">Paragraph Font (Descriptions & Content)</label>
+                                    <select className="form-select" name="paragraph_font" value={formData.paragraph_font || 'Poppins'} onChange={handleInputChange}>
+                                        {FONT_OPTIONS.map(font => (
+                                            <option key={font} value={font}>{font}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+{/* Add this inside your return statement, right after the Accent Font or Global Heading Color input */}
+
+<div className="col-md-4 mt-3">
+    <label className="form-label fw-bold">Hero Carousel Speed (Seconds)</label>
+    <div className="input-group">
+        <input 
+            type="number" 
+            className="form-control" 
+            name="carousel_speed" 
+            min="3" 
+            max="20" 
+            value={formData.carousel_speed || 7} 
+            onChange={handleInputChange} 
+            placeholder="e.g. 7" 
+        />
+        <span className="input-group-text">Sec</span>
+    </div>
+    <small className="text-muted">How long each banner stays on the screen.</small>
+</div>
+
+                                {/* CONTACT DETAILS SECTION */}
+                                <div className="col-md-12 mt-4 mb-2"><h5 className="border-bottom pb-2 text-primary">Contact Details</h5></div>
                                 <div className="col-md-6">
                                     <label className="form-label fw-bold">Company Phone Number</label>
                                     <input type="text" className="form-control" name="phone" value={formData.phone || ''} onChange={handleInputChange} placeholder="+91-..." />
@@ -89,6 +139,7 @@ const GlobalSettings = () => {
                                     <textarea className="form-control" name="address" rows="2" value={formData.address || ''} onChange={handleInputChange} placeholder="Street, City, State, ZIP"></textarea>
                                 </div>
 
+                                {/* SOCIAL LINKS SECTION */}
                                 <div className="col-md-12 mt-4 mb-2"><h5 className="border-bottom pb-2 text-primary">Social Media Links</h5></div>
                                 <div className="col-md-6">
                                     <label className="form-label fw-bold">Facebook URL</label>

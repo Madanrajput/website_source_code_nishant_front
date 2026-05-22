@@ -5,7 +5,8 @@ import Script from "next/script";
 import { Great_Vibes, Poppins, Outfit } from "next/font/google";
 import dynamic from "next/dynamic";
 import AddBootstrap from "./common/AdBoostrap";
-import { GoogleTagManager, GoogleAnalytics } from '@next/third-parties/google'; // 🌟 PERF FIX: Official optimized loaders
+import DynamicTypography from "./common/DynamicTypography"; // Imported correctly!
+import { GoogleTagManager, GoogleAnalytics } from '@next/third-parties/google';
 
 const LazyToast = dynamic(() => import("./common/LazyToast"), { ssr: false });
 
@@ -89,20 +90,17 @@ export default function RootLayout({ children }) {
       </head>
       <body suppressHydrationWarning={false} className={`${greatVibes.variable} ${poppins.variable} ${outfit.variable}`}>
         <AddBootstrap />
+        
+        {/* 🌟 FIX: Added the component here so it actually renders! */}
+        <DynamicTypography /> 
+
         <ClientProvider>{children}</ClientProvider>
         <LazyToast />
       </body>
       
-      {/* 🌟 PERF FIX: These components automatically defer tracking until the page is fully interactive */}
-      {/* <GoogleTagManager gtmId="GTM-PRVJK9N" />
-      <GoogleAnalytics gaId="G-MJZK1MXG9E" /> */}
       <GoogleTagManager gtmId="GTM-PRVJK9N" />
-        
-        {/* 2. Google Analytics (GA4) */}
-        <GoogleAnalytics gaId="G-MJZK1MXG9E" />
-
-        {/* 3. Google Ads Tag (This fixes the error in your screenshot) */}
-        <GoogleAnalytics gaId="AW-11474758205" />
+      <GoogleAnalytics gaId="G-MJZK1MXG9E" />
+      <GoogleAnalytics gaId="AW-11474758205" />
     </html>
   );
 }
