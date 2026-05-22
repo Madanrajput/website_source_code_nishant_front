@@ -114,11 +114,11 @@ export default async function HomeContent() {
       <style dangerouslySetInnerHTML={{__html: `
         .text-orange-force { color: #ff914d !important; }
         .banner-overlay { padding-bottom: 7rem !important; }
-        .box_heading { color: #ff914d !important; font-weight: 800 !important; font-size: 3.5rem !important; }
+        .box_heading { color: #ffffff !important; font-weight: 800 !important; font-size: 3.5rem !important; }
 
         /* Fix visibility on images */
         .bgsectionroom .designercard *,
-        .cardoffer h3, .cardoffer h5, .cardoffer p, .cardoffer span,
+        .cardoffer h3, .cardoffer span,
         .card_room h3, .card_room h5, .card_room p, .card_room span {
             color: #ffffff !important;
             text-shadow: 0px 4px 12px rgba(0,0,0,0.9), 0px 1px 3px rgba(0,0,0,0.8) !important;
@@ -142,7 +142,8 @@ export default async function HomeContent() {
         }
         .marquee-content-fix {
             display: flex;
-            animation: marqueeScroll 25s linear infinite;
+            animation: marqueeScroll 60s linear infinite;
+            will-change: transform;
         }
         .marquee-container-fix:hover .marquee-content-fix {
             animation-play-state: paused;
@@ -300,19 +301,19 @@ export default async function HomeContent() {
           subHeadingCounter=""
           
           counterEnd={content[12]?.json_content?.title} 
-          label1={content[12]?.json_content?.designation} 
+          label1={content[12]?.json_content?.description} 
           counterDuration="5" 
           
           counterEnd2={content[11]?.json_content?.title} 
-          label2={content[11]?.json_content?.designation} 
+          label2={content[11]?.json_content?.description} 
           counterDuration2="5" 
           
           counterEnd3={content[10]?.json_content?.title} 
-          label3={content[10]?.json_content?.designation} 
+          label3={content[10]?.json_content?.description} 
           counterDuration3="5" 
           
           counterEnd4={content[9]?.json_content?.title} 
-          label4={content[9]?.json_content?.designation} 
+          label4={content[9]?.json_content?.description} 
           counterDuration4="5" 
           
           descriptionCounter={content[13]?.json_content?.description} 
@@ -335,7 +336,7 @@ export default async function HomeContent() {
               {finalMarqueeCards.slice(0, 5).map((card, index) => (
                 <div key={index} className="col-lg-4 col-md-6 col-12">
                   <div className="mx-auto" style={{ maxWidth: "380px", height: "100%" }}>
-                    <Card cardLinkName={card?.link || `/estimator-for-home`} cardNameALl="cardoffer shadow-sm border-0 bg-white h-100 d-flex flex-column" imgSrc={card?.image || card?.child_content?.image} imgAlt={card?.title || card?.child_content?.title} imgClass={"bhkimg rounded-top-3 w-100 object-fit-cover"} titleCard={card?.title || card?.child_content?.title} titleClass="text-center mb-0 pb-3 pt-3 fw-bold fs-6 text-dark flex-grow-1" />
+                    <Card cardLinkName={card?.link || `/estimator-for-home`} cardNameALl="cardoffer shadow-sm border-0 bg-white h-100 d-flex flex-column" imgSrc={card?.image || card?.child_content?.image} imgAlt={card?.title || card?.child_content?.title} imgClass={"bhkimg rounded-top-3 w-100 object-fit-cover"} titleCard={card?.title || card?.child_content?.title} titleClass="text-center mb-0 pb-3 pt-3 fw-bold fs-4 text-orange-force flex-grow-1" />
                   </div>
                 </div>
               ))}

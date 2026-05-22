@@ -89,7 +89,7 @@ export default function HeroCarousel({ bannerData }) {
             flex-direction: column; 
             justify-content: flex-end; 
             align-items: center;      
-            padding-bottom: 4rem; /* 🌟 Shifted up on mobile */       
+            padding-bottom: 4rem; /* Shifted up on mobile */       
             pointer-events: none;
             background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0) 80%);
             text-align: center;
@@ -98,9 +98,10 @@ export default function HeroCarousel({ bannerData }) {
         .banner-overlay * { pointer-events: auto; }
         .banner-content-wrapper { width: 100%; padding: 0 1.25rem; }
 
+        /* 🌟 UPDATED: Moved dots higher from bottom: 20px to bottom: 45px */
         .embla__dots {
             position: absolute;
-            bottom: 20px;
+            bottom: 45px;
             left: 0;
             right: 0;
             display: flex;
@@ -121,7 +122,7 @@ export default function HeroCarousel({ bannerData }) {
             box-shadow: 0 0 8px rgba(255, 145, 77, 0.8);
         }
 
-        /* 🌟 THIN Top Slogan */
+        /* THIN Top Slogan */
         .banner-top-slogan { 
             font-family: var(--dynamic-paragraph-font) !important;
             font-size: 0.8rem; 
@@ -132,7 +133,7 @@ export default function HeroCarousel({ bannerData }) {
             color: #ff914d !important; 
         }
         
-        /* 🌟 THICK Main Heading */
+        /* THICK Main Heading */
         .home_banner_heading { 
             font-family: var(--dynamic-heading-font) !important; 
             font-size: 2rem; 
@@ -142,7 +143,7 @@ export default function HeroCarousel({ bannerData }) {
             color: #ffffff !important; 
         }
         
-        /* 🌟 THIN Subtitle */
+        /* THIN Subtitle */
         .font_stylish_home { 
             font-family: var(--dynamic-heading-font) !important; 
             font-size: 1.1rem; 
@@ -154,7 +155,7 @@ export default function HeroCarousel({ bannerData }) {
             line-height: 1.2;
         }
         
-        /* 🌟 THIN Description */
+        /* THIN Description */
         .banner-desc { 
             font-family: var(--dynamic-paragraph-font) !important;
             font-size: 0.9rem; 
@@ -168,7 +169,7 @@ export default function HeroCarousel({ bannerData }) {
             overflow: hidden;
         }
 
-        /* 🌟 THICK Button */
+        /* THICK Button */
         .banner-btn {
             background-color: #ff914d; border: none;
             font-family: var(--dynamic-heading-font) !important;
@@ -184,7 +185,7 @@ export default function HeroCarousel({ bannerData }) {
         .embla__nav-btn { display: none; }
 
         @media (min-width: 768px) {
-            /* 🌟 Shifted up on Desktop */
+            /* Shifted up on Desktop */
             .banner-overlay { padding-bottom: 6rem; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0) 100%); }
             .banner-content-wrapper { width: 90%; max-width: 1200px; padding: 0 20px; }
             .banner-top-slogan { font-size: 1.1rem; margin-bottom: 1rem !important; }
@@ -193,6 +194,11 @@ export default function HeroCarousel({ bannerData }) {
             .banner-desc { font-size: 1.2rem; line-height: 1.6; margin-bottom: 2rem !important; max-width: 800px; margin-left: auto; margin-right: auto; }
             .banner-btn { display: inline-block; width: auto; padding: 16px 50px !important; font-size: 1.1rem !important; border-radius: 50px; }
             
+            /* 🌟 UPDATED: Adjusted desktop dots to sit slightly higher proportionally */
+            .embla__dots {
+                bottom: 55px; 
+            }
+
             .embla__nav-btn {
                 display: flex; position: absolute; top: 50%; transform: translateY(-50%); z-index: 20;
                 width: 44px; height: 44px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(4px);
