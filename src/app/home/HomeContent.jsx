@@ -114,7 +114,16 @@ export default async function HomeContent() {
       <style dangerouslySetInnerHTML={{__html: `
         .text-orange-force { color: #ff914d !important; }
         .banner-overlay { padding-bottom: 7rem !important; }
-        .box_heading { color: #ffffff !important; font-weight: 800 !important; font-size: 3.5rem !important; }
+        
+        /* 🌟 FIX 1: Restored Old Styling for "The Way We Work" Numbers */
+        .box_heading { 
+            color: #ffffff !important; 
+            -webkit-text-stroke: 2px rgba(255, 255, 255, 0.8) !important; 
+            font-weight: 800 !important; 
+            font-size: 5.5rem !important; 
+            line-height: 1 !important;
+            opacity: 0.9;
+        }
 
         /* Fix visibility on images */
         .bgsectionroom .designercard *,
@@ -154,18 +163,25 @@ export default async function HomeContent() {
         }
 
         .yt-fix-wrapper iframe, .yt-fix-wrapper [class*="youtube"] {
-            width: 100% !important; min-height: 250px !important; height: auto !important;
+            width: 100% !important; height: auto !important;
             aspect-ratio: 16/9 !important; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         .yt-fix-wrapper .card { border-radius: 12px; overflow: hidden; border: none; }
         
         @media (min-width: 768px) {
-            .yt-fix-wrapper iframe { min-height: 300px !important; }
             .banner-overlay { padding-bottom: 9rem !important; }
         }
 
         @media (max-width: 768px) {
-          .mobile-scroll-row { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; scroll-snap-type: x mandatory; padding-bottom: 20px !important; margin-bottom: 10px !important; -webkit-overflow-scrolling: touch; scrollbar-width: none; justify-content: flex-start !important; }
+          /* 🌟 FIX 2: Reduce all large bootstrap spacings on mobile devices to collapse whitespace */
+          .my-5 { margin-top: 1.5rem !important; margin-bottom: 1.5rem !important; }
+          .py-5 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+          .mb-5 { margin-bottom: 1.5rem !important; }
+          .mt-5 { margin-top: 1.5rem !important; }
+          .pt-5 { padding-top: 1.5rem !important; }
+          .pb-5 { padding-bottom: 1.5rem !important; }
+          
+          .mobile-scroll-row { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; scroll-snap-type: x mandatory; padding-top:20px !important; padding-bottom: 20px !important; margin-bottom: 10px !important; -webkit-overflow-scrolling: touch; scrollbar-width: none; justify-content: flex-start !important; }
           .mobile-scroll-row::-webkit-scrollbar { display: none; }
           .mobile-scroll-row > [class*="col-"] { flex: 0 0 85% !important; max-width: 85% !important; scroll-snap-align: center; }
           .mobile-process-row { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; scroll-snap-type: x mandatory; padding-bottom: 20px !important; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 15px; margin-left: 0; margin-right: 0; justify-content: flex-start !important; }
@@ -230,7 +246,6 @@ export default async function HomeContent() {
           
           <div className="marquee-container-fix">
             <div className="marquee-content-fix">
-              {/* Duplicate 4 times so the scrolling never ends */}
               {[...activeWhyChooseUsData, ...activeWhyChooseUsData, ...activeWhyChooseUsData, ...activeWhyChooseUsData].map((item, idx) => {
                 const IconComponent = ICON_MAP[item.icon] || FaCheckCircle;
                 return (
@@ -291,35 +306,27 @@ export default async function HomeContent() {
         </div>
       </LazySection>
 
-      {/* 🌟 FIX 4: Restored Original Data Prop Structure for CounterRow */}
       <LazySection placeholderHeight="300px">
         <CounterRow 
           ImgCounter={content[13]?.json_content?.image} 
           imgAltCounter={content[13]?.json_content?.title} 
-          
           titleHeadingCounter="Celebrating Excellence:"
           subHeadingCounter=""
-          
           counterEnd={content[12]?.json_content?.title} 
           label1={content[12]?.json_content?.description} 
           counterDuration="5" 
-          
           counterEnd2={content[11]?.json_content?.title} 
           label2={content[11]?.json_content?.description} 
           counterDuration2="5" 
-          
           counterEnd3={content[10]?.json_content?.title} 
           label3={content[10]?.json_content?.description} 
           counterDuration3="5" 
-          
           counterEnd4={content[9]?.json_content?.title} 
           label4={content[9]?.json_content?.description} 
           counterDuration4="5" 
-          
           descriptionCounter={content[13]?.json_content?.description} 
           btnLink="/residential-projects" 
           textAboutBtnCounter="View Our Projects" 
-          
           btnLink2={content[13]?.json_content?.designation} 
           textAboutBtnCounter2="All Services" 
         />

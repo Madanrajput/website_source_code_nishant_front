@@ -142,7 +142,7 @@ const VideoTestimonial = () => {
             .yt-nav-btn { width: 44px; height: 44px; }
             .yt-nav-btn svg { width: 24px; height: 24px; }
             .slick-slide { padding: 0 10px; opacity: 0.6; transform: scale(0.95); }
-            .slick-center { transform: scale(1); }
+            .slick-center {opacity:1 !important; transform: scale(1); }
             .video_card { border-radius: 12px; }
         }
       `}} />

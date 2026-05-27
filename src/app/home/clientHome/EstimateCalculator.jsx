@@ -10,7 +10,6 @@ export default function EstimateCalculator({ estimateSectionData }) {
     const [currentWordIndex, setCurrentWordIndex] = useState(0);
 
     useEffect(() => {
-        // 🌟 FIX: Slowed down from 2000ms to 4000ms for a calm, readable pace
         const interval = setInterval(() => {
             setCurrentWordIndex((prevIndex) => (prevIndex + 1) % rotatingWords.length);
         }, 4000); 
@@ -69,13 +68,11 @@ export default function EstimateCalculator({ estimateSectionData }) {
                 .estimate-wrapper { background-color: #fafafa; padding: 5rem 0; font-family: var(--font-poppins), sans-serif; }
                 .estimate-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; text-align: center; }
                 
-                /* 🌟 FIX: Made the Heading Bolder */
                 .estimate-section-title { font-family: var(--font-outfit), sans-serif; font-size: 2.8rem; font-weight: 800; color: #111; margin-bottom: 0.5rem; }
                 .estimate-subheading { font-size: 1.1rem; color: #666; margin-bottom: 3.5rem; font-weight: 400; }
 
                 .rotating-text-wrapper { display: inline-block; min-width: 120px; text-align: left; vertical-align: bottom; overflow: hidden; height: 1.2em; position: relative; top: 5px; }
                 
-                /* 🌟 FIX: Animation extended to 4s with a smooth pause at the top */
                 .rotating-text { 
                     color: #ff914d; 
                     display: block; 
@@ -102,8 +99,36 @@ export default function EstimateCalculator({ estimateSectionData }) {
                 .btn-card-action:disabled { background: #ffc099 !important; border-color: #ffc099 !important; color: #fff !important; cursor: not-allowed; }
 
                 @media (max-width: 1024px) { .property-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
-                @media (max-width: 768px) { .estimate-section-title { font-size: 2.2rem; } }
-                @media (max-width: 576px) { .property-grid { grid-template-columns: 1fr; } .property-card { padding: 30px 20px; } .estimate-wrapper { padding: 4rem 0; } }
+                
+                /* 🌟 FIX: Mobile Slider CSS matches HomeContent safe-zones */
+                @media (max-width: 768px) { 
+                    .estimate-section-title { font-size: 2.2rem; } 
+                    .property-grid { 
+                        display: flex !important; 
+                        flex-wrap: nowrap !important; 
+                        overflow-x: auto !important; 
+                        overflow-y: visible !important; 
+                        scroll-snap-type: x mandatory; 
+                        padding-top: 10px !important; /* Added slight top buffer for shadows */
+                        padding-bottom: 20px !important; 
+                        -webkit-overflow-scrolling: touch; 
+                        scrollbar-width: none; 
+                        scroll-padding-left: 15px;
+                        padding-left: 15px; 
+                        padding-right: 40px !important; /* Buffer to prevent cropped edges */
+                        margin-left: -20px; /* Bleed edge to edge of the screen */
+                        margin-right: -20px; 
+                        gap: 15px;
+                    }
+                    .property-grid::-webkit-scrollbar { display: none; }
+                    .property-card { 
+                        flex: 0 0 85% !important; 
+                        max-width: 85% !important; 
+                        scroll-snap-align: start !important; /* Ensures clean snapping to the left */
+                        padding: 30px 20px;
+                    }
+                    .estimate-wrapper { padding: 4rem 0; }
+                }
             `}} />
 
             <div className="estimate-container">

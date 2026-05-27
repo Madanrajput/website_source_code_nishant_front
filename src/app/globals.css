@@ -425,3 +425,18 @@ img, video, iframe {
     transform: translateX(-50%);
   }
 }
+
+
+/* ==========================================================================
+   📱 MOBILE STANDARD HEADING SIZES (Added for responsive typography)
+   ========================================================================== */
+   @media (max-width: 768px) {
+    h1, .h1 { font-size: 2rem !important; line-height: 1.25; }
+    h2, .h2 { font-size: 1.75rem !important; line-height: 1.3; }
+    h3, .h3 { font-size: 1.5rem !important; line-height: 1.35; }
+    h4, .h4 { font-size: 1.25rem !important; line-height: 1.4; }
+    h5, .h5 { font-size: 1.1rem !important; line-height: 1.4; }
+    h6, .h6 { font-size: 1rem !important; line-height: 1.4; }
+    
+    .font_stylish { font-size: 1.5rem !important; }
+  }

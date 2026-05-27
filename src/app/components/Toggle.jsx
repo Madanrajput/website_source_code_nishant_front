@@ -162,7 +162,7 @@ const Toggle = () => {
                     <ul className="list-unstyled mb-0 gap-3 d-flex flex-column mt-2 align-items-center align-items-lg-start">
                       <li><a href="/residential-projects" className="offcanvas_anchor">Residential Projects</a></li>
                       <li><a href="/luxury-projects" className="offcanvas_anchor">Luxury Projects</a></li>
-                      <li><a href="/reallife-portfolio" className="offcanvas_anchor">Real Life Portfolio</a></li>
+                      {/* <li><a href="/reallife-portfolio" className="offcanvas_anchor">Real Life Portfolio</a></li> */}
                     </ul>
                   </div>
 

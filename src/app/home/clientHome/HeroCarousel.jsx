@@ -81,6 +81,10 @@ export default function HeroCarousel({ bannerData }) {
         .embla__slide { flex: 0 0 100%; min-width: 0; position: relative; }
         .banner-media { object-fit: cover; object-position: center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
         
+        /* Mobile vs Desktop image toggle classes */
+        .desktop-banner { display: none !important; }
+        .mobile-banner { display: block !important; }
+
         .banner-overlay { 
             position: absolute; 
             z-index: 10; 
@@ -89,7 +93,7 @@ export default function HeroCarousel({ bannerData }) {
             flex-direction: column; 
             justify-content: flex-end; 
             align-items: center;      
-            padding-bottom: 4rem; /* Shifted up on mobile */       
+            padding-bottom: 4rem;      
             pointer-events: none;
             background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0) 80%);
             text-align: center;
@@ -98,7 +102,6 @@ export default function HeroCarousel({ bannerData }) {
         .banner-overlay * { pointer-events: auto; }
         .banner-content-wrapper { width: 100%; padding: 0 1.25rem; }
 
-        /* 🌟 UPDATED: Moved dots higher from bottom: 20px to bottom: 45px */
         .embla__dots {
             position: absolute;
             bottom: 45px;
@@ -122,7 +125,6 @@ export default function HeroCarousel({ bannerData }) {
             box-shadow: 0 0 8px rgba(255, 145, 77, 0.8);
         }
 
-        /* THIN Top Slogan */
         .banner-top-slogan { 
             font-family: var(--dynamic-paragraph-font) !important;
             font-size: 0.8rem; 
@@ -133,17 +135,16 @@ export default function HeroCarousel({ bannerData }) {
             color: #ff914d !important; 
         }
         
-        /* THICK Main Heading */
+        /* THICK Main Heading - Reduced font-size for mobile from 2rem to 1.5rem */
         .home_banner_heading { 
             font-family: var(--dynamic-heading-font) !important; 
-            font-size: 2rem; 
+            font-size: 1.5rem; 
             font-weight: 800 !important;
-            line-height: 1.1; 
+            line-height: 1.2; 
             margin-bottom: 0.5rem !important; 
             color: #ffffff !important; 
         }
         
-        /* THIN Subtitle */
         .font_stylish_home { 
             font-family: var(--dynamic-heading-font) !important; 
             font-size: 1.1rem; 
@@ -155,7 +156,6 @@ export default function HeroCarousel({ bannerData }) {
             line-height: 1.2;
         }
         
-        /* THIN Description */
         .banner-desc { 
             font-family: var(--dynamic-paragraph-font) !important;
             font-size: 0.9rem; 
@@ -169,32 +169,40 @@ export default function HeroCarousel({ bannerData }) {
             overflow: hidden;
         }
 
-        /* THICK Button */
         .banner-btn {
             background-color: #ff914d; border: none;
             font-family: var(--dynamic-heading-font) !important;
             font-weight: 700 !important;
             box-shadow: 0 4px 15px rgba(255, 145, 77, 0.4);
             transition: all 0.3s ease; text-transform: uppercase;
-            letter-spacing: 1px; color: #ffffff !important;
-            padding: 14px 0 !important; font-size: 0.9rem !important;
-            border-radius: 8px; display: block; width: 100%; 
+            letter-spacing: 0.8px; color: #ffffff !important;
+            padding: 8px 24px !important; /* Added side padding for mobile */
+            font-size: 0.8rem !important;
+            border-radius: 24px; 
+            display: inline-block; /* Keeps button wrapping the text */
+            width: fit-content; /* Hugs the text size */
+            max-width: 100%; /* Prevents overflow if text is very long */
+            margin: 0 auto; /* Centers the button naturally */
         }
         .banner-btn:hover { background-color: #e67d3c; transform: translateY(-2px); }
 
         .embla__nav-btn { display: none; }
 
         @media (min-width: 768px) {
-            /* Shifted up on Desktop */
+            .desktop-banner { display: block !important; }
+            .mobile-banner { display: none !important; }
+
             .banner-overlay { padding-bottom: 6rem; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0) 100%); }
             .banner-content-wrapper { width: 90%; max-width: 1200px; padding: 0 20px; }
             .banner-top-slogan { font-size: 1.1rem; margin-bottom: 1rem !important; }
-            .home_banner_heading { font-size: 4.5rem; margin-bottom: 1rem !important; }
+            
+            /* Desktop font size restored */
+            .home_banner_heading { font-size: 4.5rem; margin-bottom: 1rem !important; line-height: 1.1; }
+            
             .font_stylish_home { font-size: 1.5rem; margin-bottom: 1rem !important; }
             .banner-desc { font-size: 1.2rem; line-height: 1.6; margin-bottom: 2rem !important; max-width: 800px; margin-left: auto; margin-right: auto; }
-            .banner-btn { display: inline-block; width: auto; padding: 16px 50px !important; font-size: 1.1rem !important; border-radius: 50px; }
+            .banner-btn { display: inline-block; width: fit-content; padding: 16px 50px !important; font-size: 1.1rem !important; border-radius: 50px; }
             
-            /* 🌟 UPDATED: Adjusted desktop dots to sit slightly higher proportionally */
             .embla__dots {
                 bottom: 55px; 
             }
@@ -227,7 +235,32 @@ export default function HeroCarousel({ bannerData }) {
                     <source src={banner?.banner_image} type="video/mp4" />
                   </video>
                 ) : (
-                  <Image src={banner?.banner_image ?? "/images/home-banner-1.png"} className="banner-media" alt={banner?.title?.trim() || "High Creation Interior Banner"} fill priority={isFirstSlide} fetchPriority={isFirstSlide ? "high" : "auto"} quality={isFirstSlide ? 90 : 75} sizes="(max-width: 768px) 100vw, 100vw" />
+                  <>
+                    {/* Render Mobile Specific Image if available */}
+                    {banner?.mobile_banner_image && (
+                      <Image 
+                        src={banner.mobile_banner_image} 
+                        className="banner-media mobile-banner" 
+                        alt={banner?.title?.trim() || "High Creation Interior Mobile Banner"} 
+                        fill 
+                        priority={isFirstSlide} 
+                        fetchPriority={isFirstSlide ? "high" : "auto"} 
+                        quality={isFirstSlide ? 90 : 75} 
+                        sizes="(max-width: 768px) 100vw, 100vw" 
+                      />
+                    )}
+                    {/* Standard/Desktop Image */}
+                    <Image 
+                      src={banner?.banner_image ?? "/images/home-banner-1.png"} 
+                      className={`banner-media ${banner?.mobile_banner_image ? 'desktop-banner' : ''}`} 
+                      alt={banner?.title?.trim() || "High Creation Interior Banner"} 
+                      fill 
+                      priority={isFirstSlide} 
+                      fetchPriority={isFirstSlide ? "high" : "auto"} 
+                      quality={isFirstSlide ? 90 : 75} 
+                      sizes="(max-width: 768px) 100vw, 100vw" 
+                    />
+                  </>
                 )}
 
                 <div className="banner-overlay">

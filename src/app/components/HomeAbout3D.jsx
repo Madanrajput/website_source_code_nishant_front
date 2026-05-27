@@ -69,7 +69,7 @@ const HomeAbout3D = () => {
                     </div>
 
                     {/* RIGHT SIDE: Text Content */}
-                    <div className="col-lg-6 col-md-12 ps-lg-4 mt-3 mt-lg-0">
+                    <div className="col-lg-6 col-md-12 mt-3 mt-lg-0 text-center text-lg-start">
                         <h2 className="fw-bold mb-4 text-dark" style={{ fontSize: "clamp(2rem, 3.5vw, 3rem)", lineHeight: "1.2" }}>
                             {data.title}
                         </h2>
@@ -78,9 +78,18 @@ const HomeAbout3D = () => {
                             {data.description}
                         </p>
 
-                        <a href="/about-us" className="btn text-white px-5 py-3 rounded-pill fw-bold shadow-sm" style={{ background: "linear-gradient(135deg, #ff914d 0%, #ff5722 100%)", letterSpacing: "1px" }}>
-                            KNOW MORE ABOUT US
-                        </a>
+                        <div className="d-flex justify-content-center justify-content-lg-start">
+    <a 
+        href="/about-us" 
+        className="btn text-white px-5 py-3 rounded-pill fw-bold shadow-sm"
+        style={{ 
+            background: "linear-gradient(135deg, #ff914d 0%, #ff5722 100%)",
+            letterSpacing: "1px"
+        }}
+    >
+        KNOW MORE ABOUT US
+    </a>
+</div>
                     </div>
                 </div>
             </div>
