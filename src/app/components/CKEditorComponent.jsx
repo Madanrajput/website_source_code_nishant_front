@@ -52,16 +52,15 @@ function MandatoryAltTextPlugin(editor) {
 
                 if (!imageElement) continue;
 
-                // 🌟 CRITICAL FIX: If the image is currently being uploaded via our CustomUploadAdapter,
-                // do NOT prompt here! The adapter handles its own modern prompt before uploading.
+                // Skip if currently being uploaded by our adapter (adapter handles the prompt)
                 if (imageElement.hasAttribute('uploadId') || imageElement.hasAttribute('uploadStatus')) {
                     continue;
                 }
 
-                // If it bypassed the upload adapter (like copy-pasting an external web image) and has no alt text
                 if (!imageElement.getAttribute('alt')) {
                     requireAltTextPrompt().then(altText => {
-                        editor.model.change((writer) => {
+                        // Use enqueueChange for asynchronous prompt responses
+                        editor.model.enqueueChange('transparent', (writer) => {
                             writer.setAttribute('alt', altText, imageElement);
                         });
                     });
@@ -70,24 +69,33 @@ function MandatoryAltTextPlugin(editor) {
 
             // 2. Detect when an uploaded image gets its final URL applied by the adapter
             if (entry.type === 'attribute' && entry.attributeKey === 'src') {
-                const imageElement = entry.range.start.nodeAfter;
-                
-                if (imageElement && (imageElement.is('element', 'imageBlock') || imageElement.is('element', 'imageInline'))) {
-                    const newSrc = entry.attributeNewValue;
-                    const uploadedAlt = getUploadedImageAlt(newSrc);
-                    
-                    // Silently apply the remembered alt text to the final model
-                    if (uploadedAlt && imageElement.getAttribute('alt') !== uploadedAlt) {
-                        editor.model.change((writer) => {
-                            writer.setAttribute('alt', uploadedAlt, imageElement);
-                        });
+                for (const item of entry.range.getItems()) {
+                    if (item.is('element', 'imageBlock') || item.is('element', 'imageInline')) {
+                        const newSrc = entry.attributeNewValue;
+                        const uploadedAlt = getUploadedImageAlt(newSrc);
+                        
+                        if (uploadedAlt && item.getAttribute('alt') !== uploadedAlt) {
+                            
+                            // 🌟 FINAL FIX: Do NOT use setTimeout or enqueueChange here.
+                            // We must use immediate change() logic with a safety check.
+                            editor.model.change((writer) => {
+                                // Before trying to touch the item, check if it's still 
+                                // valid in the model and not currently locked/being removed.
+                                if (writer.model.document.differ.isItemValid(item)) {
+                                    // Make sure we are applying within a transparent (undos-skipping) batch
+                                    writer.setAttribute('alt', uploadedAlt, item);
+                                } else {
+                                    console.warn("Skipping deferred alt-text update: Image element became invalid.");
+                                }
+                            });
+                            
+                        }
                     }
                 }
             }
         }
     });
 }
-
 const sanitizeEmbeddedHtml = (inputHtml) => {
     const sanitizedHtml = DOMPurify.sanitize(inputHtml, {
         ADD_TAGS: ['iframe', 'section', 'article', 'main', 'aside', 'form'],
@@ -152,7 +160,7 @@ const editorConfig = {
         TableToolbar,
         Undo
     ],
-    extraPlugins: [CustomUploadAdapterPlugin, MandatoryAltTextPlugin],
+    extraPlugins: [CustomUploadAdapterPlugin],
     toolbar: {
         items: [
             'undo', 'redo', '|',

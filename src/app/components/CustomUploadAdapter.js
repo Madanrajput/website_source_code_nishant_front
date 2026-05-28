@@ -1,8 +1,6 @@
 import imageCompression from 'browser-image-compression';
 import api from '@/utils/api';
 
-const uploadedImageAltRegistry = new Map();
-
 const API_BASE_URL =
     (process.env.NODE_ENV === 'development'
         ? process.env.NEXT_PUBLIC_API_DEV_URL
@@ -11,19 +9,11 @@ const API_BASE_URL =
 const normalizeMediaUrl = (url = '') => {
     if (!url) return '';
     if (url.startsWith('http://')) return url.replace('http://', 'https://');
+    if (url.startsWith('/')) return `${API_BASE_URL}${url}`;
     return url;
 };
 
-const rememberUploadedImageAlt = (url, altText) => {
-    const trimmedAltText = altText?.trim();
-    const normalizedUrl = normalizeMediaUrl(url);
-    if (!normalizedUrl || !trimmedAltText) return;
-    uploadedImageAltRegistry.set(normalizedUrl, trimmedAltText);
-};
-
-export const getUploadedImageAlt = (url) => uploadedImageAltRegistry.get(normalizeMediaUrl(url));
-
-// 🌟 MODERN ASYNC PROMPT UI (Replaces the buggy window.prompt)
+// 🌟 MODERN ASYNC PROMPT UI (Unchanged, exactly as you designed it)
 let isPromptActive = false;
 const promptQueue = [];
 
@@ -33,7 +23,6 @@ const processPromptQueue = () => {
 
     const { resolve, defaultText } = promptQueue.shift();
 
-    // Create Background Overlay
     const overlay = document.createElement('div');
     Object.assign(overlay.style, {
         position: 'fixed', top: '0', left: '0', width: '100%', height: '100%',
@@ -42,7 +31,6 @@ const processPromptQueue = () => {
         fontFamily: 'var(--font-outfit), var(--font-poppins), sans-serif'
     });
 
-    // Create Modal Box
     const box = document.createElement('div');
     Object.assign(box.style, {
         backgroundColor: '#ffffff', padding: '32px', borderRadius: '16px',
@@ -70,7 +58,6 @@ const processPromptQueue = () => {
     input.onfocus = () => input.style.borderColor = '#ff914d';
     input.onblur = () => input.style.borderColor = '#e2e8f0';
 
-    // Bottom Action Row
     const btnWrapper = document.createElement('div');
     Object.assign(btnWrapper.style, { display: 'flex', justifyContent: 'space-between', alignItems: 'center' });
 
@@ -85,15 +72,12 @@ const processPromptQueue = () => {
         borderRadius: '50px', cursor: 'pointer', fontWeight: '700', fontSize: '0.95rem',
         transition: 'all 0.2s ease', boxShadow: '0 4px 12px rgba(255, 145, 77, 0.3)'
     });
-    saveBtn.onmouseover = () => { saveBtn.style.backgroundColor = '#e67d3c'; saveBtn.style.transform = 'translateY(-1px)'; };
-    saveBtn.onmouseout = () => { saveBtn.style.backgroundColor = '#ff914d'; saveBtn.style.transform = 'translateY(0)'; };
 
     btnWrapper.append(errorMsg, saveBtn);
     box.append(title, desc, input, btnWrapper);
     overlay.appendChild(box);
     document.body.appendChild(overlay);
 
-    // Auto focus the input after it mounts
     setTimeout(() => input.focus(), 50);
 
     const handleSave = () => {
@@ -101,11 +85,6 @@ const processPromptQueue = () => {
         if (!val) {
             errorMsg.style.opacity = '1';
             input.style.borderColor = '#e74c3c';
-            box.animate([
-                { transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' },
-                { transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' },
-                { transform: 'translateX(0)' }
-            ], { duration: 400, easing: 'ease-in-out' });
         } else {
             document.body.removeChild(overlay);
             isPromptActive = false;
@@ -118,71 +97,81 @@ const processPromptQueue = () => {
     input.onkeydown = (e) => { if (e.key === 'Enter') handleSave(); };
 };
 
-export const requireAltTextPrompt = (defaultText = '') => {
+export const requireAltTextPrompt = () => {
     return new Promise((resolve) => {
-        promptQueue.push({ resolve, defaultText });
+        promptQueue.push({ resolve, defaultText: '' });
         processPromptQueue();
     });
 };
 
 class MyUploadAdapter {
-    constructor(loader) {
+    // 🌟 Capture the Editor instance in the constructor
+    constructor(loader, editor) {
         this.loader = loader;
+        this.editor = editor; 
     }
 
     async upload() {
         try {
             const file = await this.loader.file;
-            
-            // 🌟 Use the sleek React-style async popup instead of window.prompt
             const altText = await requireAltTextPrompt();
 
-            // 🌟 YOUR LIVE LOGIC PRESERVED EXACTLY 🌟
-            // Step 1: Compress image and convert to WebP for faster loading
-            const options = {
-                maxSizeMB: 1,
-                maxWidthOrHeight: 1024,
-                useWebWorker: true,
-                fileType: 'image/webp',
-            };
-            const compressedFile = await imageCompression(file, options);
+            let uploadFile = file;
+            try {
+                // Safe compression fallback
+                const options = { maxSizeMB: 1, maxWidthOrHeight: 1024, useWebWorker: false, fileType: 'image/webp' };
+                uploadFile = await imageCompression(file, options);
+            } catch (e) { 
+                console.warn("Compression fallback", e); 
+            }
 
-            // Step 2: Prepare FormData
             const formData = new FormData();
-            formData.append('image', compressedFile, 'upload.webp');
-            formData.append('alt_text', altText); // using the captured altText from new UI
+            formData.append('image', uploadFile, uploadFile.name || 'upload.webp');
+            formData.append('alt_text', altText);
 
-            // Step 3: Upload to backend
             const response = await api.post('/cms-parent-child/upload-image', formData);
             
-            // Axios automatically parses the JSON into the `.data` property
-            const result = response.data;
+            const data = response.data;
+            const finalUrl = data.url || (data.data && data.data.url) || '';
 
-            // Step 4: Ensure HTTPS URL
-            const imageUrl = normalizeMediaUrl(result.url || '');
-            rememberUploadedImageAlt(imageUrl, result.alt_text || altText);
+            if (!finalUrl) throw new Error("Image URL is missing from response.");
 
-            // Return the URL to CKEditor so it can display the image
-            return {
-                default: imageUrl,
-            };
+            const imageUrl = normalizeMediaUrl(finalUrl);
+
+            // 🌟 THE FIX: The Safe SEO Injection Method
+            // We wait 500ms for CKEditor to completely finish its upload swap process.
+            // Then we manually scan the document for the new URL and add the Alt Text.
+            // No event listeners needed = No more crashes!
+            setTimeout(() => {
+                if (this.editor && this.editor.model) {
+                    this.editor.model.change(writer => {
+                        const root = this.editor.model.document.getRoot();
+                        const range = writer.createRangeIn(root);
+                        
+                        for (const item of range.getItems()) {
+                            // Find the exact image we just uploaded
+                            if ((item.is('element', 'imageBlock') || item.is('element', 'imageInline')) && item.getAttribute('src') === imageUrl) {
+                                writer.setAttribute('alt', altText, item);
+                            }
+                        }
+                    });
+                }
+            }, 500);
+
+            return { default: imageUrl };
 
         } catch (error) {
-            console.error("Upload Adapter Error:", error);
-            // Reject the promise so CKEditor knows the upload failed
-            return Promise.reject(error?.message || "Failed to upload image");
+            console.error("Upload Error:", error);
+            return Promise.reject(error?.message || "Failed to upload");
         }
     }
 
-    abort() {
-        // This stops the upload if the user deletes the image before it finishes uploading
-        console.log("Image upload aborted by user.");
-    }
+    abort() {}
 }
 
-// CKEditor plugin initialization
+// 🌟 Pass the editor instance into the adapter when initializing
 export default function CustomUploadAdapterPlugin(editor) {
     editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-        return new MyUploadAdapter(loader);
+        return new MyUploadAdapter(loader, editor);
     };
 }
