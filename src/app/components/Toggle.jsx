@@ -32,9 +32,9 @@ const Toggle = () => {
 
   return (
     <div>
-      {/* 🌟 STYLING: Imported Cursive Font and adjusted sizes for readability */}
       <style dangerouslySetInnerHTML={{ __html: `
         @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
         .menu-toggle-btn {
           transition: all 0.3s ease;
@@ -42,13 +42,13 @@ const Toggle = () => {
         }
         .menu-toggle-btn:hover {
           transform: scale(1.15);
-          color: #ff914d; /* Brand Orange */
+          color: #ff914d;
         }
         
-        /* Apply elegant cursive font to sidebar */
         #mySidebar {
-          font-family: 'Dancing Script', cursive; 
-          letter-spacing: 0.5px;
+          background-color: rgba(15, 15, 15, 0.98);
+          backdrop-filter: blur(12px);
+          font-family: 'Poppins', sans-serif; /* Clean, readable font for the whole menu */
         }
 
         .sidebar-close-btn {
@@ -60,26 +60,29 @@ const Toggle = () => {
           color: #ff914d;
         }
         
-        /* Scaled up headings for cursive readability */
+        /* Keep the cursive ONLY for the main brand heading */
         .offcanvas_heading {
+          font-family: 'Dancing Script', cursive; 
           background: -webkit-linear-gradient(45deg, #fff, #ff914d);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
-          font-size: 2.8rem; 
+          font-size: 3.5rem; 
+          line-height: 1.2;
         }
         
         .offcanvas_description {
           color: #a3a3a3; 
           line-height: 1.8;
-          font-size: 1.3rem; /* Scaled up for cursive */
+          font-size: 1.05rem; 
         }
 
         .stylish-section-title {
           color: #ff914d;
           font-weight: 600;
-          border-bottom: 1px solid rgba(255, 145, 77, 0.3);
-          display: inline-block;
-          font-size: 1.7rem; /* Scaled up for cursive */
+          font-size: 1.1rem;
+          text-transform: uppercase;
+          letter-spacing: 1.5px;
+          margin-bottom: 1.5rem;
         }
 
         .offcanvas_anchor {
@@ -87,11 +90,56 @@ const Toggle = () => {
           color: #d1d1d1;
           text-decoration: none;
           display: inline-block;
-          font-size: 1.35rem; /* Scaled up for cursive */
+          font-size: 1rem;
+          font-weight: 400;
+          padding: 6px 0; /* Better tap target for mobile */
         }
         .offcanvas_anchor:hover {
           color: #ff914d;
           transform: translateX(8px); 
+        }
+
+        /* 🌟 MOBILE RESPONSIVENESS FIXES 🌟 */
+        @media (max-width: 991px) {
+          .offcanvas_heading {
+            font-size: 2.8rem;
+            text-align: center;
+            margin-bottom: 1rem !important;
+          }
+          .offcanvas_description {
+            text-align: center;
+            margin-bottom: 2.5rem;
+          }
+          
+          /* Switch from horizontal columns to a clean vertical stack */
+          .mobile-menu-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem; /* Space out the categories */
+          }
+          
+          .mobile-menu-column {
+            width: 100%;
+            text-align: center; /* Center everything for a clean mobile look */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Subtle dividers */
+            padding-bottom: 2rem;
+          }
+          
+          .mobile-menu-column:last-child {
+            border-bottom: none;
+          }
+          
+          .stylish-section-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #ffffff; /* White looks cleaner centered on mobile */
+          }
+          
+          .offcanvas_anchor {
+            font-size: 1.1rem;
+            padding: 10px 0; /* Much bigger tap target for thumbs */
+            width: 100%;
+          }
         }
       `}} />
 
@@ -114,8 +162,6 @@ const Toggle = () => {
           position: "fixed",
           top: 0,
           left: 0,
-          backgroundColor: "rgba(15, 15, 15, 0.98)", 
-          backdropFilter: "blur(12px)", 
           overflowX: "hidden",
           overflowY: "auto", 
           height: "100%",
@@ -123,7 +169,7 @@ const Toggle = () => {
           zIndex: 1055, 
         }}
       >
-        <div className="d-flex justify-content-end align-items-center container-fluid px-4 px-lg-5 pt-3">
+        <div className="d-flex justify-content-end align-items-center container-fluid px-4 px-lg-5 pt-4">
           <div className="close">
             <button
               type="button"
@@ -136,13 +182,13 @@ const Toggle = () => {
           </div>
         </div>
 
-        <div style={{ padding: "20px 10px", color: "white" }}>
+        <div style={{ padding: "10px 10px 60px", color: "white" }}>
           <div className="container-fluid px-lg-5">
             <div className="row mt-3">
               
-              {/* Left Column Intro (Desktop only) */}
-              <div className="col-lg-4 mb-5 mb-lg-0 pe-lg-4 d-none d-lg-block">
-                <h2 className="offcanvas_heading fw-bold mb-3">
+              {/* Left Column Intro (Visible on Desktop, stacked on Mobile) */}
+              <div className="col-lg-4 pe-lg-5">
+                <h2 className="offcanvas_heading fw-bold">
                   High Creation Interior
                 </h2>
                 <p className="offcanvas_description">
@@ -152,55 +198,55 @@ const Toggle = () => {
                 </p>
               </div>
 
-              {/* Right Column Links (4 Columns) */}
+              {/* Right Column Links */}
               <div className="col-lg-8">
-                <div className="row g-4">
+                <div className="row mobile-menu-grid">
                   
                   {/* 1st - Projects */}
-                  <div className="col-6 col-md-3 text-center text-lg-start">
-                    <h5 className="mb-4 pb-1 stylish-section-title">Projects</h5>
-                    <ul className="list-unstyled mb-0 gap-3 d-flex flex-column mt-2 align-items-center align-items-lg-start">
-                      <li><a href="/residential-projects" className="offcanvas_anchor">Residential Projects</a></li>
-                      <li><a href="/luxury-projects" className="offcanvas_anchor">Luxury Projects</a></li>
-                      {/* <li><a href="/reallife-portfolio" className="offcanvas_anchor">Real Life Portfolio</a></li> */}
+                  <div className="col-lg-3 mobile-menu-column">
+                    <h5 className="stylish-section-title">Projects</h5>
+                    <ul className="list-unstyled mb-0 d-flex flex-column align-items-center align-items-lg-start">
+                      <li><a href="/residential-projects" className="offcanvas_anchor" onClick={closeSidebar}>Residential Projects</a></li>
+                      <li><a href="/luxury-projects" className="offcanvas_anchor" onClick={closeSidebar}>Luxury Projects</a></li>
                     </ul>
                   </div>
 
                   {/* 2nd - Experience Center */}
-                  <div className="col-6 col-md-3 text-center text-lg-start">
-                    <h5 className="mb-4 pb-1 stylish-section-title">Experience Center</h5>
-                    <ul className="list-unstyled mb-0 gap-3 d-flex flex-column mt-2 align-items-center align-items-lg-start">
-                      <li><a href="/experience-center/" className="offcanvas_anchor">Noida Center</a></li>
-                      <li><a href="/experience-center-gurugram/" className="offcanvas_anchor">Gurugram Center</a></li>
-                      <li><a href="/experience-center-faridabad/" className="offcanvas_anchor">Faridabad Center</a></li>
+                  <div className="col-lg-3 mobile-menu-column">
+                    <h5 className="stylish-section-title">Experience Center</h5>
+                    <ul className="list-unstyled mb-0 d-flex flex-column align-items-center align-items-lg-start">
+                      <li><a href="/experience-center/" className="offcanvas_anchor" onClick={closeSidebar}>Noida Center</a></li>
+                      <li><a href="/experience-center-gurugram/" className="offcanvas_anchor" onClick={closeSidebar}>Gurugram Center</a></li>
+                      <li><a href="/experience-center-faridabad/" className="offcanvas_anchor" onClick={closeSidebar}>Faridabad Center</a></li>
+                      <li><a href="/experience-center-noida-extension/" className="offcanvas_anchor" onClick={closeSidebar}>Noida Extension</a></li>
                     </ul>
                   </div>
 
                   {/* 3rd - Cities */}
-                  <div className="col-6 col-md-3 text-center text-lg-start">
-                    <h5 className="mb-4 pb-1 stylish-section-title">Cities</h5>
-                    <ul className="list-unstyled mb-0 gap-3 d-flex flex-column mt-2 align-items-center align-items-lg-start">
-                      <li><a href="/interior-designers-in-noida" className="offcanvas_anchor">Designers In Noida</a></li>
-                      <li><a href="/interior-designers-in-ghaziabad" className="offcanvas_anchor">Designers in Ghaziabad</a></li>
-                      <li><a href="/interior-designers-in-greater-noida" className="offcanvas_anchor">Designers in Greater Noida</a></li>
-                      <li><a href="/interior-designers-in-delhi" className="offcanvas_anchor">Designers in Delhi</a></li>
-                      <li><a href="/interior-designers-in-dwarka" className="offcanvas_anchor">Designers in Dwarka</a></li>
-                      <li><a href="/best-interior-designers-in-faridabad" className="offcanvas_anchor">Designers in Faridabad</a></li>
-                      <li><a href="/interior-designers-in-gurgaon" className="offcanvas_anchor">Designers in Gurugram</a></li>
-                      <li><a href="/interior-designers-in-manesar" className="offcanvas_anchor">Designers In Manesar</a></li>
-                      <li><a href="/interior-designer-in-sohna-gurgaon" className="offcanvas_anchor">Designers In Sohna</a></li>
+                  <div className="col-lg-3 mobile-menu-column">
+                    <h5 className="stylish-section-title">Cities</h5>
+                    <ul className="list-unstyled mb-0 d-flex flex-column align-items-center align-items-lg-start">
+                      <li><a href="/interior-designers-in-noida" className="offcanvas_anchor" onClick={closeSidebar}>Designers In Noida</a></li>
+                      <li><a href="/interior-designers-in-ghaziabad" className="offcanvas_anchor" onClick={closeSidebar}>Designers in Ghaziabad</a></li>
+                      <li><a href="/interior-designers-in-greater-noida" className="offcanvas_anchor" onClick={closeSidebar}>Designers in Greater Noida</a></li>
+                      <li><a href="/interior-designers-in-delhi" className="offcanvas_anchor" onClick={closeSidebar}>Designers in Delhi</a></li>
+                      <li><a href="/interior-designers-in-dwarka" className="offcanvas_anchor" onClick={closeSidebar}>Designers in Dwarka</a></li>
+                      <li><a href="/best-interior-designers-in-faridabad" className="offcanvas_anchor" onClick={closeSidebar}>Designers in Faridabad</a></li>
+                      <li><a href="/interior-designers-in-gurgaon" className="offcanvas_anchor" onClick={closeSidebar}>Designers in Gurugram</a></li>
+                      <li><a href="/interior-designers-in-manesar" className="offcanvas_anchor" onClick={closeSidebar}>Designers In Manesar</a></li>
+                      <li><a href="/interior-designer-in-sohna-gurgaon" className="offcanvas_anchor" onClick={closeSidebar}>Designers In Sohna</a></li>
                     </ul>
                   </div>
 
                   {/* 4th - Design Ideas */}
-                  <div className="col-6 col-md-3 text-center text-lg-start">
-                    <h5 className="mb-4 pb-1 stylish-section-title">Design Ideas</h5>
-                    <ul className="list-unstyled mb-0 gap-3 d-flex flex-column mt-2 align-items-center align-items-lg-start">
-                      <li><a href="/furniture/" className="offcanvas_anchor">Furniture</a></li>
-                      <li><a href="/ready-togo-design/" className="offcanvas_anchor">Ready To Go</a></li>
-                      <li><a href="/sustainable-furniture/" className="offcanvas_anchor">Sustainable</a></li>
-                      <li><a href="/spacesaving-furniture/" className="offcanvas_anchor">Space-Saving</a></li>
-                      <li><a href="/wallpaper/" className="offcanvas_anchor">Wallpapers</a></li>
+                  <div className="col-lg-3 mobile-menu-column">
+                    <h5 className="stylish-section-title">Design Ideas</h5>
+                    <ul className="list-unstyled mb-0 d-flex flex-column align-items-center align-items-lg-start">
+                      <li><a href="/furniture/" className="offcanvas_anchor" onClick={closeSidebar}>Furniture</a></li>
+                      <li><a href="/ready-togo-design/" className="offcanvas_anchor" onClick={closeSidebar}>Ready To Go</a></li>
+                      <li><a href="/sustainable-furniture/" className="offcanvas_anchor" onClick={closeSidebar}>Sustainable</a></li>
+                      <li><a href="/spacesaving-furniture/" className="offcanvas_anchor" onClick={closeSidebar}>Space-Saving</a></li>
+                      <li><a href="/wallpaper/" className="offcanvas_anchor" onClick={closeSidebar}>Wallpapers</a></li>
                     </ul>
                   </div>
 

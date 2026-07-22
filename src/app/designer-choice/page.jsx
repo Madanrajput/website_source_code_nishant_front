@@ -287,7 +287,7 @@ export default async function DesignerChoice() {
           {/* Static Records Grid (Oldest 5) */}
           {staticRecords.length > 0 && (
             <div className="mt-0 row g-4 mx-0">
-              <div className="col-lg-5 col-md-6 col-12">
+              <div className="col-lg-5 col-md-6 col-12 .text-light-force">
                 {staticRecords[0] && (
                   <BgImageCard
                     style={{

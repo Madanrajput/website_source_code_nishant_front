@@ -12,6 +12,12 @@ const getBaseUrl = () => {
     : process.env.NEXT_PUBLIC_API_BASE_URL;
 };
 
+// --- HELPER: Strip HTML to prevent Hydration Mismatches ---
+const stripHtml = (html) => {
+  if (!html) return "";
+  return html.replace(/<[^>]*>?/gm, '');
+};
+
 // --- HELPER: Fetch Furniture Data ---
 async function getFurnitureData() {
   try {
@@ -19,12 +25,10 @@ async function getFurnitureData() {
     const res = await fetch(`${baseURL}/cms-parent-child/furniture`, {
       // cache handled by page revalidate
     });
-
     if (!res.ok) {
       console.error(`Failed to fetch furniture data: ${res.status}`);
       return [];
     }
-
     return await res.json();
   } catch (err) {
     console.error("Furniture Data Fetch Error:", err);
@@ -39,11 +43,8 @@ async function getSeoData() {
     const res = await fetch(`${baseURL}/seo-tag`, {
       next: { revalidate: 60 },
     });
-
     if (!res.ok) return null;
-
     const allTags = await res.json();
-
     // Match the specific page URL for Furniture
     if (Array.isArray(allTags)) {
       return allTags.find(
@@ -62,10 +63,9 @@ async function getSeoData() {
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
   const seoData = await getSeoData();
-
   const defaultTitle = "Explore customized furniture design for your dream home";
   const defaultDesc =
-    "Discover customized furniture designs tailored for your dream home, blending style, functionality, and personalization to create spaces you’ll love.";
+    "Discover customized furniture designs tailored for your dream home, blending style, functionality, and personalization to create spaces you'll love.";
   const defaultCanonical = "https://hcinterior.in/furniture";
 
   return {
@@ -85,7 +85,10 @@ export async function generateMetadata() {
 
 // --- MAIN SERVER COMPONENT ---
 export default async function Furniture() {
-  const exclusiveDesignData = await getFurnitureData();
+  const rawData = await getFurnitureData();
+  
+  // Strictly ensure it's an array so .map() never triggers a TypeError
+  const exclusiveDesignData = Array.isArray(rawData) ? rawData : (rawData?.data || []);
 
   return (
     <MainLayout>
@@ -102,36 +105,40 @@ export default async function Furniture() {
               and function. Each item is made with attention to detail, ensuring
               it complements your style while making everyday life easier.
               Discover furniture that not only looks great but works for you,
-              turning your house into a space you’ll truly love to live in. Let
+              turning your house into a space you&apos;ll truly love to live in. Let
               us bring your dream home to life.
             </p>
           </div>
-
           <div className="row g-4 mx-0">
-            {exclusiveDesignData && exclusiveDesignData.length > 0 ? (
-              exclusiveDesignData.map((design, index) => (
-                <div key={index} className="col-lg-6 col-md-6 col-12">
-                  <WallpaperCard
-                    linkTagWallpaper={`/furniture/gallery?id=${design?.id}`}
-                    wallpaperCard="wallpapercard"
-                    imgWallpaper={
-                      design?.child_content?.image ?? "/images/Bhk/1bhk.png"
-                    }
-                    wallpaperImgClass="wallpaperclass"
-                    altWallpaper={
-                      design?.child_content?.title ?? defaultAltText
-                    }
-                    portfolioTitle={design?.child_content?.title}
-                    wallpaperDescriptiion={design?.child_content?.description}
-                    descriptionClass="team_description mb-0"
-                    textBtnWallpaper="View Design"
-                    btnHrefWallpaper={`/furniture/gallery?id=${design?.id}`}
-                  />
-                </div>
-              ))
+            {exclusiveDesignData.length > 0 ? (
+              exclusiveDesignData.map((design, index) => {
+                
+                // Safe fallbacks using || to strictly prevent empty string crashes
+                const safeImage = design?.child_content?.image || "/images/Bhk/1bhk.png";
+                const safeTitle = design?.child_content?.title || defaultAltText;
+                const safeDescription = stripHtml(design?.child_content?.description);
+                const safeId = design?.id || index;
+
+                return (
+                  <div key={index} className="col-lg-6 col-md-6 col-12">
+                    <WallpaperCard
+                      linkTagWallpaper={`/furniture/gallery?id=${safeId}`}
+                      wallpaperCard="wallpapercard"
+                      imgWallpaper={safeImage}
+                      wallpaperImgClass="wallpaperclass"
+                      altWallpaper={safeTitle}
+                      portfolioTitle={safeTitle !== defaultAltText ? safeTitle : "Furniture Design"}
+                      wallpaperDescriptiion={safeDescription}
+                      descriptionClass="team_description mb-0"
+                      textBtnWallpaper="View Design"
+                      btnHrefWallpaper={`/furniture/gallery?id=${safeId}`}
+                    />
+                  </div>
+                );
+              })
             ) : (
               <div className="col-12 text-center">
-                <p>Loading furniture items...</p>
+                <p className="text-muted">Loading furniture items...</p>
               </div>
             )}
           </div>

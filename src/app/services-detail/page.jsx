@@ -9,9 +9,10 @@ import {
   FaMapMarkerAlt, FaArrowRight, FaPhoneAlt, FaEnvelope, FaUser, 
   FaShieldAlt, FaGem, FaClock, FaTrophy, FaStar, FaAward, 
   FaCheckCircle, FaWallet, FaTools, FaDraftingCompass, FaHardHat, FaHome,
-  FaWhatsapp, FaPlus, FaChevronDown
+  FaWhatsapp, FaPlus, FaChevronDown, 
+  FaSmile, FaUsers, FaCalendarAlt // <--- ADD THESE
 } from "react-icons/fa";
-
+import { getBackendImageUrl } from "@/utils/helper";
 import { SidebarForm, BottomContactForm } from "./CityForms";
 import { getPageSEO } from "@/utils/getSEO";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://apidev.hcinterior.in";
@@ -82,6 +83,20 @@ async function getRecentBlogs() {
   } catch (error) { return []; }
 }
 
+async function getExcellenceData() {
+  try {
+    // Calling the exact endpoint the Home page uses
+    const res = await fetch(`${API_BASE_URL}/cms-content/home_page_content_what_we_are`, { 
+      next: { revalidate: 3600 } 
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return Array.isArray(data) ? data : null;
+  } catch (error) { 
+    return null; 
+  }
+}
+
 const parseJsonSafe = (data) => {
   if (!data) return [];
   if (Array.isArray(data)) return data;
@@ -121,10 +136,11 @@ const ServicesDetailPage = async ({ searchParams }) => {
   const fallbackPath = cityUrlMap[city] || `/services-detail/${city}`;
 
   // 👈 3. Fetch Data + Global SEO schemas concurrently for the component
-  const [pageData, recentBlogs, seoData] = await Promise.all([
+  const [pageData, recentBlogs, seoData, homeContent] = await Promise.all([
     getCityData(city),
     getRecentBlogs(),
-    getPageSEO(fallbackPath).catch(() => null)
+    getPageSEO(fallbackPath).catch(() => null),
+    getExcellenceData()
   ]);
   
   if (!pageData) notFound(); 
@@ -143,6 +159,30 @@ const ServicesDetailPage = async ({ searchParams }) => {
   const currentSubCities = subCitiesMap[city] || [];
   const initialSubCities = currentSubCities.slice(0, 6);
   const hiddenSubCities = currentSubCities.slice(6);
+
+
+  const excellenceStats = homeContent ? [
+    {
+      icon: <FaHome size={40} className="text-warning mb-3" />,
+      value: homeContent[12]?.json_content?.title,
+      label: homeContent[12]?.json_content?.description
+    },
+    {
+      icon: <FaSmile size={40} color="#ff914d" className="mb-3" />,
+      value: homeContent[11]?.json_content?.title,
+      label: homeContent[11]?.json_content?.description
+    },
+    {
+      icon: <FaUsers size={40} color="#ff914d" className="mb-3" />,
+      value: homeContent[10]?.json_content?.title,
+      label: homeContent[10]?.json_content?.description
+    },
+    {
+      icon: <FaAward size={40} color="#2b2b2b" className="mb-3" />,
+      value: homeContent[9]?.json_content?.title,
+      label: homeContent[9]?.json_content?.description
+    }
+  ] : null;
 
   return (
     <MainLayout>
@@ -185,12 +225,20 @@ const ServicesDetailPage = async ({ searchParams }) => {
         .faq-premium-btn:not(.collapsed) .faq-icon-toggle { transform: rotate(45deg); color: #ff5722; }
         .faq-premium-body { padding: 0 clamp(16px, 4vw, 24px) 20px; color: #475569; font-size: clamp(0.95rem, 3vw, 1.05rem); line-height: 1.7; background: #fffcf9; }
         
+        /* FIX: Addresses CKEditor Figure wrappers and Image Cropping */
+        .rich-text-content figure, 
+        .rich-text-content figure.image { margin: 2rem auto !important; max-width: 100% !important; height: auto !important; display: flex; justify-content: center; }
+        .rich-text-content img { max-width: 100% !important; height: auto !important; border-radius: 12px; display: block !important; margin: 0 auto !important; object-fit: contain !important; }
+        .rich-text-content iframe, .rich-text-content video, .rich-text-content table { max-width: 100% !important; overflow-x: auto; display: block !important; margin: 2rem auto !important; }
+
         .rich-text-content h2, .rich-text-content h3 { font-family: var(--font-outfit), sans-serif; font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: 700; color: #0f172a; margin-top: 2rem; margin-bottom: 1rem; }
         .rich-text-content p { font-family: var(--font-poppins), sans-serif; font-size: 1rem; line-height: 1.8; color: #475569; margin-bottom: 1.2rem; }
-        .rich-text-content ul { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; padding: 0; list-style: none; margin: 2rem 0; }
-        .rich-text-content li { background: #fdfdfd; border: 1px solid #f1f5f9; padding: 1rem; border-radius: 12px; display: flex; align-items: flex-start; font-weight: 500; font-family: var(--font-poppins), sans-serif; transition: 0.3s; }
+        
+        /* FIX: Bullet points flexbox correction */
+        .rich-text-content ul { display: flex; flex-direction: column; gap: 1rem; padding: 0; list-style: none; margin: 2rem 0; }
+        .rich-text-content li { background: #fdfdfd; border: 1px solid #f1f5f9; padding: 1.2rem 1.5rem 1.2rem 3rem; border-radius: 12px; display: block; position: relative; font-weight: 500; font-family: var(--font-poppins), sans-serif; transition: 0.3s; }
         .rich-text-content li:hover { border-color: var(--hc-primary); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255,145,77,0.1); }
-        .rich-text-content li::before { content: '✦'; color: var(--hc-primary); margin-right: 12px; font-size: 1.2rem; line-height: 1; }
+        .rich-text-content li::before { content: '✦'; color: var(--hc-primary); position: absolute; left: 1.2rem; top: 1.2rem; font-size: 1.2rem; font-weight: bold; line-height: 1.5; }
 
         .micro-trust-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; }
         .micro-trust-item:last-child { border-bottom: none; padding-bottom: 0; }
@@ -238,6 +286,7 @@ const ServicesDetailPage = async ({ searchParams }) => {
         .nav-city-link { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border-radius: 10px; color: #475569; text-decoration: none; font-weight: 500; font-family: var(--font-poppins), sans-serif; transition: all 0.2s ease; background: #f8fafc; margin-bottom: 10px; }
         .nav-city-link:hover, .nav-city-link.active { background: #ff914d; color: white; transform: translateX(5px); }
         .nav-city-link.active { pointer-events: none; }
+        .sidebar-cta h4 { color: #ffffff !important; }
 
         .related-card { overflow: hidden; border-radius: 16px; transition: transform 0.3s ease; border: 1px solid #f0f0f0; }
         .related-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
@@ -284,19 +333,20 @@ const ServicesDetailPage = async ({ searchParams }) => {
         {/* --- HERO SECTION --- */}
         <div className="city-hero w-100">
           <Image 
-            src={pageData?.location_image || '/images/wework_bgImage.jpg'} 
+            // src={pageData?.location_image || '/images/wework_bgImage.jpg'} 
+            src={getBackendImageUrl('/parent-child/wework_bgImage.94f57400.jpg')}
             alt={`${displayCity} Interior Design`}
             fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 0 }}
           />
-          <div className="hero-overlay"></div>
+          {/* <div className="hero-overlay"></div> */}
           <div className="container hero-content font-poppins">
-            <div className="hero-badge"><FaMapMarkerAlt className="me-2" /> High Creation in {displayCity}</div>
+            <div className="hero-badge"><FaMapMarkerAlt className="me-2" /> High Creation Interior in {displayCity}</div>
             <h1 className="hero-main-title fw-bold mb-3 font-outfit text-white" style={{ textShadow: '0 4px 20px rgba(0,0,0,0.9)' }}>
               {pageData?.main_title || `Interior Designers in ${displayCity}`}
             </h1>
-            <p className="fs-5 text-white mx-auto" style={{ maxWidth: '700px', opacity: 0.9 }}>
+            {/* <p className="fs-5 text-white mx-auto" style={{ maxWidth: '700px', opacity: 0.9 }}>
               Elevating lifestyles with bespoke, luxury interiors tailored for homes in {displayCity}.
-            </p>
+            </p> */}
           </div>
         </div>
 
@@ -310,9 +360,11 @@ const ServicesDetailPage = async ({ searchParams }) => {
                  {/* --- 5. LENGTHY CONTENT --- */}
                  <div className="premium-card mb-4">
                   <h2 className="font-outfit fw-bold h3 mb-4 text-dark">
-                    Transforming Spaces in <span className="text-gradient">{displayCity}</span>
+                     {/* <span className="text-gradient">{displayCity}</span> */}
+                     Interior Designer In {displayCity}
                   </h2>
-                  <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: safeDescription }} />
+                  {/* FIX: Included ck-content class here to inherit image containment logic */}
+                  <div className="rich-text-content ck-content" dangerouslySetInnerHTML={{ __html: safeDescription }} />
                 </div>
                 {/* --- 1. NEW SECTION: APPROACH & OFFERINGS --- */}
                 
@@ -362,28 +414,48 @@ const ServicesDetailPage = async ({ searchParams }) => {
                     </div>
                   </div>
                 )}
-                {/* --- 3. EXCELLENCE STATS --- */}
-                <div className="lazy-render">
-                  <div className="premium-card shadow-sm" style={{ background: 'linear-gradient(to right, #ffffff, #fff9f5)' }}>
-                    <div className="row align-items-center mobile-slider-wrapper">
-                      <div className="col-md-4 excellence-stat">
-                        <FaTrophy size={40} className="text-warning mb-3" />
-                        <h3 className="font-outfit fw-bold h2 mb-1">500+</h3>
-                        <p className="font-poppins text-muted small fw-bold text-uppercase mb-0">Projects Delivered</p>
-                      </div>
-                      <div className="col-md-4 excellence-stat">
-                        <FaStar size={40} color="#ff914d" className="mb-3" />
-                        <h3 className="font-outfit fw-bold h2 mb-1">4.9/5</h3>
-                        <p className="font-poppins text-muted small fw-bold text-uppercase mb-0">Client Ratings</p>
-                      </div>
-                      <div className="col-md-4 excellence-stat">
-                        <FaAward size={40} color="#2b2b2b" className="mb-3" />
-                        <h3 className="font-outfit fw-bold h2 mb-1">15+</h3>
-                        <p className="font-poppins text-muted small fw-bold text-uppercase mb-0">Design Awards</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                
+
+                {/* --- 3. EXCELLENCE STATS (Dynamic Celebrating Excellence) --- */}
+                {/* --- 3. EXCELLENCE STATS (Mapped from Home Page) --- */}
+<div className="lazy-render">
+  <div className="premium-card shadow-sm" style={{ background: 'linear-gradient(to right, #ffffff, #fff9f5)' }}>
+    <div className="row align-items-center mobile-slider-wrapper">
+      
+      {excellenceStats ? (
+        /* Render the 4 columns matching the Home Page */
+        excellenceStats.map((stat, idx) => (
+          <div className="col-md-3 excellence-stat" key={idx}>
+            {stat.icon}
+            <h3 className="font-outfit fw-bold h2 mb-1">{stat.value}</h3>
+            <p className="font-poppins text-muted small fw-bold text-uppercase mb-0">{stat.label}</p>
+          </div>
+        ))
+      ) : (
+        /* Safe Fallback just in case the API goes down */
+        <>
+          <div className="col-md-4 excellence-stat">
+            <FaTrophy size={40} className="text-warning mb-3" />
+            <h3 className="font-outfit fw-bold h2 mb-1">500+</h3>
+            <p className="font-poppins text-muted small fw-bold text-uppercase mb-0">Projects Delivered</p>
+          </div>
+          <div className="col-md-4 excellence-stat">
+            <FaStar size={40} color="#ff914d" className="mb-3" />
+            <h3 className="font-outfit fw-bold h2 mb-1">4.9/5</h3>
+            <p className="font-poppins text-muted small fw-bold text-uppercase mb-0">Client Ratings</p>
+          </div>
+          <div className="col-md-4 excellence-stat">
+            <FaAward size={40} color="#2b2b2b" className="mb-3" />
+            <h3 className="font-outfit fw-bold h2 mb-1">15+</h3>
+            <p className="font-poppins text-muted small fw-bold text-uppercase mb-0">Design Awards</p>
+          </div>
+        </>
+      )}
+
+    </div>
+  </div>
+</div>
+
 
                 {/* --- 4. WHY CHOOSE US (Modern Cards) --- */}
                 <div className="lazy-render">
@@ -432,7 +504,8 @@ const ServicesDetailPage = async ({ searchParams }) => {
                   <div className="lazy-render">
                     <div className="premium-card mb-4" style={{ background: '#fffcf9' }}>
                       <h3 className="font-outfit fw-bold h4 mb-3 text-dark">{pageData.side_title}</h3>
-                      <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: safeSideDescription }} />
+                      {/* FIX: Included ck-content class here to inherit image containment logic */}
+                      <div className="rich-text-content ck-content" dangerouslySetInnerHTML={{ __html: safeSideDescription }} />
                     </div>
                   </div>
                 )}
@@ -533,7 +606,7 @@ const ServicesDetailPage = async ({ searchParams }) => {
                   <Link href={cityUrlMap[cityName]} className="text-decoration-none">
                     <div className="related-card bg-white position-relative shadow-sm h-100 rounded-4 overflow-hidden">
                       <div style={{ height: "200px", position: "relative" }}>
-                        <Image src="/images/wework_bgImage.jpg" alt={cityName} fill style={{ objectFit: "cover" }} loading="lazy" />
+                        <Image src={getBackendImageUrl('/parent-child/wework_bgImage.94f57400.jpg')} alt={cityName} fill style={{ objectFit: "cover" }} loading="lazy" />
                         <div className="position-absolute bottom-0 start-0 p-4 w-100 text-white fw-bold" style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.8))' }}>
                           <FaMapMarkerAlt className="me-2 text-warning" /> {cityName.replace('_', ' ').toUpperCase()}
                         </div>

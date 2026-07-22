@@ -24,7 +24,7 @@ const BgImageCard = ({
       className={designerCardBgDiv}
     >
       <div>
-        <h5>{titleBgImage}</h5>
+        <h5 className="text-light-force">{titleBgImage}</h5>
         <p className="text-white mb-0">{descriptionBg}</p>
       </div>
 

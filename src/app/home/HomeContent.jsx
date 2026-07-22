@@ -27,6 +27,7 @@ import BgImageCard from "../components/BgImageCard";
 import RoomOfice from "../components/RoomOfice";
 import HomeAbout3D from "../components/HomeAbout3D";
 import EstimateCalculator from "./clientHome/EstimateCalculator";
+import { getBackendImageUrl } from "@/utils/leadForms";
 
 // --- DYNAMIC IMPORTS ---
 const Blogs = dynamic(() => import("../components/Blogs"));
@@ -109,6 +110,7 @@ export default async function HomeContent() {
   const activeEstimateCards = safeEstimateCards.filter(card => card?.is_active !== false); 
   const finalMarqueeCards = activeEstimateCards.length > 0 ? activeEstimateCards : h3d_gallery.filter(item => !item.child_content?.title?.toLowerCase().includes("1 bhk")).slice(0, 5);
 
+  const dynamicBgUrl = getBackendImageUrl(content?.bg_image || '/parent-child/wework_bgImage.jpg'); 
   return (
     <>
       <style dangerouslySetInnerHTML={{__html: `
@@ -213,7 +215,7 @@ export default async function HomeContent() {
           </div>
         </div>
 
-      <div className="way_wework">
+      <div className="way_wework" style={{ backgroundImage: `url(${dynamicBgUrl})` }}>
           <div className="container">
             <div className="mb-5 text-center">
                <h2 className="h2 font_about fw-bold mb-0">The Way <span className="text-orange-force">We Work</span></h2>

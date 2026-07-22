@@ -19,10 +19,17 @@ const Awards = () => {
       </head>
       <MainLayout>
         <main>
+        <style dangerouslySetInnerHTML={{ __html: `
+            .force-white-heading {
+              color: #ffffff !important;
+              text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            }
+          `}} />
           <BackgroundImageWithHeading
             sectionBgImages={"contact_wrapper services"}
             sectionBgHeading="Awards Gallery"
-            secBgHeadingClass="sec_bgheading_lass"
+            // secBgHeadingClass="sec_bgheading_lass"
+            secBgHeadingClass="sec_bgheading_lass force-white-heading"
             sectionBgDescription=""
             secBgDesClass={"text-center bg-transparent"}
           />

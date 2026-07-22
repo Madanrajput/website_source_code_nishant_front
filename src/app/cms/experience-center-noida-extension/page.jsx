@@ -5,10 +5,10 @@ import AuthMainLayout from "../../layouts/auth/AuthMainLayout";
 import api from "@/utils/api";
 import { toast } from "react-toastify";
 
-const CmsExperienceCenter = () => {
+const CmsExperienceCenterNoidaExtension = () => {
     const authToken = useSelector((state) => state.auth.authToken);
-    const [pagesList, setPagesList] = useState([]);
-    const [pagesListVideo, setPagesListVideo] = useState([]);
+    const [pagesList, setPagesList] = useState();
+    const [pagesListVideo, setPagesListVideo] = useState();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         title: "",
@@ -20,13 +20,13 @@ const CmsExperienceCenter = () => {
 
     const fetchContentManagerPages = useCallback(async () => {
         try {
-            const response = await api.get(`/cms-parent-child/experience_center`, {
+            const response = await api.get(`/cms-parent-child/experience_center_noida_extension`, {
                 headers: {
-                    Authorization: `Bearer ${authToken}`,
+                    Authorization: `Bearer ${authToken}`, 
                 },
             });
 
-            if (response.data) {
+            if (response.data && response.data) {
                 setPagesList(response.data);
                 setLoading(false);
             }
@@ -38,13 +38,13 @@ const CmsExperienceCenter = () => {
 
     const fetchContentManagerPagesVideo = useCallback(async () => {
         try {
-            const response = await api.get(`/cms-parent-child/experience_center_video`, {
+            const response = await api.get(`/cms-parent-child/experience_center_noida_extension_video`, {
                 headers: {
-                    Authorization: `Bearer ${authToken}`,
+                    Authorization: `Bearer ${authToken}`, 
                 },
             });
 
-            if (response.data) {
+            if (response.data && response.data) {
                 setPagesListVideo(response.data);
                 setLoading(false);
             }
@@ -53,11 +53,10 @@ const CmsExperienceCenter = () => {
             setLoading(false);
         }
     }, [authToken]);
-
-    // Handle form submission for Video Edit
-    const handleEditSubmitVideo = async (e) => {
+    
+     // Handle form submission for video
+     const handleEditSubmitVideo = async (e) => {
         e.preventDefault();
-        e.stopPropagation(); // <-- Added to prevent GTM/Ads tracking script interception
 
         const formDataToSend = new FormData();
         formDataToSend.append("title", formData.title);
@@ -70,7 +69,7 @@ const CmsExperienceCenter = () => {
             const response = await api.patch(`/cms-parent-child/${selectedId}`, formDataToSend, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${authToken}`,
+                    Authorization: `Bearer ${authToken}`, 
                 },
             });
 
@@ -95,9 +94,8 @@ const CmsExperienceCenter = () => {
     useEffect(() => {
         fetchContentManagerPages();
         fetchContentManagerPagesVideo();
-    }, [fetchContentManagerPages, fetchContentManagerPagesVideo]); // <-- Fixed dependency array syntax
-
-    // Handle input change for text fields and image
+    }, [fetchContentManagerPages, fetchContentManagerPagesVideo]);
+     
     const handleInputChange = (e) => {
         const { name, value, files } = e.target;
         if (name === "image" && files.length > 0) {
@@ -107,10 +105,8 @@ const CmsExperienceCenter = () => {
         }
     };
 
-    // Handle form submission for standard Edit
     const handleEditSubmit = async (e) => {
         e.preventDefault();
-        e.stopPropagation(); // <-- Added protection here as well
 
         const formDataToSend = new FormData();
         formDataToSend.append("title", formData.title);
@@ -123,7 +119,7 @@ const CmsExperienceCenter = () => {
             const response = await api.patch(`/cms-parent-child/${selectedId}`, formDataToSend, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${authToken}`,
+                    Authorization: `Bearer ${authToken}`, 
                 },
             });
 
@@ -145,13 +141,12 @@ const CmsExperienceCenter = () => {
         }
     };
 
-    // Handle form submission for Add New
     const handleAddSubmit = async (e) => {
         e.preventDefault();
-        e.stopPropagation(); // <-- Added protection here as well
 
         const formDataToSend = new FormData();
-        formDataToSend.append("page_type", "experience_center");
+        // 🌟 CRITICAL: This sets the correct type in your database
+        formDataToSend.append("page_type", "experience_center_noida_extension");
         formDataToSend.append("title", formData.title);
         formDataToSend.append("description", formData.description);
         if (formData.image) {
@@ -162,7 +157,7 @@ const CmsExperienceCenter = () => {
             const response = await api.post(`/cms-parent-child`, formDataToSend, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${authToken}`,
+                    Authorization: `Bearer ${authToken}`, 
                 },
             });
 
@@ -184,20 +179,17 @@ const CmsExperienceCenter = () => {
         }
     };
 
-    // Set form data when edit button is clicked
     const handleEditClick = (item) => {
-        console.log("edit item here", item);
         setSelectedId(item.id);
         setFormData({
-            title: item.child_content?.title || "",
-            description: item.child_content?.description || "",
+            title: item.child_content?.title,
+            description: item.child_content?.description,
             image: null, 
         });
     };
 
     const handleChildImageChange = async (index, e) => {
         e.preventDefault();
-        e.stopPropagation(); // <-- Added protection here as well
 
         if (e.target.files.length === 0) {
             return;
@@ -211,7 +203,7 @@ const CmsExperienceCenter = () => {
             const response = await api.patch(`/cms-parent-child/update-child-image/${selectedId}`, childDataToSend, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${authToken}`,
+                    Authorization: `Bearer ${authToken}`, 
                 },
             });
 
@@ -233,9 +225,8 @@ const CmsExperienceCenter = () => {
 
     return (
         <AuthMainLayout>
-            {/* --- Experience Center Section --- */}
             <div className="container my-5">
-                <h1 className="mb-4 text-center">CMS - Experience Center</h1>
+                <h1 className="mb-4 text-center">CMS - Noida Extension Experience Center</h1>
                 <div className="d-flex justify-content-end mb-3">
                     <button
                         onClick={() => setFormData({ title: "", description: "", image: null })}
@@ -270,12 +261,12 @@ const CmsExperienceCenter = () => {
                                     <tr key={item.id}>
                                         <td>{index + 1}</td>
                                         <td>
-                                            <img src={item?.child_content?.image} alt={item?.child_content?.title} height="80" decoding="async" loading="lazy" />
+                                            <img src={item?.child_content?.image} alt={item?.child_content.title} height="80" decoding="async"  loading="lazy" />
                                         </td>
-                                        <td>{item?.child_content?.title}</td>
+                                        <td>{item?.child_content.title}</td>
                                         <td>{item?.child_content?.description}</td>
                                         <td>
-                                            <button onClick={() => handleManageChild(item.id)} type="button" className="btn btn-info me-1" data-bs-toggle="modal" data-bs-target="#manageChildModal">
+                                            <button onClick={()=> handleManageChild(item.id)} type="button" className="btn btn-info me-1" data-bs-toggle="modal" data-bs-target="#manageChildModal">
                                                 Manage Child
                                             </button>
                                             <button onClick={() => handleEditClick(item)} type="button" className="read_morebtn" data-bs-toggle="modal" data-bs-target="#editNewpageModal">
@@ -290,7 +281,7 @@ const CmsExperienceCenter = () => {
                 )}
             </div>
 
-            {/* --- Add New Page Modal --- */}
+            {/* Modal Components */}
             <div className="modal fade" id="addNewpageModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
                     <div className="modal-content">
@@ -300,6 +291,7 @@ const CmsExperienceCenter = () => {
                         </div>
                         <form onSubmit={handleAddSubmit}>
                             <div className="modal-body row">
+
                                 <div className="mb-3 col-md-12">
                                     <label htmlFor="title" className="form-label">Title</label>
                                     <input
@@ -324,6 +316,8 @@ const CmsExperienceCenter = () => {
                                         required
                                     />
                                 </div>
+
+
                                 <div className="mb-3 col-md-12">
                                     <label className="form-label">Image</label>
                                     <input
@@ -334,6 +328,7 @@ const CmsExperienceCenter = () => {
                                         onChange={handleInputChange}
                                     />
                                 </div>
+
                                 <div className="m-auto mt-2 col-12 d-flex justify-content-center">
                                     <button className="px-5 read_morebtn" type="submit">
                                         Save Changes
@@ -345,7 +340,6 @@ const CmsExperienceCenter = () => {
                 </div>
             </div>
 
-            {/* --- Edit Page Modal --- */}
             <div className="modal fade" id="editNewpageModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
                     <div className="modal-content">
@@ -355,6 +349,7 @@ const CmsExperienceCenter = () => {
                         </div>
                         <form onSubmit={handleEditSubmit}>
                             <div className="modal-body row">
+
                                 <div className="mb-3 col-md-12">
                                     <label htmlFor="title" className="form-label">Title</label>
                                     <input
@@ -379,6 +374,7 @@ const CmsExperienceCenter = () => {
                                         required
                                     />
                                 </div>
+
                                 <div className="mb-3 col-md-12">
                                     <label className="form-label">Image</label>
                                     <input
@@ -389,6 +385,7 @@ const CmsExperienceCenter = () => {
                                         onChange={handleInputChange}
                                     />
                                 </div>
+
                                 <div className="m-auto mt-2 col-12 d-flex justify-content-center">
                                     <button className="px-5 read_morebtn" type="submit">
                                         Save Changes
@@ -400,7 +397,6 @@ const CmsExperienceCenter = () => {
                 </div>
             </div>
 
-            {/* --- Manage Child Modal --- */}
             <div className="modal fade" id="manageChildModal" tabIndex="-1" aria-labelledby="manageChildModalLabel" aria-hidden="true">
                 <div className="modal-dialog modal-lg">
                     <div className="modal-content">
@@ -421,7 +417,7 @@ const CmsExperienceCenter = () => {
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        {imageItem && <img src={imageItem.image} alt={`Image ${index + 1}`} style={{ height: '100px', marginTop: '10px' }} decoding="async" loading="lazy" />}
+                                        {imageItem && <img src={imageItem.image} alt={`Image ${index + 1}`} style={{ height: '100px', marginTop: '10px' }} decoding="async"  loading="lazy" />}
                                     </div>
                                 </div>
                             ))}
@@ -435,9 +431,9 @@ const CmsExperienceCenter = () => {
                 </div>
             </div>
 
-            {/* --- Experience Center Video Section --- */}
             <div className="container my-5">
-                <h1 className="mb-4 text-center"> Experience Center Video</h1>
+                <h1 className="mb-4 text-center">Experience Center Video</h1>
+                 
                 {loading ? (
                     <div className="text-center">Loading...</div>
                 ) : (
@@ -452,7 +448,7 @@ const CmsExperienceCenter = () => {
                                     <th>SN</th>
                                     <th width="80">Video</th>
                                     <th>Title</th>
-                                    <th>Actions</th>
+                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -460,7 +456,7 @@ const CmsExperienceCenter = () => {
                                     <tr key={item.id}>
                                         <td>{index + 1}</td>
                                         <td><a target="_blank" href={item?.child_content?.image} rel="noopener noreferrer">Video </a></td>
-                                        <td>{item?.child_content?.title}</td>
+                                        <td>{item?.child_content.title}</td>
                                         <td>
                                             <button onClick={() => handleEditClick(item)} type="button" className="read_morebtn" data-bs-toggle="modal" data-bs-target="#editNewpageModalVideo">
                                                 Edit
@@ -474,7 +470,6 @@ const CmsExperienceCenter = () => {
                 )}
             </div>
 
-            {/* --- Edit Video Modal --- */}
             <div className="modal fade" id="editNewpageModalVideo" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
                     <div className="modal-content">
@@ -482,49 +477,46 @@ const CmsExperienceCenter = () => {
                             <h1 className="modal-title fs-5" id="exampleModalLabel">Edit Video</h1>
                             <button type="button" className="btn-close" id="editNewpageModalVideoClose" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        {/* NEW CODE */}
-<div className="modal-body row">
-    <div className="mb-3 col-md-12">
-        <label htmlFor="title" className="form-label">Title</label>
-        <input
-            type="text"
-            className="form-control"
-            name="title"
-            placeholder="Title"
-            value={formData.title}
-            onChange={handleInputChange}
-            required
-        />
-    </div>
-    
-    <div className="mb-3 col-md-12">
-        <label className="form-label">Video</label>
-        <input
-            type="file"
-            className="form-control"
-            name="image"
-            accept="video/*" 
-            onChange={handleInputChange}
-        />
-    </div>
+                        <form onSubmit={handleEditSubmitVideo}>
+                            <div className="modal-body row">
 
-    <div className="m-auto mt-2 col-12 d-flex justify-content-center">
-        {/* Changed type="submit" to type="button" and added onClick */}
-        <button 
-            className="px-5 read_morebtn" 
-            type="button" 
-            onClick={handleEditSubmitVideo}
-        >
-            Save Changes
-        </button>
-    </div>
-</div>
+                                <div className="mb-3 col-md-12">
+                                    <label htmlFor="title" className="form-label">Title</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        name="title"
+                                        placeholder="Title"
+                                        value={formData.title}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+                                
+                                <div className="mb-3 col-md-12">
+                                    <label className="form-label">Video</label>
+                                    <input
+                                        type="file"
+                                        className="form-control"
+                                        name="image"
+                                        accept="*"
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
+
+                                <div className="m-auto mt-2 col-12 d-flex justify-content-center">
+                                    <button className="px-5 read_morebtn" type="submit">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-
+            
         </AuthMainLayout>
     );
 };
 
-export default CmsExperienceCenter;
+export default CmsExperienceCenterNoidaExtension;

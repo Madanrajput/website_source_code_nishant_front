@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import api from "@/utils/api";
 import { image } from "@nextui-org/theme";
 import { buildLeadMetadata } from "@/utils/leadForms";
+
 const HCLandingPage = () => {
   const pathname = usePathname();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,19 +30,16 @@ const HCLandingPage = () => {
   const [submissionMessage, setSubmissionMessage] = useState("");
   const [designIdea, setDesignIdea] = useState([]);
 
-
   const [faqData, setFaqData] = useState([]);
   const [error, setError] = useState("");
 
-
   useEffect(() => {
     const fetchFAQs = async () => {
-
       try {
         const response = await api.get("/cms-content/faqs");
         setFaqData(response.data || []);
       }
-     catch (err) {
+      catch (err) {
         setError("Failed to fetch FAQ data. Please try again.");
       } finally {
         setLoading(false);
@@ -50,7 +48,6 @@ const HCLandingPage = () => {
 
     fetchFAQs();
   }, []);
-
 
   useEffect(() => {
     setLoading(true);
@@ -69,17 +66,16 @@ const HCLandingPage = () => {
     fetchDesignIdea();
   }, []);
 
-
     // Sort records by ID in descending order (newest first)
     const sortedDesignIdea = [...designIdea].sort((a, b) => b.id - a.id);
 
     // Get the 8 oldest records
     const staticRecords = sortedDesignIdea.slice(-5); // Last 8 records (oldest)
-  
+
     // Get the latest records (excluding the last 8)
     const latestRecords = sortedDesignIdea.slice(0, -5); // Everything except last 8
 
-  // section one 
+  // section one
   const [data1, setdata1] = useState();
    const fetchContentManagerPages = useCallback(async () => {
     try {
@@ -93,9 +89,7 @@ const HCLandingPage = () => {
     }
   }, []);
 
-
-
-  // section two 
+  // section two
   const [data2, setdata2] = useState();
    const fetchContentManagerPages_2 = useCallback(async () => {
     try {
@@ -109,7 +103,7 @@ const HCLandingPage = () => {
     }
   }, []);
 
-  // section three 
+  // section three
   const [data3, setdata3] = useState();
    const fetchContentManagerPages_3 = useCallback(async () => {
     try {
@@ -123,7 +117,7 @@ const HCLandingPage = () => {
     }
   }, []);
 
-  // section four 
+  // section four
   const [data4, setdata4] = useState();
    const fetchContentManagerPages_4 = useCallback(async () => {
     try {
@@ -137,8 +131,7 @@ const HCLandingPage = () => {
     }
   }, []);
 
-
-  // section five 
+  // section five
   const [data5, setdata5] = useState();
    const fetchContentManagerPages_5 = useCallback(async () => {
     try {
@@ -152,8 +145,7 @@ const HCLandingPage = () => {
     }
   }, []);
 
-
-  // section six 
+  // section six
   const [data6, setdata6] = useState();
    const fetchContentManagerPages_6 = useCallback(async () => {
     try {
@@ -167,7 +159,6 @@ const HCLandingPage = () => {
     }
   }, []);
 
-
   useEffect(() => {
     fetchContentManagerPages();
     fetchContentManagerPages_2();
@@ -175,7 +166,7 @@ const HCLandingPage = () => {
     fetchContentManagerPages_4();
     fetchContentManagerPages_5();
     fetchContentManagerPages_6();
-  }, [fetchContentManagerPages], [fetchContentManagerPages_2], [fetchContentManagerPages_3], [fetchContentManagerPages_4],[fetchContentManagerPages_5],[fetchContentManagerPages_6]);
+  }, [fetchContentManagerPages, fetchContentManagerPages_2, fetchContentManagerPages_3, fetchContentManagerPages_4, fetchContentManagerPages_5, fetchContentManagerPages_6]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -229,8 +220,7 @@ const HCLandingPage = () => {
         });
         setTimeout(() => {
           window.location.href = "/thank-you";
-
-      }, 300); 
+      }, 300);
         toast.success("Form submitted successfully!");
       } else {
         toast.error("Failed to submit form. Please try again.");
@@ -252,12 +242,47 @@ const HCLandingPage = () => {
   const handleModalStateChange = useCallback((isOpen) => {
     setIsModalOpen(isOpen);
   }, []);
+
   return (
     <div>
+      <style dangerouslySetInnerHTML={{__html: `
+        .text-orange-force { color: #ff914d !important; }
+
+        /* Fix text visibility on designer image cards — mirrors HomeContent.jsx */
+        .bgsectionroom .designercard * {
+          color: #ffffff !important;
+          text-shadow: 0px 4px 12px rgba(0,0,0,0.9), 0px 1px 3px rgba(0,0,0,0.8) !important;
+        }
+        .bgsectionroom .designercard * { font-weight: 800 !important; }
+
+        /* Modern & Clean Typography Overrides (Scaled down headings) */
+        .font_about, .about_wrapper h1, .about_wrapper h2, .about_wrapper h3 {
+          font-family: var(--font-poppins), sans-serif !important;
+          font-size: clamp(1.5rem, 2vw, 2.1rem) !important; /* Scaled down for a cleaner look */
+          font-weight: 500 !important;
+          line-height: 1.3 !important;
+          color: #1f1f1f !important;
+          letter-spacing: -0.5px !important;
+          text-align: center !important;
+          margin-bottom: 1rem !important;
+        }
+        
+        .team_description, .about_wrapper p {
+          font-family: var(--font-poppins), sans-serif !important;
+          font-size: 1.05rem !important;
+          line-height: 1.65 !important;
+          color: #555 !important;
+          font-weight: 400 !important;
+        }
+
+        .about_wrapper .our_experts_text_land {
+          text-align: left !important;
+          display: block;
+        }
+      `}} />
       <head>
         <title>
         Creating the home of your dreams. - High Creation Interior
-
         </title>
       </head>
       <div className={isModalOpen ? "blur-bg" : ""}>
@@ -312,36 +337,34 @@ const HCLandingPage = () => {
         </header>
         <main className="mt-0 pt-0">
         <section
-  className="contact_wrapper hc_landing_ban1 position-relative"
-  style={{
-    backgroundImage: `url(${data1?.mid_image})`, 
-    backgroundSize: "cover",
-    backgroundPosition: "center"
-  }}
->
-             <div className="container">
+          className="contact_wrapper hc_landing_ban1 position-relative"
+          style={{
+            backgroundImage: `url(${data1?.mid_image})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center"
+          }}
+        >
+             <div className="container position-relative" style={{ zIndex: 1 }}>
               <div className="row">
                 <div className="col-lg-7 d-flex align-items-center">
-                  <div className="pe-lg-5">
-                    <h3 className="fw-lighter fs-3 pb-0 mb-0 home_subhead">
+                  <div className="pe-lg-5 text-white">
+                    <h3 className="fw-lighter fs-3 pb-0 mb-0 home_subhead" style={{ color: "#ffffff" }}>
                     {data1?.top_title}
                     </h3>
-                    <h3 className="letheading home_banner_heading">
-                  
+                    <h3 className="letheading home_banner_heading mt-2" style={{ color: "#ffffff" }}>
                       {data1?.mid_sub_title}
-
                     </h3>
-                    <p>
+                    <p className="text-dark fw-medium fs-6 mt-3">
                     {data1?.top_description}
                     </p>
                   </div>
                 </div>
                 <div className="col-lg-5">
-                  <div className="contact_form contact shadow-none bg-transparent">
-                    <h4 className="text-black form_heading mb-3">
+                  <div className="contact_form contact" style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)", borderRadius: "12px", padding: "1.5rem", border: "1px solid rgba(255,255,255,0.25)" }}>
+                    <h4 className="form_heading mb-3" style={{ color: "#ffffff" }}>
                       Styles to Suit Every Budget
                     </h4>
-                    <p>Get Your Dream house today. Let Our experts help you</p>
+                    <p className="text-white">Get Your Dream house today. Let Our experts help you</p>
                     <form className="row" onSubmit={handleSubmit}>
                       <div className="col-md-12 mb-3">
                         <input
@@ -355,7 +378,7 @@ const HCLandingPage = () => {
                           required
                         />
                       </div>
-                      <div className="col-md-5 mb-3">
+                      <div className="col-md-6 mb-3">
                         <input
                           type="text"
                           className="form-control"
@@ -368,7 +391,7 @@ const HCLandingPage = () => {
                         />
                       </div>
 
-                      <div className="col-md-7 mb-3">
+                      <div className="col-md-6 mb-3">
                         <input
                           type="email"
                           className="form-control"
@@ -403,13 +426,14 @@ const HCLandingPage = () => {
                             onChange={handleCheckboxChange}
                           />
                           <label
-                            className="form-check-label text-black"
-                            htmlFor="invalidCheck "
+                            className="form-check-label"
+                            htmlFor="invalidCheck"
+                            style={{ color: "#1a1a1a", fontSize: "0.8rem" }}
                           >
                             By submitting this form, you agree to the privacy
                             policy & terms and conditions
                           </label>
-                          <div className="invalid-feedback text-black">
+                          <div className="invalid-feedback" style={{ color: "#c0392b" }}>
                             You must agree before submitting.
                           </div>
                         </div>
@@ -427,33 +451,21 @@ const HCLandingPage = () => {
                 </div>
               </div>
             </div>
-            <div className="rotate_div  ">
-              <div className="sssss   me-0">
-                <a href="/contact" className="know_moress">
-                  Enquiry Now
-                </a>
-              </div>
-              <div className="mt-4    me-0">
-                <a href="https://wa.me/919560277787">
-                  <img src="/images/whatsapp.svg" width={50} alt="" decoding="async"  loading="lazy" />
-                </a>
-              </div>
-            </div>
           </section>
           <section className="my-5 about_wrapper">
             <RowImage
               imageColLg="6"
               imageColXl="6"
               imageColMd="6"
-              imageCol="12" 
+              imageCol="12"
               ImgAbout={data2?.mid_image}
               ImgAboutClass={"aboout_img object-fit-contain w-100"}
               imgAlt="About"
-              titleHeading=  {data2?.top_title}   
-              subHeading= {data2?.top_description} 
+              titleHeading=  {data2?.top_title}
+              subHeading= {data2?.top_description}
               subHeadingClass="our_experts_text_land pt-3"
               desClass="team_description"
-              description= {data2?.mid_sub_title} 
+              description= {data2?.mid_sub_title}
               textAboutBtn="READ MORE"
               btnLink={data2?.mid_sub_description}
               textAboutBtnCLass="read_morebtn"
@@ -465,10 +477,10 @@ const HCLandingPage = () => {
               <div className="row py-5 mx-0 g-4">
                 <center>
                   <h3 className="font_about text-left pb-2">
-                  {data3?.top_title}   
+                  {data3?.top_title}
                   </h3>
-                  <p className="team_description pb-4 px-3 px-lg-5">
-                  {data3?.top_description}   
+                  <p className="team_description pb-4 px-3 px-lg-5 text-start">
+                  {data3?.top_description}
                   </p>
                 </center>
                 <div className="col-lg-6 col-md-6 col-12">
@@ -479,7 +491,7 @@ const HCLandingPage = () => {
                 </div>
                 <div className="col-lg-6 col-md-6 col-12">
                   <VideoBox
-                    videoUrl={data3?.mid_sub_description}  
+                    videoUrl={data3?.mid_sub_description}
                     imageUrl="/images/Designer_Choice/Natural.jpg"
                   />
                 </div>
@@ -492,7 +504,7 @@ const HCLandingPage = () => {
               <div className="row position-relative mx-0">
                 <center>
                   <h3 className="pb-3 font_about">{data4?.top_title}   </h3>
-                  <p className="team_description px-3 px-lg-5 pb-2">
+                  <p className="team_description px-3 px-lg-5 pb-2 text-start">
                   {data4?.top_description}
                   </p>
                   <div className="my-2">
@@ -505,227 +517,35 @@ const HCLandingPage = () => {
 
 
               <div className="my-5 bgsectionroom">
-          <div className="container ">
-            <div className="row position-relative mx-0">
-              <span className="pb-0 mb-0 font_stylish d-grid ms-lg-5 designer">
-                Designer&apos;s Choice:
-              </span>
-
-              <h3 className="pb-4 w-auto font_about excluisive_home_heading">
-                Exclusive Design Specials
-              </h3>
+          <div className="container">
+            {/* ── Header: exact same pattern as HomeContent.jsx line 294-296 ── */}
+            <div className="row mx-0 mb-4 text-center">
+              <div className="col-12 px-0">
+                <span className="font_stylish text-orange-force d-block mb-1">{`Designer's Choice:`}</span>
+                <h2 className="h2 font_about fw-bold mb-0 text-center">Exclusive Design Specials</h2>
+              </div>
             </div>
+            {/* ── Cards Grid ── */}
             <div className="mt-4 row g-4 mx-0">
-            <div className="col-lg-5 col-md-6 col-12">
-                <BgImageCard
-                 style={{
-                  backgroundImage: `url(${staticRecords[0]?.child_content?.image})`,
-                }}
-                  cardLinkTag={`/designer-choice/gallery?id=${staticRecords[0]?.id}`}
-                  designerCardBgDiv={"designercard designercardimg1"}
-                  titleBgImage={staticRecords[0]?.child_content?.title}
-                  descriptionBg={staticRecords[0]?.child_content?.description}
-                />
-              </div>
-              <div className="col-lg-7 col-md-6 col-12">
-              <BgImageCard
-                 style={{
-                  backgroundImage: `url(${staticRecords[1]?.child_content?.image})`,
-                }}
-                  cardLinkTag={`/designer-choice/gallery?id=${staticRecords[1]?.id}`}
-                  designerCardBgDiv={"designercard designercardimg1"}
-                  titleBgImage={staticRecords[1]?.child_content?.title}
-                  descriptionBg={staticRecords[1]?.child_content?.description}
-                />
-              </div>
-              <div className="col-lg-7 col-md-6 col-12">
-              <BgImageCard
-                 style={{
-                  backgroundImage: `url(${staticRecords[2]?.child_content?.image})`,
-                }}
-                  cardLinkTag={`/designer-choice/gallery?id=${staticRecords[2]?.id}`}
-                  designerCardBgDiv={"designercard designercardimg1"}
-                  titleBgImage={staticRecords[2]?.child_content?.title}
-                  descriptionBg={staticRecords[2]?.child_content?.description}
-                />
-              </div>
-              <div className="col-lg-5 col-md-6 col-12">
-              <BgImageCard
-                 style={{
-                  backgroundImage: `url(${staticRecords[3]?.child_content?.image})`,
-                }}
-                  cardLinkTag={`/designer-choice/gallery?id=${staticRecords[3]?.id}`}
-                  designerCardBgDiv={"designercard designercardimg1"}
-                  titleBgImage={staticRecords[3]?.child_content?.title}
-                  descriptionBg={staticRecords[3]?.child_content?.description}
-                />
-              </div>
-              <div className="col-lg-12 ">
-              <BgImageCard
-                 style={{
-                  backgroundImage: `url(${staticRecords[4]?.child_content?.image})`,
-                }}
-                  cardLinkTag={`/designer-choice/gallery?id=${staticRecords[4]?.id}`}
-                  designerCardBgDiv={"designercard designercardimg1"}
-                  titleBgImage={staticRecords[4]?.child_content?.title}
-                  descriptionBg={staticRecords[4]?.child_content?.description}
-                />
-              </div>
-              <div className="col-lg-12 text-right">
-              <div className="button_text">
-              <a href="/designer-choice" className="know_more">
-                    Know More
-                  </a>
-              </div>
-              </div>
+              {staticRecords.map((record, i) => (
+                <div className={`col-lg-${i === 0 || i === 3 ? '5' : i === 4 ? '12' : '7'} col-md-6 col-12`} key={record.id}>
+                  <BgImageCard
+                    style={{ backgroundImage: `url(${record?.child_content?.image})` }}
+                    cardLinkTag={`/designer-choice/gallery?id=${record?.id}`}
+                    designerCardBgDiv={"designercard designercardimg1"}
+                    titleBgImage={record?.child_content?.title}
+                    descriptionBg={record?.child_content?.description}
+                  />
+                </div>
+              ))}
             </div>
-
+            <div className="mt-4 col-lg-12 text-end pe-3">
+              <a href="/designer-choice" className="know_more">Know More</a>
+            </div>
           </div>
         </div>
-              {/* <div className="row g-4 mt-4 mx-0">
-                <div className="col-lg-5 col-md-6 col-12">
-                  <BgImageCard
-                    designerCardBgDiv={"designercard homecardimg1"}
-                    titleBgImage={"Dark Desier"}
-                    descriptionBg={"Designed By Ranveer Singh "}
-                    // ratingBg={"4.73(130)"}
-                    // buttonShareBg={
-                    //   <IoIosShareAlt className="text-white fs-4" />
-                    // }
-                    // buttonCommentBg={<FaComments className="text-white fs-4" />}
-                  />
-                </div>
-                <div className="col-lg-7 col-md-6 col-12">
-                  <BgImageCard
-                    designerCardBgDiv={"designercard homecardimg2"}
-                    titleBgImage={"Dark Desier"}
-                    descriptionBg={"Designed By Ranveer Singh "}
-                    // ratingBg={"4.73(130)"}
-                    // buttonShareBg={
-                    //   <IoIosShareAlt className="text-white fs-4" />
-                    // }
-                    // buttonCommentBg={<FaComments className="text-white fs-4" />}
-                  />
-                </div>
-                <div className="col-lg-7 col-md-6 col-12">
-                  <BgImageCard
-                    designerCardBgDiv={"designercard homecardimg3"}
-                    titleBgImage={"Dark Desier"}
-                    descriptionBg={"Designed By Ranveer Singh "}
-                    // ratingBg={"4.73(130)"}
-                    // buttonShareBg={
-                    //   <IoIosShareAlt className="text-white fs-4" />
-                    // }
-                    // buttonCommentBg={<FaComments className="text-white fs-4" />}
-                  />
-                </div>
-                <div className="col-lg-5 col-md-6 col-12">
-                  <BgImageCard
-                    designerCardBgDiv={"designercard homecardimg4"}
-                    titleBgImage={"Dark Desier"}
-                    descriptionBg={"Designed By Ranveer Singh "}
-                    // ratingBg={"4.73(130)"}
-                    // buttonShareBg={
-                    //   <IoIosShareAlt className="text-white fs-4" />
-                    // }
-                    // buttonCommentBg={<FaComments className="text-white fs-4" />}
-                  />
-                </div>
-
-                <div className="col-lg-12">
-                  <BgImageCard
-                    designerCardBgDiv={"designercard homecardimg5"}
-                    titleBgImage={"Dark Desier"}
-                    descriptionBg={"Designed By Ranveer Singh "}
-                    // ratingBg={"4.73(130)"}
-                    // buttonShareBg={
-                    //   <IoIosShareAlt className="text-white fs-4" />
-                    // }
-                    // buttonCommentBg={<FaComments className="text-white fs-4" />}
-                  />
-                </div>
-              </div> */}
             </div>
           </div>
-          {/* <div className="my-5 corporate_interior">
-            <div className="container ">
-              <div className="row position-relative mx-0">
-                <center>
-                  <h3 className="pb-3 font_about">{data5?.top_title}</h3>
-                  <p className="team_description px-3 px-lg-5 pb-2">
-                  {data5?.top_description}
-                  </p>
-                  <div className="my-2">
-                    <a href={data5?.mid_sub_title} className="read_morebtn py-2">
-                      Let’s Connect
-                    </a>
-                  </div>
-                </center>
-              </div>
-              <div className="row g-4 mt-4 mx-0">
-                <div className="col-lg-5 col-md-6 col-12">
-                  <BgImageCard
-                    designerCardBgDiv={"designercard corporatecardimg1"}
-                    titleBgImage={"Dark Desier"}
-                    descriptionBg={"Designed By Ranveer Singh "}
-                    // ratingBg={"4.73(130)"}
-                    // buttonShareBg={
-                    //   <IoIosShareAlt className="text-white fs-4" />
-                    // }
-                    // buttonCommentBg={<FaComments className="text-white fs-4" />}
-                  />
-                </div>
-                <div className="col-lg-7 col-md-6 col-12">
-                  <BgImageCard
-                    designerCardBgDiv={"designercard corporatecardimg2"}
-                    titleBgImage={"Dark Desier"}
-                    descriptionBg={"Designed By Ranveer Singh "}
-                    // ratingBg={"4.73(130)"}
-                    // buttonShareBg={
-                    //   <IoIosShareAlt className="text-white fs-4" />
-                    // }
-                    // buttonCommentBg={<FaComments className="text-white fs-4" />}
-                  />
-                </div>
-                <div className="col-lg-12">
-                  <BgImageCard
-                    designerCardBgDiv={"designercard corporatecardimg5"}
-                    titleBgImage={"Dark Desier"}
-                    descriptionBg={"Designed By Ranveer Singh "}
-                    // ratingBg={"4.73(130)"}
-                    // buttonShareBg={
-                    //   <IoIosShareAlt className="text-white fs-4" />
-                    // }
-                    // buttonCommentBg={<FaComments className="text-white fs-4" />}
-                  />
-                </div>
-                <div className="col-lg-5 col-md-6 col-12">
-                  <BgImageCard
-                    designerCardBgDiv={"designercard corporatecardimg3"}
-                    titleBgImage={"Dark Desier"}
-                    descriptionBg={"Designed By Ranveer Singh "}
-                    // ratingBg={"4.73(130)"}
-                    // buttonShareBg={
-                    //   <IoIosShareAlt className="text-white fs-4" />
-                    // }
-                    // buttonCommentBg={<FaComments className="text-white fs-4" />}
-                  />
-                </div>
-                <div className="col-lg-7 col-md-6 col-12">
-                  <BgImageCard
-                    designerCardBgDiv={"designercard corporatecardimg4"}
-                    titleBgImage={"Dark Desier"}
-                    descriptionBg={"Designed By Ranveer Singh "}
-                    // ratingBg={"4.73(130)"}
-                    // buttonShareBg={
-                    //   <IoIosShareAlt className="text-white fs-4" />
-                    // }
-                    // buttonCommentBg={<FaComments className="text-white fs-4" />}
-                  />
-                </div>
-              </div>
-            </div>
-          </div> */}
           <section className="faq_wrapper savedesign">
             <div className="container">
               <div className="text-start">
@@ -782,20 +602,47 @@ const HCLandingPage = () => {
             </div>
           </section>
           <footer>
-            <div className="footer_top py-4">
-              <center>
-                <h3 className="font_about">{data6?.top_title}</h3>
-                <h3>
-                  <span className="our_experts_text_land">
-                  {data6?.top_description}
-                  </span>
-                </h3>
-                <div>
-                  <a href={data6?.mid_sub_title} className="read_morebtn py-2">
-                    Let&apos;s Connect
+            <div className="footer_top py-5">
+              <div className="container">
+                <div className="text-center py-3">
+                  <p style={{
+                    fontFamily: "var(--font-poppins), sans-serif",
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    letterSpacing: "3px",
+                    textTransform: "uppercase",
+                    color: "#ff914d",
+                    marginBottom: "0.5rem",
+                  }}>
+                    ✦   Your Dream Awaits
+                  </p>
+
+                  <h2 style={{
+                    fontFamily: "var(--font-poppins), sans-serif",
+                    fontWeight: 800,
+                    fontSize: "clamp(1.8rem, 4vw, 3rem)",
+                    lineHeight: 1.15,
+                    color: "#171717",
+                    marginBottom: "0.2rem",
+                  }}>
+                    {data6?.top_title || "Bring Your Dream Home to Life"}
+                  </h2>
+                  <h2 style={{
+                    fontFamily: "var(--font-poppins), sans-serif",
+                    fontWeight: 700,
+                    fontSize: "clamp(1.5rem, 3.2vw, 2.4rem)",
+                    lineHeight: 1.15,
+                    color: "#ff914d",
+                    marginBottom: "2rem",
+                  }}>
+                    {data6?.top_description || "with Our Experts"}
+                  </h2>
+
+                  <a href={data6?.mid_sub_title} className="read_morebtn py-2 px-4">
+                    {`Let's Connect`}
                   </a>
                 </div>
-              </center>
+              </div>
             </div>
             <hr />
             <div className="pt-5 pb-2 mx-0 row justify-content-center">
@@ -890,7 +737,7 @@ const HCLandingPage = () => {
                           className="text-black"
                         >
                           Jmd Galleria Mall, Badshahpur Sohna Rd Hwy, Sector 47,
-                          Sector 48, Gurugram, Haryana 122001
+                          Sector 48, Gurugram, Haryana 122001
                         </a>
                       </li>
                       <ul>
@@ -917,6 +764,31 @@ const HCLandingPage = () => {
               </div>
             </div>
           </footer>
+          
+          {/* Refactored Sticky Sidebar using writing-mode for clean vertical layout */}
+          <div className="position-fixed d-flex flex-column align-items-end" style={{ top: '50%', right: '0', zIndex: 9999, transform: 'translateY(-50%)', gap: '12px' }}>
+            <a href="/contact" style={{
+              writingMode: 'vertical-rl',
+              backgroundColor: '#ff914d',
+              color: 'white',
+              padding: '16px 8px',
+              textDecoration: 'none',
+              fontWeight: '600',
+              fontSize: '14px',
+              borderTopLeftRadius: '6px',
+              borderBottomLeftRadius: '6px',
+              boxShadow: '-2px 2px 8px rgba(0,0,0,0.15)',
+              transform: 'rotate(180deg)', /* Flips the text so it reads bottom-to-top */
+              letterSpacing: '1px',
+              transition: 'background-color 0.3s'
+            }}>
+              Enquiry Now
+            </a>
+            <a href="https://wa.me/919560277787" className="shadow rounded-circle d-flex align-items-center justify-content-center bg-white" style={{ width: '44px', height: '44px', marginRight: '4px', transition: 'transform 0.3s' }}>
+              <img src="/images/whatsapp.svg" width={28} alt="WhatsApp" decoding="async" loading="lazy" />
+            </a>
+          </div>
+          
         </main>
         <ContactUsPopUp onModalStateChange={handleModalStateChange} />
       </div>

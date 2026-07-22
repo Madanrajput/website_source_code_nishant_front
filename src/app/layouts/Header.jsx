@@ -93,7 +93,7 @@ const Header = () => {
                     <li><a className="dropdown-item py-2" href="/experience-center-gurugram/">Experience Center Gurugram</a></li>
                   
                     <li><a className="dropdown-item py-2" href="/experience-center-faridabad/">Experience Center Faridabad</a></li>
-                    {/* <li><a className="dropdown-item py-2" href="/experience-center-noida-extension/">Experience Center Noida Extension</a></li> */}
+                    <li><a className="dropdown-item py-2" href="/experience-center-noida-extension/">Experience Center Noida Extension</a></li>
                   </ul>
                 </li>
 
@@ -112,7 +112,7 @@ const Header = () => {
 
                 <li className={`nav-item dropdown ${activeDropdown === 'services' ? 'show' : ''}`}>
                   <a className="nav-link dropdown-toggle text-dark" href="#" onClick={(e) => handleDropdown(e, 'services')} aria-expanded={activeDropdown === 'services'}>
-                    Services
+                    Serving Area
                   </a>
                   <ul className={`dropdown-menu border-0 shadow-sm ${activeDropdown === 'services' ? 'show' : ''}`}>
                     <li><a className="dropdown-item py-2" href="/interior-designers-in-noida">Interior Designers In Noida</a></li>

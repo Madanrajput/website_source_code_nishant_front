@@ -61,7 +61,7 @@ const ResidentialCard = (props) => {
             />
 
             <div className="mt-auto">
-              <span className="btn btn-outline-dark rounded-pill px-4 py-2 know_more fw-semibold">
+              <span className="know_more rounded-pill px-4 py-2 fw-semibold d-inline-block">
                 {props.residentialButton} <span className="ms-1">→</span>
               </span>
             </div>

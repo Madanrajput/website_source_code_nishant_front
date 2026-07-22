@@ -160,7 +160,7 @@ export default async function CancelletionPolicy() {
                     <li>Removes work or line items worth ₹5 lakh, and</li>
                     <li>Adds new work of ₹25 lakh or more.</li>
                   </ul>
-                  <p className="fw-bold mb-1">Result: No service charge shall be applicable.</p>
+                  <p className="fw-bold  text-danger mb-1">Result: No service charge shall be applicable.</p>
                   <p className="text-muted small mb-0">Note: This shall apply only if 2D drawings or 3D designs have not been initiated.</p>
                 </div>
               </div>
@@ -189,7 +189,7 @@ export default async function CancelletionPolicy() {
               <p className="mb-1">
                 {"All charges are applicable due to resource allocation, design efforts, and operational planning already undertaken by the company."
 }</p>
-              <p className="mb-0 fw-bold">
+              <p className="mb-0 fw-bold text-danger">
  {               "Discount is not applicable in any type of either partial or full cancellation"
             }            </p>
             </div>

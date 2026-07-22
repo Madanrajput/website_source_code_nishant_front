@@ -150,7 +150,7 @@ export default function EstimateCalculator({ estimateSectionData }) {
                                 <h3 className="card-title">{card.title}</h3>
                                 <p className="card-description">{card.description}</p>
                                 
-                                <button onClick={() => handleCalculateClick(card.id)} className="btn-card-action" disabled={submittingId !== null}>
+                                <button onClick={() => handleCalculateClick(card.id)} className="btn-card-action" disabled={isThisCardLoading}>
                                     {isThisCardLoading ? 'Processing...' : 'Calculate Estimate'}
                                 </button>
                             </div>

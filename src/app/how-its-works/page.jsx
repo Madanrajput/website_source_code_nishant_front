@@ -83,7 +83,7 @@ const HowItsWork = () => {
   return (
     <div>
       <head>
-        <title>We make home interiors a breeze!</title>
+        <title >We make home interiors a breeze!</title>
         <meta name="description" content="We make home interiors a breeze!" />
         <link rel="canonical" href="https://hcinterior.in/how-its-works" />
       </head>
@@ -111,15 +111,16 @@ const HowItsWork = () => {
             color: #555555;
           }
 
-          /* 🌟 DARK THEME (For Steps 2, 4) - Makes white PNG icons visible! */
+          /* 🌟 DARK THEME (For Steps 2, 4) */
           .step-row-dark {
-            background-color: #1a1a1a; /* Sleek, premium dark background */
+            background-color: #1a1a1a; 
           }
+          /* This strictly guarantees the heading is white in the dark sections */
           .step-row-dark .step-title {
-            color: #ffffff;
+            color: #ffffff !important;
           }
           .step-row-dark .step-list li {
-            color: #e0e0e0; /* Off-white for easy reading */
+            color: #e0e0e0; 
           }
 
           .step-badge {
@@ -195,6 +196,11 @@ const HowItsWork = () => {
             transform: translateY(-10px);
           }
 
+          .force-white-heading {
+            color: #ffffff !important;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+          }
+
           /* Mobile Adjustments */
           @media (max-width: 767px) {
             .step-row-wrapper { padding: 3rem 0; }
@@ -209,7 +215,7 @@ const HowItsWork = () => {
           <BackgroundImageWithHeading
             sectionBgImages={"contact_wrapper services"}
             sectionBgHeading="We make home interiors a breeze!"
-            secBgHeadingClass="sec_bgheading_lass"
+            secBgHeadingClass="sec_bgheading_lass force-white-heading" 
             sectionBgDescription=""
             secBgDesClass={"text-center bg-transparent"}
           />
@@ -245,7 +251,11 @@ const HowItsWork = () => {
                     <div className={`col-12 col-md-6 mt-4 mt-md-0 ${isImageLeft ? 'order-2 order-md-2' : 'order-2 order-md-1'}`}>
                       <div className="step-content px-2 px-md-0">
                         <span className="step-badge">Step {step.stepNumber}</span>
-                        <h2 className="step-title">{step.title}</h2>
+                        
+                        {/* Simply use step-title. The CSS block above will force it to be white if it is inside .step-row-dark */}
+                        <h2 className="step-title">
+                          {step.title}
+                        </h2>
                         
                         <ul className="step-list">
                           {step.points.map((point, i) => (

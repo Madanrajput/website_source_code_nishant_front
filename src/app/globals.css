@@ -440,3 +440,15 @@ img, video, iframe {
     
     .font_stylish { font-size: 1.5rem !important; }
   }
+
+
+  .sec_bgheading_lass {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  }
+
+  .text-light-force {
+    color: #f8f9fa !important;
+    opacity: 0.95 !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+  }
