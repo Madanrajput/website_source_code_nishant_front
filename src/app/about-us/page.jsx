@@ -133,7 +133,7 @@ export default async function AboutUs() {
             <div className="row mx-0">
               <div className="col-lg-7 d-flex align-items-center">
                 <div>
-                  <h3>{formData?.mid_sub_title}</h3>
+                  <h3 className="text-white">{formData?.mid_sub_title}</h3>
                   <div className="team_description text-white pe-lg-5">
                     <p>
                       <span className="font_stylish text-white">

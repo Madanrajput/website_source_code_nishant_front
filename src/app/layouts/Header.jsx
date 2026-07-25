@@ -124,6 +124,8 @@ const Header = () => {
                     <li><a className="dropdown-item py-2" href="/interior-designers-in-gurgaon">Interior Designers in Gurugram</a></li>
                     <li><a className="dropdown-item py-2" href="/interior-designers-in-manesar">Interior Designers In Manesar</a></li>
                     <li><a className="dropdown-item py-2" href="/interior-designer-in-sohna-gurgaon">Interior Designers in Sohna</a></li>
+                    <li><a className="dropdown-item py-2" href="/interior-designer-in-noida-extension">Interior Designer in Noida Extension</a></li>
+
                   </ul>
                 </li>
 

@@ -28,6 +28,15 @@ const cityUrlMap = {
   "dwarka": "/interior-designers-in-dwarka",
 };
 
+// 👇 ADDED: City Banner Map for dynamic nearby cities images
+const cityBannerMap = {
+  "delhi": "/images/nearby cities/Delhi.png",
+  "faridabad": "/images/nearby cities/Faridabad.png",
+  "gurugram": "/images/nearby cities/Gurugram.png",
+  "noida": "/images/nearby cities/Noida.png",
+  "greater_noida": "/images/nearby cities/Greater Noida.png",
+};
+
 // 🌟 EXPANDED SUB-CITY LOGIC: Clean, robust list for the new sidebar widget
 const subCitiesMap = {
   "noida": [
@@ -172,15 +181,20 @@ const ServicesDetailPage = async ({ searchParams }) => {
       value: homeContent[11]?.json_content?.title,
       label: homeContent[11]?.json_content?.description
     },
+    // {
+    //   icon: <FaUsers size={40} color="#ff914d" className="mb-3" />,
+    //   value: homeContent[10]?.json_content?.title,
+    //   label: homeContent[10]?.json_content?.description
+    // },
+    // {
+    //   icon: <FaAward size={40} color="#2b2b2b" className="mb-3" />,
+    //   value: homeContent[9]?.json_content?.title,
+    //   label: homeContent[9]?.json_content?.description
+    // }
     {
-      icon: <FaUsers size={40} color="#ff914d" className="mb-3" />,
-      value: homeContent[10]?.json_content?.title,
-      label: homeContent[10]?.json_content?.description
-    },
-    {
-      icon: <FaAward size={40} color="#2b2b2b" className="mb-3" />,
-      value: homeContent[9]?.json_content?.title,
-      label: homeContent[9]?.json_content?.description
+      icon: <FaStar size={40} color="#2b2b2b" className="mb-3" />,
+      value: "4.8/5",
+      label: "Client Ratings"
     }
   ] : null;
 
@@ -334,8 +348,12 @@ const ServicesDetailPage = async ({ searchParams }) => {
         <div className="city-hero w-100">
           <Image 
             // src={pageData?.location_image || '/images/wework_bgImage.jpg'} 
-            src={getBackendImageUrl('/parent-child/wework_bgImage.94f57400.jpg')}
-            alt={`${displayCity} Interior Design`}
+            src={pageData?.banner_image ? getBackendImageUrl(pageData.banner_image) : getBackendImageUrl('/parent-child/wework_bgImage.94f57400.jpg')}
+            alt={
+              pageData?.banner_title ||
+              pageData?.main_title ||
+              `${displayCity} Interior Design`
+            }
             fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 0 }}
           />
           {/* <div className="hero-overlay"></div> */}
@@ -377,8 +395,8 @@ const ServicesDetailPage = async ({ searchParams }) => {
                       {[
                         { icon: <FaUser />, title: "Consultation & Ideation", desc: `We meet at your ${displayCity} property to understand your vision.` },
                         { icon: <FaDraftingCompass />, title: "3D Concept & Planning", desc: "Walking through your home with detailed 3D renders before we build." },
-                        { icon: <FaHardHat />, title: "Precision Execution", desc: "Expert execution with 146 quality checks and zero compromises." },
-                        { icon: <FaHome />, title: "The Grand Handover", desc: "A flawless move-in within 45 guaranteed days. Welcome home." }
+                        { icon: <FaHardHat />, title: "Precision Execution", desc: "Expert execution with 150+ quality checks and zero compromises." },
+                        { icon: <FaHome />, title: "The Grand Handover", desc: "A flawless move-in within 45 Days Delivery*. Welcome home." }
                       ].map((step, i) => (
                         <div className="process-step" key={i}>
                           <div className="process-icon">{step.icon}</div>
@@ -425,7 +443,7 @@ const ServicesDetailPage = async ({ searchParams }) => {
       {excellenceStats ? (
         /* Render the 4 columns matching the Home Page */
         excellenceStats.map((stat, idx) => (
-          <div className="col-md-3 excellence-stat" key={idx}>
+          <div className="col-md-4 excellence-stat d-flex flex-column align-items-center justify-content-center text-center" key={idx}>
             {stat.icon}
             <h3 className="font-outfit fw-bold h2 mb-1">{stat.value}</h3>
             <p className="font-poppins text-muted small fw-bold text-uppercase mb-0">{stat.label}</p>
@@ -482,7 +500,7 @@ const ServicesDetailPage = async ({ searchParams }) => {
                       <div className="col-md-6 col-lg-3">
                         <div className="modern-card">
                           <div className="modern-card-icon"><FaClock /></div>
-                          <h4 className="font-outfit fw-bold h6">45-Day Delivery</h4>
+                          <h4 className="font-outfit fw-bold h6">45-Day Delivery*</h4>
                           <p className="text-muted font-poppins small mb-0">Swift, on-time installation of storage & kitchens.</p>
                         </div>
                       </div>
@@ -513,7 +531,7 @@ const ServicesDetailPage = async ({ searchParams }) => {
                 {/* --- 7. INTERACTIVE PREMIUM FAQs --- */}
                 {faqs.length > 0 && (
                   <div className="lazy-render">
-                    <div className="premium-card border-0 px-0">
+                    <div className="premium-card border-0 px-4">
                       <h2 className="font-outfit fw-bold h3 mb-4">Insights for {displayCity}</h2>
                       <div className="accordion font-poppins" id={`accordion-faq-${pageData?.id}`}>
                         {faqs.map((faq, index) => (
@@ -593,7 +611,7 @@ const ServicesDetailPage = async ({ searchParams }) => {
           </div>
         </div>
 
-        {/* --- NEARBY MAJOR CITIES AT THE BOTTOM --- */}
+        {/* 👇 UPDATED: NEARBY MAJOR CITIES AT THE BOTTOM WITH DYNAMIC BANNERS */}
         {otherCities.length > 0 && (
           <div className="container mt-5 pt-5 border-top">
             <div className="d-flex justify-content-between align-items-end mb-4">
@@ -601,20 +619,31 @@ const ServicesDetailPage = async ({ searchParams }) => {
               <Link href="/services" className="text-decoration-none fw-bold small text-gradient">VIEW ALL CITIES <FaArrowRight /></Link>
             </div>
             <div className="row g-4 mobile-slider-wrapper">
-              {otherCities.map((cityName, idx) => (
-                <div className="col-lg-4" key={idx}>
-                  <Link href={cityUrlMap[cityName]} className="text-decoration-none">
-                    <div className="related-card bg-white position-relative shadow-sm h-100 rounded-4 overflow-hidden">
-                      <div style={{ height: "200px", position: "relative" }}>
-                        <Image src={getBackendImageUrl('/parent-child/wework_bgImage.94f57400.jpg')} alt={cityName} fill style={{ objectFit: "cover" }} loading="lazy" />
-                        <div className="position-absolute bottom-0 start-0 p-4 w-100 text-white fw-bold" style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.8))' }}>
-                          <FaMapMarkerAlt className="me-2 text-warning" /> {cityName.replace('_', ' ').toUpperCase()}
+              {otherCities.map((cityName, idx) => {
+                // 👇 Use the mapped local image or a backend fallback if not found in the mapping
+                const cityImg = cityBannerMap[cityName] || getBackendImageUrl('/parent-child/wework_bgImage.94f57400.jpg');
+
+                return (
+                  <div className="col-lg-4" key={idx}>
+                    <Link href={cityUrlMap[cityName]} className="text-decoration-none">
+                      <div className="related-card bg-white position-relative shadow-sm h-100 rounded-4 overflow-hidden">
+                        <div style={{ height: "200px", position: "relative" }}>
+                          <Image 
+                            src={cityImg} 
+                            alt={cityName} 
+                            fill 
+                            style={{ objectFit: "cover" }} 
+                            loading="lazy" 
+                          />
+                          <div className="position-absolute bottom-0 start-0 p-4 w-100 text-white fw-bold" style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.8))' }}>
+                            <FaMapMarkerAlt className="me-2 text-warning" /> {cityName.replace('_', ' ').toUpperCase()}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                </div>
-              ))}
+                    </Link>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

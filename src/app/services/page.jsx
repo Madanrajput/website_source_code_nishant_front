@@ -210,7 +210,9 @@ export default async function Services() {
           sectionBgImages={"sectionbg services"}
           sectionBgHeading="Services"
           secBgHeadingClass="sec_bgheading_lass"
-          sectionBgDescription="Explore a curated selection of premium living room interior designs and décor ideas at High Creation. We offer customizable, functional, and stylish solutions to elevate your living space. From modular TV units to wall art and innovative wall designs, find all the inspiration you need to transform your living room. Start browsing today to discover designs that perfectly reflect your personal style."
+          sectionBgDescription="Every home has potential, and we at High Creation Interior bring it to life with exceptional design—discover our range of interior services crafted for living rooms, bedrooms, kitchens, dining areas, and more, where stylish design meets everyday functionality. 
+
+"
           secBgDesClass="secbgbesclass"
         />
 

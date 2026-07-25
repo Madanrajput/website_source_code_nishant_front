@@ -171,16 +171,7 @@ export default async function ReadyToGoDesign() {
               Ready To Go Design
             </h1>
             <p className="font-poppins rtd-header-text">
-              Ready-To-Go Interior Design solutions, crafted to bring you
-              beautifully designed spaces with ease. These pre-designed setups
-              combine style and practicality, giving your home or office a
-              fresh, modern look without the stress of planning. Whether you’re
-              updating a single room or transforming an entire space, our
-              solutions are tailored to meet your needs. Each design is
-              thoughtfully created to balance aesthetics with functionality,
-              ensuring a space that’s both visually appealing and practical. Let
-              us take the hassle out of interior design so you can enjoy a
-              seamless transformation that reflects your taste and lifestyle.
+            Why wait to create your dream space? Our ready-to-go interior design solutions deliver thoughtfully crafted interiors that combine stunning aesthetics with smart functionality. Designed for effortless living, every space is ready to elevate your home with style and comfort. 
             </p>
           </div>
         </section>

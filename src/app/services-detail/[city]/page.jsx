@@ -189,7 +189,7 @@ export default async function ServicesDetail({ params }) {
                       />
                       <div className="pt-3 text-center card-body">
                         <h4 className="px-4 py-3 text-center card-title card_Services_heading">
-                          146 quality checks to give your home the best
+                          150+ quality checks to give your home the best
                         </h4>
                       </div>
                     </div>

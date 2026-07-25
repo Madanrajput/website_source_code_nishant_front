@@ -314,16 +314,7 @@ export default async function SpaceSavingFurniture() {
           <div className="text-center row mx-0 mb-3 mb-lg-5">
             <h1 className="wallpaperHeading">Space-Saving Furniture</h1>
             <p className="px-lg-5 team_designation pt-3">
-              Make the most of your home with High Creation Interior&apos;s
-              space-saving furniture. Our stylish and practical designs are
-              created to help you optimize every corner of your living space.
-              Whether you have a small apartment or want to create more room in
-              your home, our furniture combines functionality and elegance to
-              suit your needs. From multi-purpose tables to smart storage
-              solutions, each piece is thoughtfully designed to bring both
-              convenience and beauty to your space. Transform your home into a
-              more organized, comfortable, and inviting place with furniture
-              that adapts to your lifestyle and enhances your daily living.
+            Every inch matters—make it count with smart space-saving furniture by High Creation Interior. Expertly designed to maximize functionality without compromising on style, our innovative pieces create spacious, organized, and elegant interiors. From hidden storage to multifunctional designs.
             </p>
           </div>
 

@@ -95,13 +95,7 @@ export default async function Product() {
           <div className="text-center mb-5 row mx-0">
             <h1 className="wallpaperHeading">Our Product</h1>
             <p className="px-lg-5">
-              Explore a curated selection of premium living room interior designs
-              and décor ideas at High Creation. We offer customizable,
-              functional, and stylish solutions to elevate your living space.
-              From modular TV units to wall art and innovative wall designs, find
-              all the inspiration you need to transform your living room. Start
-              browsing today to discover designs that perfectly reflect your
-              personal style.
+            Beautiful to look at. Effortless to live with. Designed to last — Explore our products that are as practical as they are beautiful, designed to add style, comfort, and character to every space. From modular TV units to wall art and innovative wall designs.
             </p>
           </div>
           <div className="row g-4 mx-0">

@@ -74,7 +74,7 @@ export async function generateMetadata() {
   const defaultTitle =
     "Residential Project Interior Portfolio : High creation Interior";
   const defaultDesc =
-    "Explore High Creation Interior's stunning residential project portfolio showcasing luxurious and functional designs. Discover inspiring interiors tailored to elevate your living spaces.";
+    "Every home has a story, and we are proud to help bring it to life. Explore our portfolio of beautifully designed residential interiors, where stunning design, modern functionality, and meticulous attention to detail come together seamlessly. ";
   const defaultCanonical = "https://hcinterior.in/residential-projects";
 
   return {

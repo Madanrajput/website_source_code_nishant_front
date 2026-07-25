@@ -147,17 +147,9 @@ export default async function SustainableFurniture() {
           <div className="text-center mb-5">
             <h1 className="wallpaperHeading">Sustainable Furniture</h1>
             <p className="px-lg-5 team_description">
-              Elevate your home with High Creation Interior&apos;s sustainable
-              furniture, crafted from eco-friendly materials and designed for
-              lasting beauty. Our pieces blend timeless style with environmental
-              responsibility, making it easy to create a greener, more stylish
-              living space. From elegant tables to functional storage solutions,
-              each item is thoughtfully designed to reduce waste while enhancing
-              your home. Whether you’re refreshing a room or furnishing your
-              entire home, our furniture offers the perfect balance of
-              sustainability and sophistication. Make a positive impact on the
-              planet without compromising on style, and enjoy a space that’s as
-              kind to the earth as it is to you.
+           { `Good for your home. Better for the planet. Our sustainable furniture combines elegant design, premium craftsmanship, and eco-friendly materials. Because the best homes don't just look exceptional—they leave a lasting impact for all the right reasons.
+`}
+
             </p>
           </div>
           <div className="row g-4 mx-0">

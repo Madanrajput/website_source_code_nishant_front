@@ -49,7 +49,9 @@ const AboutUsContent = () => {
           sectionBgImages="contact_wrapper about_us_banner"
           sectionBgHeading="About Us"
           secBgHeadingClass="sec_bgheading_lass about_mob"
-          sectionBgDescription="Get A Place Designed Exactly How You Wished"
+          sectionBgDescription="400+ in-house professionals,  
+
+We have successfully completed over 2671+ projects, with many more on the horizon. "
           secBgDesClass="text-center bg-transparent text-white"
         />
         <section className="my-5 container">

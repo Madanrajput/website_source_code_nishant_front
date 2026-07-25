@@ -50,8 +50,8 @@ export default function ManageWhyChooseUs() {
       setLoading(true);
       const defaultData = [
         { title: "Lifetime Warranty¹", description: "India's only full-home coverage guarantee.", icon: "FaShieldAlt" },
-        { title: "45-day move-in guarantee²", description: "Swift, on-time installation.", icon: "FaClock" },
-        { title: "146 quality checks", description: "Rigorous quality assurance.", icon: "FaCheckCircle" },
+        { title: "45-day move-in*²", description: "Swift, on-time installation.", icon: "FaClock" },
+        { title: "150+ quality checks", description: "Rigorous quality assurance.", icon: "FaCheckCircle" },
         { title: "1,00,00+ happy homes", description: "Trusted by thousands.", icon: "FaHome" }
       ];
 

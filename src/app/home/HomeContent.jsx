@@ -103,7 +103,7 @@ export default async function HomeContent() {
   ];
 
   const activeWhyChooseUsData = Array.isArray(whyChooseUsData) && whyChooseUsData.length > 0 ? whyChooseUsData : [
-    { title: "Lifetime warranty¹", icon: "FaShieldAlt" }, { title: "45-day move-in guarantee²", icon: "FaClock" }, { title: "146 quality checks", icon: "FaCheckCircle" }
+    { title: "Lifetime warranty¹", icon: "FaShieldAlt" }, { title: "45-day move-in guarantee²", icon: "FaClock" }, { title: "150+ quality checks", icon: "FaCheckCircle" }
   ];
 
   const activeEstimateBanner = estimateBannerData || { is_active: true, heading: "Calculate the cost of your", rotating_words: "Kitchen, Wardrobe, Full Home, Living Room", description: "Get a personalized, transparent estimate for your interior project in just a few clicks. No hidden costs.", button_text: "Get Free Estimate" };

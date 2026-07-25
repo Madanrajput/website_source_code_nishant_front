@@ -103,7 +103,7 @@ style. We provide affordable interior design services in Delhi"
                     decoding="async"  loading="lazy" />
                     <div className="pt-3 text-center card-body">
                       <h4 className="px-4 py-3 text-center card-title">
-                        146 quality checks to give your home the best
+                        150+ quality checks to give your home the best
                       </h4>
                     </div>
                   </div>

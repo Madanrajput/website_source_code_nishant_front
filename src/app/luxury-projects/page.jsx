@@ -112,13 +112,9 @@ export default async function LuxuryProjects({ searchParams }) {
           <div className="text-center mb-5">
             <h1 className="wallpaperHeading">Luxury Projects</h1>
             <p className="px-lg-5 team_description">
-              Explore a curated selection of premium living room interior designs
-              and décor ideas at High Creation. We offer customizable,
-              functional, and stylish solutions to elevate your living space.
-              From modular TV units to wall art and innovative wall designs,
-              find all the inspiration you need to transform your living room.
-              Start browsing today to discover designs that perfectly reflect
-              your personal style.
+            Luxury is not just seen, it is felt and experienced—explore our collection of luxury interiors, thoughtfully designed with premium materials, bespoke details, and timeless sophistication to create homes that are truly extraordinary.
+
+
             </p>
           </div>
         </section>

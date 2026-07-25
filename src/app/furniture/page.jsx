@@ -97,16 +97,9 @@ export default async function Furniture() {
           <div className="text-center mb-5 row mx-0">
             <h1 className="wallpaperHeading">Furniture</h1>
             <p className="px-lg-5">
-              Create the perfect home with customized furniture designs that are
-              designed to your needs. We combine style, functionality, and
-              personalization to craft pieces that fit seamlessly into your
-              space. Whether you&apos;re updating a single room or redesigning
-              your entire home, our furniture is designed to enhance both form
-              and function. Each item is made with attention to detail, ensuring
-              it complements your style while making everyday life easier.
-              Discover furniture that not only looks great but works for you,
-              turning your house into a space you&apos;ll truly love to live in. Let
-              us bring your dream home to life.
+            Why settle for ordinary when your home can be one of a kind? Our customized furniture is designed around your space, your style, and your story. Thoughtfully crafted for a flawless fit, every piece transforms everyday living into a personalized experience of comfort, elegance, and functionality.  
+
+
             </p>
           </div>
           <div className="row g-4 mx-0">

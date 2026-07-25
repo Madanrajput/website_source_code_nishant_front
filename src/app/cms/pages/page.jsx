@@ -26,7 +26,10 @@ const initialFormState = {
     status: "Draft",
     faqs: [],
     accordions: [],
-    content_blocks: [] 
+    content_blocks: [],
+    banner_title: "",
+    banner_subtitle: "",
+    banner_image: ""
 };
 
 const CmsPages = () => {
@@ -242,7 +245,10 @@ const CmsPages = () => {
             status: defaultStatus,
             faqs: item.faqs || [], 
             accordions: item.accordions || [], 
-            content_blocks: item.content_blocks || []
+            content_blocks: item.content_blocks || [],
+            banner_title: item.banner_title || "",
+            banner_subtitle: item.banner_subtitle || "",
+            banner_image: item.banner_image || ""
         });
     };
 
@@ -486,6 +492,30 @@ const CmsPages = () => {
                     </div>
               
                     <div className="col-md-12 mt-4"><label className="form-label fw-bold">Main Content</label><div className="border rounded"><CKEditorComponent pageData={formData.content} setPageData={setContentData} /></div></div>
+
+                    <div className="col-md-12 mt-4">
+                        <h6 className="fw-bold text-primary border-bottom pb-2">Hero Banner</h6>
+                    </div>
+                    <div className="col-md-12">
+                        <label className="form-label fw-bold">Banner Title</label>
+                        <input type="text" className="form-control" name="banner_title" placeholder="Banner Title" value={formData.banner_title} onChange={handleInputChange} />
+                    </div>
+                    <div className="col-md-12 mt-3">
+                        <label className="form-label fw-bold">Banner Subtitle</label>
+                        <textarea className="form-control" name="banner_subtitle" placeholder="Banner Subtitle" value={formData.banner_subtitle} onChange={handleInputChange} rows="2"></textarea>
+                    </div>
+                    <div className="col-md-12 mt-3">
+                        <label className="form-label fw-bold">Banner Image URL</label>
+                        <input type="text" className="form-control" name="banner_image" placeholder="https://.../banner.jpg" value={formData.banner_image} onChange={handleInputChange} />
+                        <small className="text-muted d-block mt-1">Leave empty to keep the existing banner image.</small>
+                        <div className="mt-2">
+                            {formData.banner_image ? (
+                                <img src={formData.banner_image} alt="Banner Image Preview" height="80" decoding="async" loading="lazy" />
+                            ) : (
+                                <span className="text-muted">No banner image uploaded.</span>
+                            )}
+                        </div>
+                    </div>
                 </div>
             )}
             {activeTab === 'blocks' && renderContentBlocks()}
@@ -515,13 +545,20 @@ const CmsPages = () => {
                         ) : (
                             <div className="table-responsive">
                                 <table className="table table-hover align-middle border" style={{ width: "100%" }}>
-                                    <thead className="table-light"><tr><th>SN</th><th>Title</th><th>Author</th><th>Status</th><th>SEO Settings</th><th className="text-end">Actions</th></tr></thead>
+                                    <thead className="table-light"><tr><th>SN</th><th>Title</th><th>Author</th><th>Banner Title</th><th>Banner Subtitle</th><th>Banner Image</th><th>Status</th><th>SEO Settings</th><th className="text-end">Actions</th></tr></thead>
                                     <tbody>
                                         {pagesList.length > 0 ? pagesList.map((item, index) => (
                                             <tr key={item.id}>
                                                 <td className="fw-bold text-muted">{index + 1}</td>
                                                 <td className="fw-semibold text-dark">{item.title}</td>
                                                 <td className="text-muted">{item.writer_name || 'N/A'}</td>
+                                                <td className="text-dark">{item.banner_title || 'N/A'}</td>
+                                                <td>
+                                                    <span className="d-inline-block text-truncate" style={{ width: "200px" }}>{item.banner_subtitle || 'N/A'}</span>
+                                                </td>
+                                                <td>
+                                                    {item.banner_image ? <img src={item.banner_image} alt="Banner Image" height="80" decoding="async" loading="lazy" /> : 'N/A'}
+                                                </td>
                                                 <td>
                                                     {/* 🌟 Better Status Colors */}
                                                     <span className={`badge rounded-pill px-3 py-2 ${item.status === 'Published' ? 'bg-success' : item.status === 'Pending Approval' ? 'bg-info text-dark' : 'bg-warning text-dark'}`}>{item.status || 'Draft'}</span>
@@ -549,7 +586,7 @@ const CmsPages = () => {
                                                     )}
                                                 </td>
                                             </tr>
-                                        )) : (<tr><td colSpan="6" className="text-center py-4 text-muted">No pages found.</td></tr>)}
+                                        )) : (<tr><td colSpan="9" className="text-center py-4 text-muted">No pages found.</td></tr>)}
                                     </tbody>
                                 </table>
                             </div>

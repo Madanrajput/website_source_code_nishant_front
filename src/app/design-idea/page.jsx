@@ -105,7 +105,7 @@ export default async function DesignIdea() {
           sectionBgImages={"contact_wrapper design_gallery_banner"}
           sectionBgHeading="Design Gallery"
           secBgHeadingClass="sec_bgheading_lass"
-          sectionBgDescription="Explore our curated collection of stunning designs that reflect creativity, craftsmanship, and attention to detail. Each project tells a story — brought to life with passion and precision."
+          sectionBgDescription="Designs That Speak Before Words Do—Explore Our Most Inspiring Creations, spaces that blend beauty, functionality, and timeless design."
           secBgDesClass="secbgbesclass"
         />
 

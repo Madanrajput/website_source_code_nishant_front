@@ -73,7 +73,7 @@ export default async function TeamGallerys() {
           sectionBgImages={"sectionbg teamsImage"}
           sectionBgHeading="Teams"
           secBgHeadingClass="sec_bgheading_lass"
-          sectionBgDescription="Behind every success story is a passionate team — meet the people who bring our vision to life every day."
+          sectionBgDescription="Great design starts with great people—meet our passionate designers, planners, and innovators who turn ideas into beautiful interiors and dreams into reality. "
           secBgDesClass="secbgbesclass"
         />
 

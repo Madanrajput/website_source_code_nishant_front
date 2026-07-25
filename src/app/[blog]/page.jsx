@@ -195,7 +195,7 @@ const DynamicRootPage = async ({ params }) => {
   const homeContent = await getExcellenceData();
   const excellenceStats = homeContent ? [
     {
-      icon: <FaHome size={40} className="text-warning mb-3" />,
+      icon: <FaHome size={40} color="#ff914d" className="mb-3" />,
       value: homeContent[12]?.json_content?.title,
       label: homeContent[12]?.json_content?.description
     },
@@ -205,15 +205,20 @@ const DynamicRootPage = async ({ params }) => {
       label: homeContent[11]?.json_content?.description
     },
     {
-      icon: <FaUsers size={40} color="#ff914d" className="mb-3" />,
-      value: homeContent[10]?.json_content?.title,
-      label: homeContent[10]?.json_content?.description
-    },
-    {
-      icon: <FaAward size={40} color="#2b2b2b" className="mb-3" />,
-      value: homeContent[9]?.json_content?.title,
-      label: homeContent[9]?.json_content?.description
+      icon: <FaStar size={40} color="#2b2b2b" className="mb-3" />,
+      value: "4.8/5",
+      label: "Client Ratings"
     }
+    // {
+    //   icon: <FaUsers size={40} color="#ff914d" className="mb-3" />,
+    //   value: homeContent[10]?.json_content?.title,
+    //   label: homeContent[10]?.json_content?.description
+    // },
+    // {
+    //   icon: <FaAward size={40} color="#2b2b2b" className="mb-3" />,
+    //   value: homeContent[9]?.json_content?.title,
+    //   label: homeContent[9]?.json_content?.description
+    // }
   ] : null;
   
   let faqs = [];
@@ -255,6 +260,24 @@ const DynamicRootPage = async ({ params }) => {
   const displayCity = slug.split(/-|_/).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   const safeContent = pageData?.content ? DOMPurify.sanitize(pageData.content) : "";
 // const dynamicBgUrl = getBackendImageUrl(content?.bg_image || '/parent-child/wework_bgImage.jpg'); 
+
+let heroImageSrc = getBackendImageUrl('/parent-child/wework_bgImage.94f57400.jpg'); // Default fallback
+
+  const normalizedSlug = slug.toLowerCase();
+
+  // If a backend image exists, use it first (this allows you to easily update from backend later)
+  if (pageData?.image) {
+    heroImageSrc = getBackendImageUrl(pageData.image);
+  } 
+  // Temporary overrides for specific cities using images from the local /public folder
+  else if (normalizedSlug.includes('sohna')) {
+    // Escaping spaces in Next.js public directory paths using encodeURI (or safely rely on Next.js handling spaces)
+    heroImageSrc = '/images/Serving Area/Interior Designers in Sohna.jpg';
+  } 
+  else if (normalizedSlug.includes('noida-extension') || normalizedSlug.includes('noida_extension')) {
+    heroImageSrc = '/images/Serving Area/Interior Designer in Noida Extension.jpg';
+  }
+  // 👆 END OF BANNER DISPLAY LOGIC
 
   return (
     <MainLayout>
@@ -489,9 +512,9 @@ const DynamicRootPage = async ({ params }) => {
 {pageType === "cms-page" && (
           <>
             <div className="city-hero w-100">
-              <Image 
-                // src={pageData?.image || '/images/wework_bgImage.jpg'} 
-                src={getBackendImageUrl('/parent-child/wework_bgImage.94f57400.jpg') || ""}
+            <Image 
+                /* 👇 UPDATED TO USE THE NEW DYNAMIC IMAGE LOGIC */
+                src={heroImageSrc}
                 alt={`${displayCity} Interior Design`}
                 fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 0 }}
               />
@@ -534,23 +557,23 @@ const DynamicRootPage = async ({ params }) => {
                           {[
                             { icon: <FaUser />, title: "Consultation & Ideation", desc: `We meet at your ${displayCity} property to understand your vision.` },
                             { icon: <FaDraftingCompass />, title: "3D Concept & Planning", desc: "Walking through your home with detailed 3D renders before we build." },
-                            { icon: <FaHardHat />, title: "Precision Execution", desc: "Expert execution with 146 quality checks and zero compromises." },
-                            // { icon: <FaHome />, title: "The Grand Handover", desc: "A flawless move-in within 45 guaranteed days. Welcome home." }
-                            { 
-                              icon: <FaHome />, 
-                              title: (
-                   <>
-                                  150+ quality checks | 45 days delivery
-                                  <span 
-                                    title="Subject to change" 
-                                    style={{ cursor: 'help', color: 'var(--hc-primary)', marginLeft: '4px' }}
-                                  >
-                                    *
-                                  </span>
-                                </>
-                              ), 
-                              desc: "A flawless move-in experience guaranteed. Welcome home." 
-                            }
+                            { icon: <FaHardHat />, title: "Precision Execution", desc: "Expert execution with 150+ quality checks and zero compromises." },
+                            { icon: <FaHome />, title: "The Grand Handover", desc: "A flawless move-in within 45 Days Delivery*. Welcome home." }
+                  //           { 
+                  //             icon: <FaHome />, 
+                  //             title: (
+                  //  <>
+                  //                 150+ quality checks | 45 days delivery
+                  //                 <span 
+                  //                   title="Subject to change" 
+                  //                   style={{ cursor: 'help', color: 'var(--hc-primary)', marginLeft: '4px' }}
+                  //                 >
+                  //                   *
+                  //                 </span>
+                  //               </>
+                  //             ), 
+                  //             desc: "A flawless move-in experience guaranteed. Welcome home." 
+                  //           }
                           ].map((step, i) => (
                             <div className="process-step" key={i}>
                               <div className="process-icon">{step.icon}</div>
@@ -596,7 +619,7 @@ const DynamicRootPage = async ({ params }) => {
       {excellenceStats ? (
         /* Render 4 columns from CMS Data */
         excellenceStats.map((stat, idx) => (
-          <div className="col-md-3 excellence-stat" key={idx}>
+          <div className="col-md-4 excellence-stat d-flex flex-column align-items-center justify-content-center text-center" key={idx}>
             {stat.icon}
             <h3 className="font-outfit fw-bold h2 mb-1">{stat.value}</h3>
             <p className="font-poppins text-muted small fw-bold text-uppercase mb-0">{stat.label}</p>
@@ -650,7 +673,7 @@ const DynamicRootPage = async ({ params }) => {
                           <div className="col-md-6 col-lg-3">
                             <div className="modern-card">
                               <div className="modern-card-icon"><FaClock /></div>
-                              <h4 className="font-outfit fw-bold h6">45-Day Delivery</h4>
+                              <h4 className="font-outfit fw-bold h6">45-Day Delivery*</h4>
                               <p className="text-muted font-poppins small mb-0">Swift, on-time installation of storage & kitchens.</p>
                             </div>
                           </div>
@@ -730,28 +753,32 @@ const DynamicRootPage = async ({ params }) => {
                       </div>
                     )}
 
-                    {faqs.length > 0 && (
-                      <div className="lazy-render">
-                        <div className="premium-card border-0 px-0">
-                          <h2 className="font-outfit fw-bold h3 mb-4">Insights for {displayCity}</h2>
-                          <div className="accordion font-poppins" id={`accordion-faq-${pageData?.id}`}>
-                            {faqs.map((faq, index) => (
-                              <div className="accordion-item faq-premium-item" key={index}>
-                                <h2 className="accordion-header">
-                                  <button className={`accordion-button faq-premium-btn ${index !== 0 ? 'collapsed' : ''}`} type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${index}`}>
-                                    <span className="pe-3">{faq.question}</span>
-                                    <FaPlus className="faq-icon-toggle flex-shrink-0" />
-                                  </button>
-                                </h2>
-                                <div id={`collapse${index}`} className={`accordion-collapse collapse ${index === 0 ? 'show' : ''}`} data-bs-parent={`#accordion-faq-${pageData?.id}`}>
-                                  <div className="accordion-body faq-premium-body" style={{ whiteSpace: 'pre-line' }}>{faq.answer}</div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
+{faqs.length > 0 && (
+  <div className="lazy-render">
+    <div className="premium-card border-0">
+      <h2 className="font-outfit fw-bold h3 mb-4">Insights for {displayCity}</h2>
+      <div className="accordion font-poppins" id={`accordion-faq-${pageData?.id}`}>
+        {faqs.map((faq, index) => (
+          <div className="accordion-item faq-premium-item mb-4 shadow-sm" style={{ borderRadius: '16px', border: '1px solid #f1f5f9' }} key={index}>
+            <h2 className="accordion-header">
+              {/* ADDED px-4 HERE: This pushes the question text away from the left and right edges */}
+              <button className={`accordion-button faq-premium-btn py-4 px-4 ${index !== 0 ? 'collapsed' : ''}`} type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${index}`}>
+                <span className="pe-3" style={{ lineHeight: '1.6' }}>{faq.question}</span>
+                <FaPlus className="faq-icon-toggle flex-shrink-0" />
+              </button>
+            </h2>
+            <div id={`collapse${index}`} className={`accordion-collapse collapse ${index === 0 ? 'show' : ''}`} data-bs-parent={`#accordion-faq-${pageData?.id}`}>
+              {/* ADDED px-4 HERE: This ensures the answer text aligns perfectly with the question text above it */}
+              <div className="accordion-body faq-premium-body px-4 pb-4" style={{ whiteSpace: 'pre-line', lineHeight: '1.8' }}>
+                {faq.answer}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
 
                   </div>
                 </div>

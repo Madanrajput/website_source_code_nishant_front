@@ -362,16 +362,7 @@ export default async function Wallpaper() {
           <div className="text-center row mx-0 mb-3 mb-lg-5">
             <h1 className="wallpaperHeading">Wallpaper</h1>
             <p className="px-lg-5 team_designation">
-              Give your walls a fresh new look with our stunning wallpapers,
-              designed to bring style, texture, and personality to any room.
-              From bold patterns to subtle designs, our collection offers
-              something for every taste and decor style. Whether you want to
-              create a cozy ambiance, make a statement, or add a touch of
-              elegance, our wallpapers make it easy to transform your space.
-              Choose from a variety of colors, textures, and themes to match
-              your vision and make your home truly yours. Simple to install and
-              long-lasting, our wallpapers are the perfect way to elevate your
-              interiors effortlessly.
+            Your walls deserve more than just paint—they deserve a statement. Discover our premium wallpaper collection, where striking designs meet timeless elegance. From bold textures to refined patterns, every wallpaper is crafted to transform ordinary spaces into unforgettable interiors.
             </p>
           </div>
 
