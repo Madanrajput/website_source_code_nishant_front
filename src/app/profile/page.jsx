@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { FaUserCircle } from "react-icons/fa";
+import api from "@/utils/api";
 import AuthMainLayout from "../layouts/auth/AuthMainLayout";
 import { useHasMounted } from "../../utils/useHasMounted";
 
@@ -38,7 +39,7 @@ const Profile = () => {
         } else {
             fetchUserData();
         }
-    }, [isLoggedIn, router, hasMounted]);
+    }, [isLoggedIn, router, hasMounted, userId, accessToken]);
 
 
     const handleInputChange = (e) => {

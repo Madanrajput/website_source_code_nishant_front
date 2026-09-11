@@ -69,6 +69,24 @@ async function getSeoData() {
   }
 }
 
+async function getHeadingDescriptionData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-content/manage_heading_description`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) return null;
+
+    const record = await res.json();
+    const data = Array.isArray(record) ? record[0] : record;
+    return data?.json_content?.sections?.luxury_projects || null;
+  } catch (err) {
+    console.error("Heading/Description Fetch Error:", err);
+    return null;
+  }
+}
+
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
   const seoData = await getSeoData();
@@ -105,17 +123,39 @@ export default async function LuxuryProjects({ searchParams }) {
   const { data: projects, meta } = await getLuxuryProjects(currentPage);
   const totalPages = meta?.totalPages || 1;
 
+  const headingData = await getHeadingDescriptionData();
+
+  const HeadingTag = headingData?.headingTag || "h1";
+const headingText = headingData?.headingText || "Luxury Projects";
+const headingStyle = {
+  textShadow: "none",
+  fontFamily: "inherit",
+  ...(headingData?.headingColor && { color: headingData.headingColor }),
+};
+
+const descriptionText =
+  headingData?.descriptionText ||
+  "Luxury is not just seen, it is felt and experienced—explore our collection of luxury interiors, thoughtfully designed with premium materials, bespoke details, and timeless sophistication to create homes that are truly extraordinary."
+const descriptionStyle = {
+  ...(headingData?.descriptionColor && { color: headingData.descriptionColor }),
+};
+
   return (
     <MainLayout>
       <main>
         <section className="container my-5">
           <div className="text-center mb-5">
-            <h1 className="wallpaperHeading">Luxury Projects</h1>
-            <p className="px-lg-5 team_description">
-            Luxury is not just seen, it is felt and experienced—explore our collection of luxury interiors, thoughtfully designed with premium materials, bespoke details, and timeless sophistication to create homes that are truly extraordinary.
-
-
-            </p>
+            <HeadingTag id="luxury-projects-heading" className="wallpaperHeading" style={headingStyle}>
+  {headingText}
+</HeadingTag>
+<p id="luxury-projects-description" className="px-lg-5 fs-6 text-muted" style={descriptionStyle}>
+  {descriptionText}
+</p>
+<style>{`
+  ${headingData?.headingColor ? `#luxury-projects-heading { color: ${headingData.headingColor} !important; }` : ""}
+  ${headingData?.descriptionColor ? `#luxury-projects-description { color: ${headingData.descriptionColor} !important; }` : ""}
+  ${headingData?.descriptionFontSize ? `#luxury-projects-description { font-size: ${headingData.descriptionFontSize}px !important; }` : ""}
+`}</style>
           </div>
         </section>
 
@@ -133,7 +173,7 @@ export default async function LuxuryProjects({ searchParams }) {
                       resiImgClass={"resi_img"}
                       residentialTitle={project.title}
                       residentialTitleClass="product_heading"
-                      residentialDescriptiion={project.description}
+                      // residentialDescriptiion={project.description}
                       residentialClassCss="team_designation mb-0"
                       residentialButton="View More"
                       residentialButtonUrl={`/luxury-projects/project-gallery?id=${project.id}`}

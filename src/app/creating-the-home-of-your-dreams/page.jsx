@@ -1,4 +1,5 @@
 "use client";
+import MainLayout from "../layouts/MainLayout";
 import BgImageCard from "../components/BgImageCard";
 import RowImage from "../components/RowImage";
 import { IoIosShareAlt } from "react-icons/io";
@@ -244,6 +245,7 @@ const HCLandingPage = () => {
   }, []);
 
   return (
+    <MainLayout>
     <div>
       <style dangerouslySetInnerHTML={{__html: `
         .text-orange-force { color: #ff914d !important; }
@@ -267,7 +269,7 @@ const HCLandingPage = () => {
           margin-bottom: 1rem !important;
         }
         
-        .team_description, .about_wrapper p {
+        .hc_landing_desc, .about_wrapper p {
           font-family: var(--font-poppins), sans-serif !important;
           font-size: 1.05rem !important;
           line-height: 1.65 !important;
@@ -280,13 +282,13 @@ const HCLandingPage = () => {
           display: block;
         }
       `}} />
-      <head>
+      {/* <head>
         <title>
         Creating the home of your dreams. - High Creation Interior
         </title>
-      </head>
+      </head> */}
       <div className={isModalOpen ? "blur-bg" : ""}>
-        <header className="container-fluid px-lg-5 px-3">
+        {/* <header className="container-fluid px-lg-5 px-3">
           <nav className="navbar navbar-expand-lg p-0">
             <div className="container-fluid">
               <a className="navbar-brand ms-lg-5" href="/" aria-label="Home">
@@ -334,7 +336,7 @@ const HCLandingPage = () => {
               </div>
             </div>
           </nav>
-        </header>
+        </header> */}
         <main className="mt-0 pt-0">
         <section
           className="contact_wrapper hc_landing_ban1 position-relative"
@@ -464,7 +466,7 @@ const HCLandingPage = () => {
               titleHeading=  {data2?.top_title}
               subHeading= {data2?.top_description}
               subHeadingClass="our_experts_text_land pt-3"
-              desClass="team_description"
+              desClass="team_description hc_landing_desc"
               description= {data2?.mid_sub_title}
               textAboutBtn="READ MORE"
               btnLink={data2?.mid_sub_description}
@@ -479,7 +481,7 @@ const HCLandingPage = () => {
                   <h3 className="font_about text-left pb-2">
                   {data3?.top_title}
                   </h3>
-                  <p className="team_description pb-4 px-3 px-lg-5 text-start">
+                  <p className="team_description hc_landing_desc pb-4 px-3 px-lg-5 text-start">
                   {data3?.top_description}
                   </p>
                 </center>
@@ -504,7 +506,7 @@ const HCLandingPage = () => {
               <div className="row position-relative mx-0">
                 <center>
                   <h3 className="pb-3 font_about">{data4?.top_title}   </h3>
-                  <p className="team_description px-3 px-lg-5 pb-2 text-start">
+                  <p className="team_description hc_landing_desc px-3 px-lg-5 pb-2 text-start">
                   {data4?.top_description}
                   </p>
                   <div className="my-2">
@@ -601,8 +603,7 @@ const HCLandingPage = () => {
               </div>
             </div>
           </section>
-          <footer>
-            <div className="footer_top py-5">
+          <div className="footer_top py-5">
               <div className="container">
                 <div className="text-center py-3">
                   <p style={{
@@ -645,125 +646,6 @@ const HCLandingPage = () => {
               </div>
             </div>
             <hr />
-            <div className="pt-5 pb-2 mx-0 row justify-content-center">
-              <div className="col-lg-10">
-                <div className="row justify-content-lg-center g-4 mx-0">
-                  <div className="col-lg-3 ps-lg-5 col-md-4 col-12">
-                    <div>
-                      <a href="/" aria-label="Home">
-                        {" "}
-                        <img
-                          src="/images/new_hc_logo.png"
-                          alt="hero image"
-                          className=""
-                          width={150}
-                          height={150}
-                        decoding="async"  loading="lazy" />
-                      </a>
-                    </div>
-
-                    <div>
-                      <h6 className="pt-3">FOR QUERY</h6>
-                      <p className="mb-0">
-                        <a
-                          href="callto:+19810506301"
-                          className="footer_land text-black"
-                        >
-                          +91 9810506301
-                        </a>
-                      </p>
-                      <a
-                        href="callto:9810503881"
-                        className="footer_land text-black"
-                      >
-                        +91 9810503881
-                      </a>
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-2 col-12">
-                    <h4 className="footer_heading">Our Expertise</h4>
-                    <ul className="list-unstyled ps-0">
-                      <li className="footer_land">
-                        <a href="" className="text-black">
-                          Home Interior Designs
-                        </a>
-                      </li>
-                      <li className="footer_land">
-                        <a href="" className="text-black">
-                          Corporate Interior Design
-                        </a>
-                      </li>
-                      <li className="footer_land">
-                        <a href="" className="text-black">
-                          All Interior Designs
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="col-lg-4 ps-lg-0 col-md-6 col-12">
-                    <h4 className="footer_heading">Branch Office</h4>
-                    <ul className="list-unstyled">
-                      <li className="footer_land pb-2">
-                        <a
-                          href="https://maps.app.goo.gl/6oJ1uEQqPAbde7Ke6"
-                          className="text-black"
-                        >
-                          NOIDA – H101, LGF, Sector-63, Noida, Uttar Pradesh-
-                          201301
-                        </a>
-                      </li>
-                      <li className="footer_land pb-2">
-                        <a
-                          href="/https://maps.app.goo.gl/xkxyztKSbkCcMs8c9/"
-                          className="text-black"
-                        >
-                          NOIDA – H56 , 1st Floor, Sector-63, Noida, Uttar
-                          Pradesh- 201301
-                        </a>
-                      </li>
-                      <li className="footer_land pb-2">
-                        <a
-                          href="/https://maps.app.goo.gl/fgvUV2sVYxd3uPct9/"
-                          className="text-black"
-                        >
-                          Our Factory – Plot no 3 , Sorkha Village, SEC – 115,
-                          Noida
-                        </a>
-                      </li>
-                      <li className="footer_land pb-2">
-                        <a
-                          href="/https://maps.app.goo.gl/FuyE6B2jZS1qXQuR6/"
-                          className="text-black"
-                        >
-                          Jmd Galleria Mall, Badshahpur Sohna Rd Hwy, Sector 47,
-                          Sector 48, Gurugram, Haryana 122001
-                        </a>
-                      </li>
-                      <ul>
-                        <li className="footer_land">
-                          Phone:{" "}
-                          <a href="callto:+19810506301" className="text-black">
-                            +91 9810503881
-                          </a>{" "}
-                        </li>
-                        <li className="footer_land">
-                          Email:
-                          <a
-                            href="mailto:Info@hcinterior.in"
-                            className="text-black"
-                          >
-                            {" "}
-                            Info@hcinterior.in
-                          </a>
-                        </li>
-                      </ul>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </footer>
           
           {/* Refactored Sticky Sidebar using writing-mode for clean vertical layout */}
           <div className="position-fixed d-flex flex-column align-items-end" style={{ top: '50%', right: '0', zIndex: 9999, transform: 'translateY(-50%)', gap: '12px' }}>
@@ -784,15 +666,15 @@ const HCLandingPage = () => {
             }}>
               Enquiry Now
             </a>
-            <a href="https://wa.me/919560277787" className="shadow rounded-circle d-flex align-items-center justify-content-center bg-white" style={{ width: '44px', height: '44px', marginRight: '4px', transition: 'transform 0.3s' }}>
+            {/* <a href="https://wa.me/919560277787" className="shadow rounded-circle d-flex align-items-center justify-content-center bg-white" style={{ width: '44px', height: '44px', marginRight: '4px', transition: 'transform 0.3s' }}>
               <img src="/images/whatsapp.svg" width={28} alt="WhatsApp" decoding="async" loading="lazy" />
-            </a>
+            </a> */}
           </div>
-          
         </main>
         <ContactUsPopUp onModalStateChange={handleModalStateChange} />
       </div>
     </div>
+    </MainLayout>
   );
 };
 

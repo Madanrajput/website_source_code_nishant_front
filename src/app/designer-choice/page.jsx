@@ -232,6 +232,24 @@ async function getSeoData() {
   }
 }
 
+async function getHeadingDescriptionData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-content/manage_heading_description`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) return null;
+
+    const record = await res.json();
+    const data = Array.isArray(record) ? record[0] : record;
+    return data?.json_content?.sections?.designer_choice || null;
+  } catch (err) {
+    console.error("Heading/Description Fetch Error:", err);
+    return null;
+  }
+}
+
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
   const seoData = await getSeoData();
@@ -271,15 +289,39 @@ export default async function DesignerChoice() {
   // These are displayed in the list below the grid
   const latestRecords = sortedDesignIdea.slice(0, -5);
 
+  const headingData = await getHeadingDescriptionData();
+
+const HeadingTag = headingData?.headingTag || "h1";
+const headingText = headingData?.headingText || "Designer Choice";
+const headingStyle = {
+  textShadow: "none",
+  fontFamily: "inherit",
+  ...(headingData?.headingColor && { color: headingData.headingColor }),
+};
+
+const descriptionText =
+  headingData?.descriptionText ||
+  "Explore our curated selection of stunning interior designs, blending luxury, functionality, and innovation. From modern minimalism to timeless elegance, each space is crafted to inspire. Discover bespoke designs, premium materials, and expert craftsmanship that transform homes into masterpieces. Elevate your interiors with our exclusive designer choices."
+const descriptionStyle = {
+  ...(headingData?.descriptionColor && { color: headingData.descriptionColor }),
+};
+
   return (
     <MainLayout>
       <main>
         <div className="container">
           <div className="text-center mt-3 mx-0 row">
-            <h1 className="wallpaperHeading">Designer Choice</h1>
-            <p className="px-lg-5 team_description">
-              Explore our curated selection of stunning interior designs, blending luxury, functionality, and innovation. From modern minimalism to timeless elegance, each space is crafted to inspire. Discover bespoke designs, premium materials, and expert craftsmanship that transform homes into masterpieces. Elevate your interiors with our exclusive designer choices.
-            </p>
+            <HeadingTag id="designer-choice-heading" className="wallpaperHeading" style={headingStyle}>
+  {headingText}
+</HeadingTag>
+            <p id="designer-choice-description" className="px-lg-5 fs-6 text-muted" style={descriptionStyle}>
+  {descriptionText}
+</p>
+<style>{`
+  ${headingData?.headingColor ? `#designer-choice-heading { color: ${headingData.headingColor} !important; }` : ""}
+  ${headingData?.descriptionColor ? `#designer-choice-description { color: ${headingData.descriptionColor} !important; }` : ""}
+  ${headingData?.descriptionFontSize ? `#designer-choice-description { font-size: ${headingData.descriptionFontSize}px !important; }` : ""}
+`}</style>
           </div>
         </div>
 

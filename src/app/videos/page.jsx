@@ -6,7 +6,7 @@ const Videos = () => {
         <main>
           <section className="container my-5">
             <div className="text-center mb-5">
-              <h1 className="wallpaperHeading">Videos</h1>
+              <h1 className="wallpaperHeading" style = {{"text-shadow" : "none"}}>Videos</h1>
               <p className="px-lg-5 team_description">
                 Explore a curated selection of premium living room interior
                 designs and décor ideas at High Creation. We offer customizable,

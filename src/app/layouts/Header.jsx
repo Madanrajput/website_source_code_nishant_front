@@ -2,10 +2,45 @@
 import { useState, useEffect, useRef } from "react";
 import { IoIosCall } from "react-icons/io";
 import Image from "next/image";
+import api from "@/utils/api";
+
+const DEFAULT_SERVING_AREAS = [
+  { label: "Interior Designers In Noida", href: "/interior-designers-in-noida" },
+  { label: "Interior Designers in Ghaziabad", href: "/interior-designers-in-ghaziabad" },
+  { label: "Interior Designers in Greater Noida", href: "/interior-designers-in-greater-noida" },
+  { label: "Interior Designers in Delhi", href: "/interior-designers-in-delhi" },
+  { label: "Interior Designers in Dwarka", href: "/interior-designers-in-dwarka" },
+  { label: "Interior Designers in Faridabad", href: "/interior-designers-in-faridabad" },
+  { label: "Interior Designers in Gurugram", href: "/interior-designers-in-gurgaon" },
+  { label: "Interior Designers In Manesar", href: "/interior-designers-in-manesar" },
+  { label: "Interior Designers in Sohna", href: "/interior-designer-in-sohna-gurgaon" },
+  { label: "Interior Designer in Noida Extension", href: "/interior-designer-in-noida-extension" }
+];
 
 const Header = () => {
+  
+  useEffect(() => {
+    const fetchServingAreas = async () => {
+      try {
+        const res = await api.get("/cms-content/navbar_serving_area");
+        if (res.data) {
+          const record = Array.isArray(res.data) ? res.data[0] : res.data;
+          const items = record?.json_content?.items;
+          if (items && items.length > 0) {
+            setServingAreas(items);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load CMS serving area navigation:", err);
+      }
+    };
+
+    fetchServingAreas();
+  }, []);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [servingAreas, setServingAreas] = useState(DEFAULT_SERVING_AREAS);
   const navRef = useRef(null);
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
@@ -94,6 +129,7 @@ const Header = () => {
                   
                     <li><a className="dropdown-item py-2" href="/experience-center-faridabad/">Experience Center Faridabad</a></li>
                     <li><a className="dropdown-item py-2" href="/experience-center-noida-extension/">Experience Center Noida Extension</a></li>
+                    <li><a className="dropdown-item py-2" href="/experience-center-new-delhi/">Experience Center New Delhi</a></li>
                   </ul>
                 </li>
 
@@ -110,7 +146,7 @@ const Header = () => {
                   </ul>
                 </li>
 
-                <li className={`nav-item dropdown ${activeDropdown === 'services' ? 'show' : ''}`}>
+                {/* <li className={`nav-item dropdown ${activeDropdown === 'services' ? 'show' : ''}`}>
                   <a className="nav-link dropdown-toggle text-dark" href="#" onClick={(e) => handleDropdown(e, 'services')} aria-expanded={activeDropdown === 'services'}>
                     Serving Area
                   </a>
@@ -127,7 +163,22 @@ const Header = () => {
                     <li><a className="dropdown-item py-2" href="/interior-designer-in-noida-extension">Interior Designer in Noida Extension</a></li>
 
                   </ul>
-                </li>
+                </li> */}
+
+                <li className={`nav-item dropdown ${activeDropdown === 'services' ? 'show' : ''}`}>
+  <a className="nav-link dropdown-toggle text-dark" href="#" onClick={(e) => handleDropdown(e, 'services')} aria-expanded={activeDropdown === 'services'}>
+    Serving Areas
+  </a>
+  <ul className={`dropdown-menu border-0 shadow-sm ${activeDropdown === 'services' ? 'show' : ''}`}>
+    {servingAreas.map((item, index) => (
+      <li key={index}>
+        <a className="dropdown-item py-2" href={item.href}>
+          {item.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</li>
 
                 <li className={`nav-item dropdown ${activeDropdown === 'more' ? 'show' : ''}`}>
                   <a className="nav-link dropdown-toggle text-dark" href="#" onClick={(e) => handleDropdown(e, 'more')} aria-expanded={activeDropdown === 'more'}>
@@ -136,7 +187,7 @@ const Header = () => {
                   <ul className={`dropdown-menu dropdown-menu-end shadow-sm border-0 ${activeDropdown === 'more' ? 'show' : ''}`} style={{ minWidth: '180px' }}>
                     <li><a className="dropdown-item py-2" href="/about-us/">About Us</a></li>
                     <li><a className="dropdown-item py-2" href="/how-its-works/">How It Works</a></li>
-                    <li><a className="dropdown-item py-2" href="/services/">Services</a></li>
+                    <li><a className="dropdown-item py-2" href="/services/">Serving Areas</a></li>
                     <li><a className="dropdown-item py-2" href="/team/">Team</a></li>
                     <li><a className="dropdown-item py-2" href="/contact/">Contact Us</a></li>
                     <li><a className="dropdown-item py-2" href="/blog/">Blogs</a></li>

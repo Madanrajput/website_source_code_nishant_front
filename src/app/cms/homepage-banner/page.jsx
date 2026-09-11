@@ -56,11 +56,13 @@ const CmsHomepageBanner = () => {
         Object.keys(formData).forEach(key => {
             if (formData[key] !== null) formDataToSend.append(key, formData[key]);
         });
-
-        try {
-            const response = await api.patch(`/cms-content/update-json-homepage-banner/${selectedId}`, formDataToSend, {
-                headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${authToken}` },
-            });
+    try {
+        // Fallback to 0 or 1 so ParseIntPipe doesn't fail on a clean start
+        const targetId = selectedId || 0; 
+        
+        const response = await api.patch(`/cms-content/update-json-homepage-banner/${targetId}`, formDataToSend, {
+            headers: { Authorization: `Bearer ${authToken}` }, // Removed strict multipart boundary!
+        });
             if (response.status === 200) {
                 fetchContentManagerPages();
                 toast.success(formData.action === 'add' ? "Banner added." : "Banner updated.");

@@ -59,6 +59,25 @@ async function getSeoData() {
   }
 }
 
+// --- HELPER: Fetch Banner Data ---
+async function getBannerData() {
+  try {
+    const baseURL = getBaseUrl();
+    console.log("BANNER FETCH URL:", `${baseURL}/cms-gallery-design/manage-banner`);
+    const res = await fetch(`${baseURL}/cms-gallery-design/manage-banner?key=design_idea`, {
+      cache: "no-store",
+      headers: { Connection: "close" },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    console.log("BANNER DATA RECEIVED:", data);
+    return data;
+  } catch (err) {
+    console.error("Banner Fetch Error:", err);
+    return null;
+  }
+}
+
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
   const seoData = await getSeoData();
@@ -85,6 +104,9 @@ export async function generateMetadata() {
 // --- MAIN SERVER COMPONENT ---
 export default async function DesignIdea() {
   const designIdea = await getDesignIdeas();
+  const bannerRecord = await getBannerData();
+const bgHeading = bannerRecord?.banner_heading || "Design Gallery";
+const bgDescription = bannerRecord?.banner_description || "Designs That Speak Before Words Do—Explore Our Most Inspiring Creations, spaces that blend beauty, functionality, and timeless design.";
 
   // --- LOGIC: Sort and Split Records ---
   // 1. Sort records by ID in descending order (newest first)
@@ -103,10 +125,15 @@ export default async function DesignIdea() {
       <main>
         <BackgroundImageRow
           sectionBgImages={"contact_wrapper design_gallery_banner"}
-          sectionBgHeading="Design Gallery"
+          sectionBgHeading={bgHeading}
           secBgHeadingClass="sec_bgheading_lass"
-          sectionBgDescription="Designs That Speak Before Words Do—Explore Our Most Inspiring Creations, spaces that blend beauty, functionality, and timeless design."
+          sectionBgDescription={bgDescription}
           secBgDesClass="secbgbesclass"
+          bgImageUrl={bannerRecord?.banner_image}
+headingTag={bannerRecord?.banner_heading_tag || "h1"}
+descriptionFontSize={bannerRecord?.banner_description_font_size || 16}
+sectionBgHeadingStyle={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
+  sectionBgDescriptionStyle={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
         />
 
         <section className="container my-5">

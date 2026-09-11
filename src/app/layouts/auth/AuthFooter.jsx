@@ -228,3 +228,5 @@ const AuthFooter = () => {
 };
 
 export default AuthFooter;
+
+

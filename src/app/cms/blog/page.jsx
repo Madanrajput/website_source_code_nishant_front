@@ -75,24 +75,7 @@ const CmsBlog = () => {
         fetchContentManagerPages();
     }, [fetchContentManagerPages]);
 
-    // --- NEW: Unified Autosave Debouncer (Works for New & Existing Blogs) ---
-    useEffect(() => {
-        if (skipNextAutosave.current) {
-            skipNextAutosave.current = false;
-            return;
-        }
-
-        // Don't spam empty autosaves if the user hasn't typed anything yet
-        if (!formData.title && !formData.description) return;
-
-        const timer = setTimeout(() => {
-            performAutosave();
-        }, 3000); // Wait 3 seconds after user stops typing
-
-        return () => clearTimeout(timer);
-    }, [formData.title, formData.description, formData.writer_name, formData.status, formData.image_alt, formData.published_on]);
-
-    const performAutosave = async () => {
+    const performAutosave = useCallback(async () => {
         setIsAutosaving(true);
         const formDataToSend = new FormData();
         
@@ -129,7 +112,24 @@ const CmsBlog = () => {
         } finally {
             setIsAutosaving(false);
         }
-    };
+    }, [authToken, selectedId, formData.title, formData.description, formData.writer_name, formData.status, formData.image_alt, formData.published_on, fetchContentManagerPages]);
+
+    // --- NEW: Unified Autosave Debouncer (Works for New & Existing Blogs) ---
+    useEffect(() => {
+        if (skipNextAutosave.current) {
+            skipNextAutosave.current = false;
+            return;
+        }
+
+        // Don't spam empty autosaves if the user hasn't typed anything yet
+        if (!formData.title && !formData.description) return;
+
+        const timer = setTimeout(() => {
+            performAutosave();
+        }, 3000); // Wait 3 seconds after user stops typing
+
+        return () => clearTimeout(timer);
+    }, [formData.title, formData.description, formData.writer_name, formData.status, formData.image_alt, formData.published_on, performAutosave]);
 
     const handleInputChange = (e) => {
         const { name, value, files } = e.target;

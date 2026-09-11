@@ -59,6 +59,21 @@ async function getSeoData() {
   }
 }
 
+async function getBannerData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-gallery-design/manage-banner?key=privacy_policy`, {
+      cache: "no-store",
+      headers: { Connection: "close" },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.error("Banner Fetch Error:", err);
+    return null;
+  }
+}
+
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
   const seoData = await getSeoData();
@@ -87,15 +102,32 @@ export async function generateMetadata() {
 export default async function Privacy() {
   const pageData = await getPrivacyPolicyContent();
 
+  const bannerRecord = await getBannerData();
+  const bgHeading = bannerRecord?.banner_heading || "Privacy Policy";
+const bgDescription = bannerRecord?.banner_description || "Get all the information you need";
+
   return (
     <MainLayout>
-      <BackgroundImageWithHeading
+      {/* <BackgroundImageWithHeading
         sectionBgImages={"contact_wrapper privacy_policy_banner"}
         sectionBgHeading="Privacy Policy"
         secBgHeadingClass="sec_bgheading_lass"
         sectionBgDescription="Get all the information you need"
         secBgDesClass={"text-center text-white"}
-      />
+      /> */}
+
+      <BackgroundImageWithHeading
+  sectionBgImages={"contact_wrapper privacy_policy_banner"}
+  sectionBgHeading={bgHeading}
+  secBgHeadingClass="sec_bgheading_lass force-white-heading"
+  sectionBgDescription={bgDescription}
+  secBgDesClass={"text-center bg-transparent text-white"}
+  bgImageUrl={bannerRecord?.banner_image}
+  headingTag={bannerRecord?.banner_heading_tag || "h1"}
+  descriptionFontSize={bannerRecord?.banner_description_font_size || 16}
+  sectionBgHeadingStyle={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
+  sectionBgDescriptionStyle={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
+/>
       <main>
         <section className="privacy my-5">
           <div className="container">

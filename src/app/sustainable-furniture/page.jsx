@@ -113,6 +113,23 @@ async function getSeoData() {
   }
 }
 
+async function getHeadingDescriptionData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-content/manage_heading_description`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) return null;
+
+    const record = await res.json();
+    const data = Array.isArray(record) ? record[0] : record;
+    return data?.json_content?.sections?.sustainable_furniture || null;
+  } catch (err) {
+    console.error("Heading/Description Fetch Error:", err);
+    return null;
+  }
+}
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
   const seoData = await getSeoData();
@@ -140,17 +157,39 @@ export async function generateMetadata() {
 
 // --- MAIN SERVER COMPONENT ---
 export default async function SustainableFurniture() {
+    const headingData = await getHeadingDescriptionData();
+
+  const HeadingTag = headingData?.headingTag || "h1";
+  const headingText = headingData?.headingText || "Sustainable Furniture";
+  const headingStyle = {
+    ...(headingData?.headingColor && { color: headingData.headingColor }),
+  };
+
+  const descriptionText =
+    headingData?.descriptionText ||
+    "Good for your home. Better for the planet. Our sustainable furniture combines elegant design, premium craftsmanship, and eco-friendly materials. Because the best homes don't just look exceptional—they leave a lasting impact for all the right reasons.";
+  const descriptionStyle = {
+    ...(headingData?.descriptionColor && { color: headingData.descriptionColor }),
+    ...(headingData?.descriptionFontSize && { fontSize: `${headingData.descriptionFontSize}px` }),
+  };
+
   return (
     <MainLayout>
       <main>
         <section className="container my-5 rattan_wrapper">
           <div className="text-center mb-5">
-            <h1 className="wallpaperHeading">Sustainable Furniture</h1>
-            <p className="px-lg-5 team_description">
-           { `Good for your home. Better for the planet. Our sustainable furniture combines elegant design, premium craftsmanship, and eco-friendly materials. Because the best homes don't just look exceptional—they leave a lasting impact for all the right reasons.
-`}
-
-            </p>
+            <HeadingTag id="sustainable-furniture-heading" className="wallpaperHeading" style={headingStyle}>
+  {headingText}
+</HeadingTag>
+<p id="sustainable-furniture-description" className="px-lg-5 team_description" style={descriptionStyle}>
+  {descriptionText}
+</p>
+<style>{`
+  #sustainable-furniture-heading { text-shadow: none !important; }
+  ${headingData?.headingColor ? `#sustainable-furniture-heading { color: ${headingData.headingColor} !important; }` : ""}
+  ${headingData?.descriptionColor ? `#sustainable-furniture-description { color: ${headingData.descriptionColor} !important; }` : ""}
+  ${headingData?.descriptionFontSize ? `#sustainable-furniture-description { font-size: ${headingData.descriptionFontSize}px !important; }` : ""}
+`}</style>
           </div>
           <div className="row g-4 mx-0">
             <div className="col-lg-6 col-md-6 col-12">

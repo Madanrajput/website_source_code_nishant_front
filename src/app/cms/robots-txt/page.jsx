@@ -5,13 +5,7 @@ import { FaSave, FaCheckCircle, FaExclamationTriangle, FaRobot } from "react-ico
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9999";
 
-export default function RobotsTxtManager() {
-  const [content, setContent] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState({ text: "", type: "" });
-
-  const defaultRobots = `User-agent: *
+const DEFAULT_ROBOTS = `User-agent: *
 Disallow: /dashboard
 Disallow: /login
 Disallow: .staging.
@@ -21,19 +15,25 @@ Disallow:/cancelletion-policy
 Allow: /
 Sitemap: https://hcinterior.in/sitemap.xml`;
 
+export default function RobotsTxtManager() {
+  const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState({ text: "", type: "" });
+
   useEffect(() => {
     const fetchRobots = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/robots-txt`);
         if (res.ok) {
           const data = await res.json();
-          setContent(data.content || defaultRobots);
+          setContent(data.content || DEFAULT_ROBOTS);
         } else {
-          setContent(defaultRobots);
+          setContent(DEFAULT_ROBOTS);
         }
       } catch (error) {
         console.error("Failed to fetch robots.txt", error);
-        setContent(defaultRobots);
+        setContent(DEFAULT_ROBOTS);
       } finally {
         setIsLoading(false);
       }

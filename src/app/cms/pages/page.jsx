@@ -63,6 +63,7 @@ const CmsPages = () => {
     });
     
     const [selectedId, setSelectedId] = useState(null);
+    const [uploadingBanner, setUploadingBanner] = useState(false); // 🆕 isolated to banner image upload
 
     const fetchPages = useCallback(async () => {
         setLoading(true);
@@ -93,6 +94,30 @@ const CmsPages = () => {
     };
 
     const setContentData = (data) => setFormData((prev) => ({ ...prev, content: data }));
+    const handleBannerImageChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const token = authToken || localStorage.getItem("token");
+    const uploadData = new FormData();
+    uploadData.append('banner_image', file);
+
+    setUploadingBanner(true);
+    try {
+        const response = await api.post('/cms-pages/upload-banner-image', uploadData, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data?.url) {
+            setFormData((prev) => ({ ...prev, banner_image: response.data.url }));
+            toast.success("Banner image uploaded.");
+        }
+    } catch (error) {
+        toast.error(error.response?.data?.message || "Failed to upload banner image.");
+    } finally {
+        setUploadingBanner(false);
+        e.target.value = ""; // allow re-selecting the same file later
+    }
+};
 
     // --- Standard Blocks (FAQs, Accordions) ---
     const handleAddStandardBlock = (type) => {
@@ -504,7 +529,7 @@ const CmsPages = () => {
                         <label className="form-label fw-bold">Banner Subtitle</label>
                         <textarea className="form-control" name="banner_subtitle" placeholder="Banner Subtitle" value={formData.banner_subtitle} onChange={handleInputChange} rows="2"></textarea>
                     </div>
-                    <div className="col-md-12 mt-3">
+                    {/* <div className="col-md-12 mt-3">
                         <label className="form-label fw-bold">Banner Image URL</label>
                         <input type="text" className="form-control" name="banner_image" placeholder="https://.../banner.jpg" value={formData.banner_image} onChange={handleInputChange} />
                         <small className="text-muted d-block mt-1">Leave empty to keep the existing banner image.</small>
@@ -515,7 +540,27 @@ const CmsPages = () => {
                                 <span className="text-muted">No banner image uploaded.</span>
                             )}
                         </div>
-                    </div>
+                    </div> */}
+                    <div className="col-md-12 mt-3">
+    <label className="form-label fw-bold">Banner Image</label>
+    <input
+        type="file"
+        accept="image/*"
+        className="form-control"
+        onChange={handleBannerImageChange}
+        disabled={uploadingBanner}
+    />
+    <small className="text-muted d-block mt-1">
+        {uploadingBanner ? "Uploading..." : "Choose a new image to replace the existing banner. Leave untouched to keep the current one."}
+    </small>
+    <div className="mt-2">
+        {formData.banner_image ? (
+            <img src={formData.banner_image} alt="Banner Image Preview" height="80" decoding="async" loading="lazy" />
+        ) : (
+            <span className="text-muted">No banner image uploaded.</span>
+        )}
+    </div>
+</div>
                 </div>
             )}
             {activeTab === 'blocks' && renderContentBlocks()}

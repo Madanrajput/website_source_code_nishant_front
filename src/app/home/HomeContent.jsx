@@ -1,7 +1,4 @@
-// src/app/home/HomeContent.jsx
 import dynamic from "next/dynamic";
-import Image from "next/image";
-import { MdKeyboardArrowRight } from "react-icons/md";
 import { 
   FaShieldAlt, FaClock, FaCheckCircle, FaHome, 
   FaMapMarkerAlt, FaGem, FaUser, FaTools, 
@@ -48,20 +45,70 @@ async function getRemainingData() {
   };
 
   try {
-    const [designIdea, h3d_gallery, contentData, blogsData, whyChooseUsRaw,estimateBannerRaw , estimateCardsRaw] = await Promise.all([
+    const [designIdea, h3d_gallery, contentData, blogsData, whyChooseUsRaw,estimateBannerRaw , estimateCardsRaw , theWayWeWorkRaw, whatWeOfferRaw, headingManagementRaw] = await Promise.all([
       fetchData("/cms-parent-child/designer_choice"),
       fetchData("/cms-parent-child/h3d_gallery"),
       fetchData("/cms-content/home_page_content_what_we_are"),
+     
       fetchData("/cms-blog"),
       fetchData("/cms-content/home_page_content_why_choose_us"),
       fetchData("/cms-content/home_page_estimate_banner"),
-      fetchData("/cms-content/home_page_estimate_cards") 
+      fetchData("/cms-content/home_page_estimate_cards") ,
+       fetchData("/cms-content/home_page_content_the_way_we_work"),
+       fetchData("/cms-content/what_we_offer"),
+       fetchData("/cms-content/home_page_heading_management")
     ]);
-    
-    let whyChooseUsData = [];
+
+    let whatWeOfferData = null;
+    if (whatWeOfferRaw) {
+      const record = Array.isArray(whatWeOfferRaw) ? whatWeOfferRaw[0] : whatWeOfferRaw;
+      const json = record?.json_content || {};
+      whatWeOfferData = {
+        heading: json.heading || "What We Offer",
+        headingColor: json.headingColor || "#23236b",
+        // 🌟 NEW: eyebrow span above the heading, previously hardcoded as a
+        // literal "Explore" string in JSX below with no CMS backing at all.
+        spanText: json.spanText || "Explore",
+        spanColor: json.spanColor || "#ff914d",
+        bg_image: json.bg_image || json.image || record?.image || "",
+        bgSize: json.bgSize || "cover",
+        cards: Array.isArray(json.cards) ? json.cards : [],
+      };
+    }
+
+let theWayWeWorkData = {
+  heading: "The Way We Work",
+  bg_image: "",
+  cards: [],
+};
+
+if (theWayWeWorkRaw) {
+  const record = Array.isArray(theWayWeWorkRaw) ? theWayWeWorkRaw[0] : theWayWeWorkRaw;
+  const json = record?.json_content || {};
+
+  theWayWeWorkData = {
+    heading: json.heading || "The Way We Work",
+    headingColor: json.headingColor || "#ffffff", // Extract global heading color
+    bg_image: json.bg_image || "",
+    bgSize: json.bgSize || "cover",               // Extract background size
+    cards: Array.isArray(json.cards) ? json.cards : [],
+  };
+}
+  
+    let whyChooseUsData = { heading: "Why Choose us", headingColor: "#222222", cards: [] };
     if (whyChooseUsRaw) {
       const record = Array.isArray(whyChooseUsRaw) ? whyChooseUsRaw[0] : whyChooseUsRaw;
-      whyChooseUsData = record?.json_content || [];
+      const json = record?.json_content;
+
+      if (Array.isArray(json)) {
+        whyChooseUsData = { heading: "Why Choose us", headingColor: "#222222", cards: json };
+      } else if (json && typeof json === "object") {
+        whyChooseUsData = {
+          heading: json.heading || "Why Choose us",
+          headingColor: json.headingColor || "#222222",
+          cards: Array.isArray(json.cards) ? json.cards : [],
+        };
+      }
     }
     
     let estimateBannerData = null;
@@ -70,14 +117,33 @@ async function getRemainingData() {
         estimateBannerData = record?.json_content;
     }
 
+    let headingsData = {};
+    if (headingManagementRaw) {
+      const record = Array.isArray(headingManagementRaw) ? headingManagementRaw[0] : headingManagementRaw;
+      headingsData = record?.json_content?.headings || {};
+    }
+
     let estimateCardsData = [];
     if (estimateCardsRaw) {
         const record = Array.isArray(estimateCardsRaw) ? estimateCardsRaw[0] : estimateCardsRaw;
-        estimateCardsData = record?.json_content || [];
+        let json = record?.json_content !== undefined ? record.json_content : record;
+        if (typeof json === "string") {
+          try { json = JSON.parse(json); } catch (e) { json = []; }
+        }
+        if (json && typeof json === 'object' && !Array.isArray(json) && json.json_content) {
+            json = json.json_content;
+        }
+        estimateCardsData = Array.isArray(json) ? json : [];
     }
 
-    return { designIdea: designIdea || [], h3d_gallery: h3d_gallery || [], content: contentData || [], blogs: Array.isArray(blogsData) ? blogsData.slice(0, 3) : [], whyChooseUsData, estimateBannerData, estimateCardsData };
-  } catch (err) { return { designIdea: [], h3d_gallery: [], content: [], blogs: [], whyChooseUsData: [], estimateBannerData: null }; }
+    return { designIdea: designIdea || [], h3d_gallery: h3d_gallery || [], content: contentData || [], blogs: Array.isArray(blogsData) ? blogsData.slice(0, 3) : [], theWayWeWorkData,whyChooseUsData, estimateBannerData, estimateCardsData, whatWeOfferData, headingsData };
+  } catch (err) {
+    return {
+      designIdea: [], h3d_gallery: [], content: [], blogs: [],
+      theWayWeWorkData: { heading: "The Way We Work", bg_image: "", cards: [] },
+      whyChooseUsData: { heading: "Why Choose us", headingColor: "#222222", cards: [] },
+      estimateBannerData: null, estimateCardsData: [], whatWeOfferData: null, headingsData: {}  };
+  }
 }
 
 const formatDate = (dateString) => {
@@ -88,8 +154,14 @@ const formatDate = (dateString) => {
 };
 
 export default async function HomeContent() {
-  const { designIdea, h3d_gallery, content, blogs, whyChooseUsData, estimateBannerData,estimateCardsData } = await getRemainingData();
+  const { designIdea, h3d_gallery, content, blogs, theWayWeWorkData, whyChooseUsData, estimateBannerData,estimateCardsData,whatWeOfferData, headingsData } = await getRemainingData();
+  const readyToGoDesignsHeading = headingsData?.ready_to_go_designs || {};
+  const designersChoiceHeading = headingsData?.designers_choice || {};
+  const celebratingExcellenceHeading = headingsData?.celebrating_excellence || {};
+  const blogsHeading = headingsData?.blogs || {};
+  const whatPeopleSayHeading = headingsData?.what_people_say || {};
 
+  const offerCards = Array.isArray(whatWeOfferData?.cards) ? whatWeOfferData.cards : [];
   const safeEstimateCards = Array.isArray(estimateCardsData) ? estimateCardsData : [];
   const sortedDesignIdea = [...designIdea].sort((a, b) => b.id - a.id);
   const staticRecords = sortedDesignIdea.slice(-5);
@@ -102,20 +174,38 @@ export default async function HomeContent() {
     { id: 5, contentIdx: 16, number: "05", col1Class: "col-lg-2 col-md-3 col-6 pe-0 ps-lg-3 mt-lg-3", boxClass: "box5 box_3", col2Class: "col-lg-2 col-md-3 col-6 ps-0 mt-lg-3", dataBoxClass: "box5_data" },
   ];
 
-  const activeWhyChooseUsData = Array.isArray(whyChooseUsData) && whyChooseUsData.length > 0 ? whyChooseUsData : [
+  const activetheWayWeWorkData = Array.isArray(theWayWeWorkData.cards) && theWayWeWorkData.cards.length > 0 ? theWayWeWorkData.cards : [
+    { title: "We Work with Experienced Team"}, {title: "We Work with Good Materials"}
+  ];
+
+ 
+  const activeWhyChooseUsData = Array.isArray(whyChooseUsData.cards) && whyChooseUsData.cards.length > 0 ? whyChooseUsData.cards : [
     { title: "Lifetime warranty¹", icon: "FaShieldAlt" }, { title: "45-day move-in guarantee²", icon: "FaClock" }, { title: "150+ quality checks", icon: "FaCheckCircle" }
   ];
 
-  const activeEstimateBanner = estimateBannerData || { is_active: true, heading: "Calculate the cost of your", rotating_words: "Kitchen, Wardrobe, Full Home, Living Room", description: "Get a personalized, transparent estimate for your interior project in just a few clicks. No hidden costs.", button_text: "Get Free Estimate" };
-  const activeEstimateCards = safeEstimateCards.filter(card => card?.is_active !== false); 
-  const finalMarqueeCards = activeEstimateCards.length > 0 ? activeEstimateCards : h3d_gallery.filter(item => !item.child_content?.title?.toLowerCase().includes("1 bhk")).slice(0, 5);
+  const activeEstimateBanner = estimateBannerData || { is_active: true, heading: "Get an estimate for your", rotating_words: "Kitchen, Wardrobe, Full Home, Living Room", description: "Get a personalized, transparent estimate for your interior project in just a few clicks. No hidden costs.", button_text: "Get Free Estimate" };
+ const activeEstimateCards = safeEstimateCards.filter(
+  card => card?.is_active !== false
+);
+  
+        
+const dynamicBgUrl = theWayWeWorkData.bg_image || "";
+const offerBgUrl = whatWeOfferData?.bg_image || "";
 
-  const dynamicBgUrl = getBackendImageUrl(content?.bg_image || '/parent-child/wework_bgImage.jpg'); 
+  
+  const WAY_WE_WORK_PALETTE = [
+    { light: "#ffe3cc", dark: "#ff914d" },
+    { light: "#cdc3b4", dark: "#4a3728" },
+    { light: "#c9e2e6", dark: "#57665f" },
+    { light: "#f4f7df", dark: "#3a3025" },
+    { light: "#f6f0c8", dark: "#eba931" },
+  ];
   return (
     <>
       <style dangerouslySetInnerHTML={{__html: `
         .text-orange-force { color: #ff914d !important; }
         .banner-overlay { padding-bottom: 7rem !important; }
+        .force-white-title { color: #ffffff !important; }
         
         /* 🌟 FIX 1: Restored Old Styling for "The Way We Work" Numbers */
         .box_heading { 
@@ -127,6 +217,86 @@ export default async function HomeContent() {
             opacity: 0.9;
         }
 
+        /* Screenshot-matched styling for "The Way We Work" Cards & Numbers */
+        .way-work-number{
+    font-size:82px !important;
+    font-weight:700 !important;
+
+    color:rgba(255,255,255,.78) !important;
+
+    -webkit-text-stroke:0 !important;
+    text-shadow:none !important;
+
+    letter-spacing:-3px;
+    line-height:1;
+}
+        
+        .way-work-card{
+    display:flex !important;
+    min-height:320px !important;
+    height:100% !important;
+    // border-radius:12px !important;
+    overflow:hidden !important;
+    box-shadow:none !important;
+}
+
+        .way-work-card > div:first-child{
+    width:50% !important;
+    flex:0 0 50% !important;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+        .way-work-card > div:last-child{
+    width:50% !important;
+    flex:0 0 50% !important;
+
+    padding:24px 20px !important;
+
+    display:flex;
+    flex-direction:column;
+     height:100%;
+}
+
+        
+
+        @media (max-width: 992px) {
+          .way-work-number { font-size: 3.75rem !important; }
+        }
+
+        // @media (max-width: 768px) {
+        //   .way-work-number { font-size: 3.25rem !important; }
+        // }
+
+        @media (max-width: 767px) {
+  /* Keep cards full width and identical in appearance — only change
+     the direction they flow: left-to-right (swipe) instead of stacked. */
+  .way_wework .row.g-4.justify-content-center {
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important; /* was centering the row,
+      which pushed card 1 & 2 off-screen with nowrap + overflow */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;      /* hide scrollbar: Firefox */
+    -ms-overflow-style: none;   /* hide scrollbar: IE/Edge */
+  }
+
+  .way_wework .row.g-4.justify-content-center::-webkit-scrollbar {
+    display: none; /* hide scrollbar: Chrome/Safari */
+  }
+
+  .way_wework .row.g-4.justify-content-center > [class*="col-"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+    scroll-snap-align: start;
+  }
+}
+
+        .know_mores { display: inline-block; font-weight: 600; }
+        .know_mores:hover { opacity: 0.85; }
+
         /* Fix visibility on images */
         .bgsectionroom .designercard *,
         .cardoffer h3, .cardoffer span,
@@ -134,7 +304,31 @@ export default async function HomeContent() {
             color: #ffffff !important;
             text-shadow: 0px 4px 12px rgba(0,0,0,0.9), 0px 1px 3px rgba(0,0,0,0.8) !important;
         }
+
+        /* 🌟 FIX: Force 'What We Offer' images to span full width on all devices */
+        .cardoffer .offerimg {
+            width: 100% !important;
+            height: 220px !important; /* Adjust height slightly if needed to match desktop precisely */
+            object-fit: cover !important;
+            border-top-left-radius: 16px !important;
+            border-top-right-radius: 16px !important;
+            display: block !important;
+            margin: 0 !important;
+        }
+        
+        /* Ensure the wrapper holding the image doesn't collapse padding */
+        .cardoffer > div:first-child {
+            padding: 0 !important;
+            width: 100% !important;
+        }
         .bgsectionroom .designercard *, .card_room h3 { font-weight: 800 !important; }
+
+        .oofer_card .row > div { display: flex; }
+        .oofer_card .cardoffer { height: 100%; width: 100%; display: flex; flex-direction: column; }
+        /* Forces the inner body (which holds text and button) to fill remaining space */
+        .oofer_card .cardoffer > div:last-child { display: flex; flex-direction: column; flex-grow: 1; }
+        /* Pushes the button (link) to the very bottom */
+        .oofer_card .cardoffer a { margin-top: auto !important; align-self: flex-start; }
 
         /* Revert cards to white */
         .savedesign .cardoffer * { color: #171717 !important; text-shadow: none !important; } 
@@ -185,7 +379,7 @@ export default async function HomeContent() {
           
           .mobile-scroll-row { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; scroll-snap-type: x mandatory; padding-top:20px !important; padding-bottom: 20px !important; margin-bottom: 10px !important; -webkit-overflow-scrolling: touch; scrollbar-width: none; justify-content: flex-start !important; }
           .mobile-scroll-row::-webkit-scrollbar { display: none; }
-          .mobile-scroll-row > [class*="col-"] { flex: 0 0 85% !important; max-width: 85% !important; scroll-snap-align: center; }
+          .mobile-scroll-row > [class*="col-"] { flex: 0 0 100% !important; max-width: 100% !important; scroll-snap-align: center; }
           .mobile-process-row { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; scroll-snap-type: x mandatory; padding-bottom: 20px !important; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 15px; margin-left: 0; margin-right: 0; justify-content: flex-start !important; }
           .mobile-process-row::-webkit-scrollbar { display: none; }
           .process-mobile-wrap { flex: 0 0 85% !important; scroll-snap-align: center; display: flex; flex-direction: column; }
@@ -196,55 +390,217 @@ export default async function HomeContent() {
 
       <HomeAbout3D />
 
-      <div className="my-5 oofer_card">
-          <div className="container">
-            <div className="mb-4 text-center">
-               <span className="font_stylish text-orange-force d-block mb-1">Explore</span>
-               <h2 className="h2 font_about mb-0 fw-bold">What we Offer</h2>
-            </div>
-            <div className="mx-0 row g-4 mobile-scroll-row">
-              {[23, 24, 22, 21].map((index) => (
-                <div className="col-lg-3 col-md-6 col-12" key={index}>
-                  <Card cardNameALl="cardoffer" imgSrc={content[index]?.json_content?.image} imgAlt={"room"} imgClass={"offerimg"} titleCard={content[index]?.json_content?.title} descriptionCard={content[index]?.json_content?.description} buttonTextCard={"Know More"} linkCard={content[index]?.json_content?.designation} />
+      <div
+        className="my-5 oofer_card py-4"
+        style={{
+          backgroundColor: offerBgUrl ? "transparent" : "#ffffff",
+          backgroundImage: offerBgUrl ? `url(${offerBgUrl})` : "none",
+          backgroundSize: whatWeOfferData?.bgSize || "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <style>{`
+          .what-we-offer-main-heading {
+            color: ${whatWeOfferData?.headingColor || "#23236b"} !important;
+          }
+          .what-we-offer-span-color {
+            color: ${whatWeOfferData?.spanColor || "#ff914d"} !important;
+          }
+        `}</style>
+
+        <div className="container">
+          <div className="mb-4 text-center">
+             {/* 🌟 NEW: span text/color now come from CMS instead of a hardcoded "Explore" literal */}
+             <span className="font_stylish text-orange-force d-block mb-1 what-we-offer-span-color">{whatWeOfferData?.spanText || "Explore"}</span>
+             <h2 className="h2 font_about mb-0 fw-bold what-we-offer-main-heading">
+               {whatWeOfferData?.heading || "What we Offer"}
+             </h2>
+          </div>
+          
+          <div className="mx-0 row g-4 mobile-scroll-row">
+            {offerCards.length > 0 ? (
+              offerCards.map((card, index) => { const targetId = `section-${index + 1}`;
+                return (
+                <div className="col-lg-3 col-md-6 col-12 d-flex" key={index}>
+                  <Card 
+                    cardNameALl="cardoffer h-100 w-100" 
+                    imgSrc={card.image || card.icon} 
+                    imgAlt={card.title || "Offer"} 
+                    imgClass={"offerimg"} 
+                    titleCard={card.title} 
+                    descriptionCard={card.description} 
+                    buttonTextCard={card.buttonText || "Know More"} 
+                    linkCard={card.buttonLink || `/what-we-offer#${targetId}`} 
+                  />
                 </div>
-              ))}
-            </div>
-            <div className="mt-5 text-end">
-              <a href="/what-we-offer" className="pe-2 know_more fs-6">View More <MdKeyboardArrowRight className="fs-4" /> </a>
-            </div>
+              );
+              })
+            ) : (
+              [23, 24, 22, 21].map((index,i) => {
+                const targetId = `section-${i + 1}`;
+                return (
+                // Added d-flex here for the fallback as well
+                <div className="col-lg-3 col-md-6 col-12 d-flex" key={index}>
+                  <div className="w-100 d-flex">
+                    <Card 
+                      cardNameALl="cardoffer h-100 w-100" 
+                      imgSrc={content[index]?.json_content?.image} 
+                      imgAlt={"room"} 
+                      imgClass={"offerimg"} 
+                      titleCard={content[index]?.json_content?.title} 
+                      descriptionCard={content[index]?.json_content?.description} 
+                      buttonTextCard={"Know More"} 
+                      linkCard={content[index]?.json_content?.designation || `/what-we-offer#${targetId}`} 
+                    />
+                  </div>
+                </div>
+              );
+            })
+            )}
           </div>
         </div>
+      </div>
 
-      <div className="way_wework" style={{ backgroundImage: `url(${dynamicBgUrl})` }}>
-          <div className="container">
-            <div className="mb-5 text-center">
-               <h2 className="h2 font_about fw-bold mb-0">The Way <span className="text-orange-force">We Work</span></h2>
-            </div>
-            <div className="mx-0 row justify-content-center g-lg-0 mobile-process-row">
-              {workProcessConfig.map((step) => (
-                <div className="process-mobile-wrap" key={step.id}>
-                  <div className={step.col1Class}>
-                    <div className={step.boxClass}><h3 className="box_heading">{step.number}</h3></div>
-                  </div>
-                  <div className={step.col2Class}>
-                    <div className={step.dataBoxClass}>
-                      <div className="px-3 px-lg-4 py-4">
-                        {content[step.contentIdx]?.json_content?.image && (<Image src={content[step.contentIdx]?.json_content?.image} width={60} height={60} alt="icon" style={{ height: 'auto' }} />)}
-                        <h4 className="py-2 text-white">{content[step.contentIdx]?.json_content?.title}</h4>
-                        <p className="box_para">{content[step.contentIdx]?.json_content?.description}</p>
-                        <div className="text-lg-center"><a className="know_mores" href={content[step.contentIdx]?.json_content?.designation}>Know More</a></div>
-                      </div>
+      <div
+        className="way_wework py-5"
+        style={{
+          backgroundColor: dynamicBgUrl ? "transparent" : "#ffffff",
+          backgroundImage: dynamicBgUrl ? `url(${dynamicBgUrl})` : "none",
+          backgroundSize: theWayWeWorkData.bgSize || "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        {/* FORCE HEADING COLOR TO OVERRIDE CSS !important */}
+        <style>{`
+          .way-work-main-heading {
+            color: ${theWayWeWorkData.headingColor || "#ffffff"} !important;
+          }
+        `}</style>
+
+        <div className="container">
+          <div className="mb-5 text-center">
+            <h2 className="h2 font_about fw-bold mb-0 way-work-main-heading">
+              {theWayWeWorkData.heading}
+            </h2>
+          </div>
+
+          <div className="row g-4 justify-content-center">
+            {theWayWeWorkData.cards.map((card, index) => {
+              
+              const palette = WAY_WE_WORK_PALETTE[index % WAY_WE_WORK_PALETTE.length] || { light: "#f8f9fa", dark: "#e9ecef" };
+              const rawNumber = card.number
+                ? parseInt(String(card.number).replace(/\D/g, ""), 10)
+                : NaN;
+              const number = String(
+                Number.isFinite(rawNumber) && rawNumber > 0 ? rawNumber : index + 1
+              ).padStart(2, "0");
+              const iconSize = card.iconSize ? `${card.iconSize}px` : "80px";
+
+              const rightSideBgColor = card.iconColor || palette.dark;
+              const textColor = card.textColor || "#ffffff";
+             const leftSideBgColor = card.bgColorLeft || palette.light;
+              const titleColorClass = `way-work-title-color-${index}`;
+
+const targetId = `step-${index + 1}`;
+
+
+              return (
+                <div key={index} className="col-lg-4 col-md-6 col-12">
+                  <div
+                    className="way-work-card h-100 d-flex overflow-hidden"
+                    style={{
+        height: "306px"
+    }}
+                  >
+                    <div
+                      className="d-flex align-items-center justify-content-center"
+                      style={{ background: leftSideBgColor, width: "50%" }}
+                    >
+                      {/* Ghost-white number, matching the original mockup —
+                          not tied to the card's own dark color. */}
+                      <span className="way-work-number" style={{ color: rightSideBgColor }}>{number}</span>
+                    </div>
+
+                    <div
+                      className="p-4 d-flex flex-column align-items-start text-start"
+                      style={{ background: rightSideBgColor, color: textColor, width: "50%" }}
+                    >
+                      {card.icon && (
+                        <div className="mb-3">
+                          <img
+                            src={card.icon}
+                            alt={card.title}
+                            style={{
+                              width: iconSize,
+                              height: iconSize,
+                              objectFit: "contain",
+                            }}
+                          />
+                        </div>
+                      )}
+
+                    {textColor && (
+  <style>{`.${titleColorClass} { color: ${textColor} !important; }`}</style>
+)}
+<h4
+  className={`fw-bold mb-3 force-white-title ${titleColorClass}`}
+  style={{
+      fontSize:"20px",
+      lineHeight:"1.25",
+      overflow: "hidden",
+      textOverflow: "ellipsis"
+  }}
+>
+  {card.title}
+</h4>
+
+                      {card.description && (
+                                                <p
+                            className="mb-4"
+                            style={{
+                                color: textColor,
+                                opacity: .95,
+                                fontSize: "14px",
+                                lineHeight: "1.45"
+                            }}
+                        >
+                          {card.description}
+                        </p>
+                      )}
+                      <a
+                        href={card.buttonLink || `/how-its-works#${targetId}`}
+                        className="know_mores mt-auto align-self-start"
+                        style={{
+                          borderRadius: "30px",
+                          padding:"6px 20px",
+                          fontSize:"14px",
+                          fontWeight:"500",
+                          textDecoration: "none",
+                          borderStyle: "solid",
+                          borderWidth: "1px",
+                          color: textColor,
+                          borderColor: textColor,
+                        }}
+                      >
+                        {card.buttonText || "Know More"}
+                      </a>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </div>
-
+      </div>
+      
       <LazySection placeholderHeight="300px">
         <section className="my-5 py-5" style={{ backgroundColor: "#fafafa" }}>
-          <div className="container mb-5"><div className="text-center"><h2 className="h2 font_about fw-bold mb-0">Why <span className="font_stylish text-orange-force">choose us</span></h2></div></div>
+          {whyChooseUsData.headingColor && (
+            <style>{`.why-choose-us-heading-color { color: ${whyChooseUsData.headingColor} !important; }`}</style>
+          )}
+          <div className="container mb-5"><div className="text-center"><h2 className="h2 font_about fw-bold mb-0 why-choose-us-heading-color">{whyChooseUsData.heading}</h2></div></div>
           
           <div className="marquee-container-fix">
             <div className="marquee-content-fix">
@@ -283,7 +639,17 @@ export default async function HomeContent() {
         <section className="my-5">
           <div className="container">
             <div className="mx-0 mb-5 row justify-content-center text-center">
-              <div className="col-12 d-flex flex-column align-items-center gap-2"><span className="font_stylish text-orange-force mb-0">Ready To Go Designs</span><h2 className="h2 font_about fw-bold mb-0">with Our Exclusive Design Choices</h2></div>
+              <div className="col-12 d-flex flex-column align-items-center gap-2">
+
+                {readyToGoDesignsHeading.spanColor && (
+                  <style>{`.rtgd-span-color { color: ${readyToGoDesignsHeading.spanColor} !important; }`}</style>
+                )}
+                {readyToGoDesignsHeading.color && (
+                  <style>{`.rtgd-heading-color { color: ${readyToGoDesignsHeading.color} !important; }`}</style>
+                )}
+                <span className="font_stylish text-orange-force mb-0 rtgd-span-color">{readyToGoDesignsHeading.spanText || "Ready To Go Designs"}</span>
+                <h2 className="h2 font_about fw-bold mb-0 rtgd-heading-color">{readyToGoDesignsHeading.text || "with Our Exclusive Design Choices"}</h2>
+              </div>
             </div>
             <SliderCard />
           </div>
@@ -294,7 +660,17 @@ export default async function HomeContent() {
         <div className="my-5 bgsectionroom">
           <div className="container ">
             <div className="row mx-0 mb-4 text-center">
-               <div className="col-12 px-0"><span className="font_stylish text-orange-force d-block mb-1">Designer&apos;s Choice:</span><h2 className="h2 font_about fw-bold mb-0">Exclusive Design Specials</h2></div>
+               <div className="col-12 px-0">
+                 {/* 🎨 COLOR FIX: same !important-vs-!important cascade-order trick as above */}
+                 {designersChoiceHeading.spanColor && (
+                   <style>{`.dc-span-color { color: ${designersChoiceHeading.spanColor} !important; }`}</style>
+                 )}
+                 {designersChoiceHeading.color && (
+                   <style>{`.dc-heading-color { color: ${designersChoiceHeading.color} !important; }`}</style>
+                 )}
+                 <span className="font_stylish text-orange-force d-block mb-1 dc-span-color">{designersChoiceHeading.spanText || "Designer's Choice:"}</span>
+                 <h2 className="h2 font_about fw-bold mb-0 dc-heading-color">{designersChoiceHeading.text || "Exclusive Design Specials"}</h2>
+               </div>
             </div>
             <div className="mt-4 row g-4 mx-0 mobile-scroll-row">
               {staticRecords.map((record, i) => (
@@ -303,7 +679,12 @@ export default async function HomeContent() {
                 </div>
               ))}
             </div>
-            <div className="mt-4 col-lg-12 text-end pe-3"><a href="/designer-choice" className="know_more">Know More</a></div>
+            <div className="mt-4 col-lg-12 text-end pe-3"><a href="/designer-choice" className="know_more" style={{ 
+      padding: '12px 32px', 
+      fontSize: '16px', 
+      fontWeight: '600', 
+      display: 'inline-block' 
+    }} >Know More</a></div>
           </div>
         </div>
       </LazySection>
@@ -312,7 +693,8 @@ export default async function HomeContent() {
         <CounterRow 
           ImgCounter={content[13]?.json_content?.image} 
           imgAltCounter={content[13]?.json_content?.title} 
-          titleHeadingCounter="Celebrating Excellence:"
+          titleHeadingCounter={celebratingExcellenceHeading.text || "Celebrating Excellence:"}
+          titleHeadingColorCounter={celebratingExcellenceHeading.color || undefined}
           subHeadingCounter=""
           counterEnd={content[12]?.json_content?.title} 
           label1={content[12]?.json_content?.description} 
@@ -329,35 +711,34 @@ export default async function HomeContent() {
           descriptionCounter={content[13]?.json_content?.description} 
           btnLink="/residential-projects" 
           textAboutBtnCounter="View Our Projects" 
-          btnLink2={content[13]?.json_content?.designation} 
-          textAboutBtnCounter2="All Services" 
+          btnLink2={content[13]?.json_content?.designation || "/serving-areas"} 
+          textAboutBtnCounter2="Serving Areas" 
         />
-      </LazySection>
-
-      <LazySection placeholderHeight="600px">
-        <div className="savedesign my-5">
-          <div className="container">
-            <div className="mb-5 text-center d-flex flex-column gap-2">
-              <span className="font_stylish text-orange-force mb-0">{content[8]?.json_content?.title}</span>
-              <h2 className="h2 font_about fw-bold mb-0">{content[8]?.json_content?.description}</h2>
-            </div>
-            <div className="row justify-content-center g-4 mx-0 mobile-scroll-row">
-              {finalMarqueeCards.slice(0, 5).map((card, index) => (
-                <div key={index} className="col-lg-4 col-md-6 col-12">
-                  <div className="mx-auto" style={{ maxWidth: "380px", height: "100%" }}>
-                    <Card cardLinkName={card?.link || `/estimator-for-home`} cardNameALl="cardoffer shadow-sm border-0 bg-white h-100 d-flex flex-column" imgSrc={card?.image || card?.child_content?.image} imgAlt={card?.title || card?.child_content?.title} imgClass={"bhkimg rounded-top-3 w-100 object-fit-cover"} titleCard={card?.title || card?.child_content?.title} titleClass="text-center mb-0 pb-3 pt-3 fw-bold fs-4 text-orange-force flex-grow-1" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
       </LazySection>
 
       {activeEstimateBanner.is_active !== false && (
         <LazySection placeholderHeight="600px">
           <section className="my-5 py-5 estimate-fix-wrapper" style={{ backgroundColor: "#fff9f9", borderTop: "1px solid #ffeeee", borderBottom: "1px solid #ffeeee" }}>
-            <EstimateCalculator cmsData={activeEstimateBanner} />
+            
+            {/* NEW: CSS specific to the estimate cards moved here */}
+            <style dangerouslySetInnerHTML={{__html: `
+              .estimate-card-custom { border: 1px solid #eaeaea; border-radius: 12px; transition: all 0.3s ease; }
+              .estimate-card-custom:hover { border-color: #ff914d; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.05); }
+              .icon-circle-wrap { width: 80px; height: 80px; border-radius: 50%; transition: all 0.3s ease; }
+              .estimate-card-custom:hover .icon-circle-wrap { background-color: #ff914d !important; }
+              .icon-img-custom { width: 40px; height: 40px; object-fit: contain; transition: filter 0.3s ease; }
+              .estimate-card-custom:hover .icon-img-custom { filter: brightness(0) invert(1); }
+              .btn-estimate-custom { border: 1px solid #ff914d; color: #ff914d; font-weight: 600; border-radius: 6px; transition: all 0.3s ease; }
+              .estimate-card-custom:hover .btn-estimate-custom { background-color: #ff914d; color: #ffffff !important; }
+            `}} />
+
+            {/* Top Heading from the Banner CMS */}
+            <EstimateCalculator
+              estimateSectionData={{
+                  ...activeEstimateBanner,
+                  cards: activeEstimateCards
+              }}
+          />
           </section>
         </LazySection>
       )}
@@ -365,7 +746,11 @@ export default async function HomeContent() {
       <LazySection placeholderHeight="500px">
         <div className="my-5 blogs_wrapper">
           <div className="container">
-            <h2 className="h2 pb-4 text-center font_about fw-bold">Blogs</h2>
+            {/* 🎨 COLOR FIX: same !important-vs-!important cascade-order trick as above */}
+            {blogsHeading.color && (
+              <style>{`.blogs-heading-color { color: ${blogsHeading.color} !important; }`}</style>
+            )}
+            <h2 className="h2 pb-4 text-center font_about fw-bold blogs-heading-color">{blogsHeading.text || "Blogs"}</h2>
             <div className="row g-2 g-lg-4 justify-content-center mx-1 mobile-scroll-row">
               {blogs.map((blog, index) => (
                 <div key={index} className="col-lg-4 col-md-6 col-12">
@@ -381,7 +766,11 @@ export default async function HomeContent() {
       
       <LazySection placeholderHeight="400px">
         <section className="my-5 yt-fix-wrapper">
-          <div className="mb-5 text-center"><span className="font_stylish text-orange-force">What People Say</span></div>
+          {/* 🎨 COLOR FIX: same !important-vs-!important cascade-order trick as above */}
+          {whatPeopleSayHeading.spanColor && (
+            <style>{`.wps-span-color { color: ${whatPeopleSayHeading.spanColor} !important; }`}</style>
+          )}
+          <div className="mb-5 text-center"><span className="font_stylish text-orange-force wps-span-color">{whatPeopleSayHeading.spanText || "What People Say"}</span></div>
           <VideoTestimonialSlider />
         </section>
       </LazySection>

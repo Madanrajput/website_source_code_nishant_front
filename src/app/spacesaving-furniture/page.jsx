@@ -278,6 +278,23 @@ async function getSeoData() {
   }
 }
 
+async function getHeadingDescriptionData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-content/manage_heading_description`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) return null;
+
+    const record = await res.json();
+    const data = Array.isArray(record) ? record[0] : record;
+    return data?.json_content?.sections?.space_saving_furniture || null;
+  } catch (err) {
+    console.error("Heading/Description Fetch Error:", err);
+    return null;
+  }
+}
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
   const seoData = await getSeoData();
@@ -307,15 +324,39 @@ export async function generateMetadata() {
 export default async function SpaceSavingFurniture() {
   const exclusiveDesignData = await getSpaceSavingFurnitureData();
 
+  const headingData = await getHeadingDescriptionData();
+
+  const HeadingTag = headingData?.headingTag || "h1";
+const headingText = headingData?.headingText || "Space-Saving Furniture";
+const headingStyle = {
+  textShadow: "none",
+  fontFamily: "inherit",
+  ...(headingData?.headingColor && { color: headingData.headingColor }),
+};
+
+const descriptionText =
+  headingData?.descriptionText ||
+  "Every inch matters—make it count with smart space-saving furniture by High Creation Interior. Expertly designed to maximize functionality without compromising on style, our innovative pieces create spacious, organized, and elegant interiors. From hidden storage to multifunctional designs."
+const descriptionStyle = {
+  ...(headingData?.descriptionColor && { color: headingData.descriptionColor }),
+};
+
   return (
     <MainLayout>
       <main>
         <section className="container my-5">
           <div className="text-center row mx-0 mb-3 mb-lg-5">
-            <h1 className="wallpaperHeading">Space-Saving Furniture</h1>
-            <p className="px-lg-5 team_designation pt-3">
-            Every inch matters—make it count with smart space-saving furniture by High Creation Interior. Expertly designed to maximize functionality without compromising on style, our innovative pieces create spacious, organized, and elegant interiors. From hidden storage to multifunctional designs.
-            </p>
+            <HeadingTag id="space-saving-furniture-heading" className="wallpaperHeading" style={headingStyle}>
+  {headingText}
+</HeadingTag>
+<p id="space-saving-furniture-description" className="px-lg-5 fs-6 text-muted" style={descriptionStyle}>
+  {descriptionText}
+</p>
+<style>{`
+  ${headingData?.headingColor ? `#space-saving-furniture-heading { color: ${headingData.headingColor} !important; }` : ""}
+  ${headingData?.descriptionColor ? `#space-saving-furniture-description { color: ${headingData.descriptionColor} !important; }` : ""}
+  ${headingData?.descriptionFontSize ? `#space-saving-furniture-description { font-size: ${headingData.descriptionFontSize}px !important; }` : ""}
+`}</style>
           </div>
 
           <div className="row g-4 mx-0">

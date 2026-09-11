@@ -37,7 +37,7 @@ const CmsReadyToGoDesign = () => {
             toast.error(err.message ?? "Failed to fetch data. Please try again.");
             setLoading(false);
         }
-    }, [authToken]);
+    }, [authToken, slug]);;
 
     useEffect(() => {
         fetchContentManagerPages();

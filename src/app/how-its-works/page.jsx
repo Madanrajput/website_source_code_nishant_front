@@ -1,14 +1,13 @@
+"use client";
+import React, { useState, useEffect } from "react";
 import BackgroundImageWithHeading from "../components/BackgroundImageWithHeading";
 import MainLayout from "../layouts/MainLayout";
+import api from "@/utils/api"; 
 
-export const metadata = {
-  title: "How High Creation Interior Work",
-  description: "How High Creation Interior Works For Residential Projects. Want to know more about work contact us today.",
-};
-
+// FALLBACK DATA (Unchanged)
 const stepsData = [
   {
-    id: "one",
+    id: "step-1",
     stepNumber: "01",
     title: "Consultation & Requirement Gathering",
     img: "/images/how-it-work/1.png",
@@ -22,7 +21,7 @@ const stepsData = [
     align: "left"
   },
   {
-    id: "two",
+    id: "step-2",
     stepNumber: "02",
     title: "Site Visit & Measurement",
     img: "/images/how-it-work/2.png",
@@ -36,7 +35,7 @@ const stepsData = [
     align: "right"
   },
   {
-    id: "three",
+    id: "step-3",
     stepNumber: "03",
     title: "Design Presentation & Finalization",
     img: "/images/how-it-work/3.png",
@@ -50,7 +49,7 @@ const stepsData = [
     align: "left"
   },
   {
-    id: "four",
+    id: "step-4",
     stepNumber: "04",
     title: "Quotation & Agreement",
     img: "/images/how-it-work/10.png",
@@ -64,7 +63,7 @@ const stepsData = [
     align: "right"
   },
   {
-    id: "five",
+    id: "step-5",
     stepNumber: "05",
     title: "Execution & Handover",
     img: "/images/how-it-work/5.png",
@@ -79,14 +78,67 @@ const stepsData = [
   }
 ];
 
+// export const metadata = {
+//   title: "How High Creation Interior Work",
+//   description: "How High Creation Interior Works For Residential Projects. Want to know more about work contact us today.",
+//   alternates: {
+//     canonical: "https://hcinterior.in/how-its-works",
+//   },
+// };
+
 const HowItsWork = () => {
+  // STATE ADDED FOR CMS INTEGRATION
+  const [dynamicSteps, setDynamicSteps] = useState([]);
+  const [bannerData, setBannerData] = useState({
+    heading: "We make home interiors a breeze!",
+    image: "contact_wrapper services"
+  });
+
+
+  useEffect(() => {
+    const fetchCmsData = async () => {
+      try {
+        const response = await api.get('/cms-content/how_it_works');
+if (response.data) {
+  const content = response.data.json_content || {};
+  if (Array.isArray(content.steps) && content.steps.length > 0) {
+    setDynamicSteps(content.steps);
+  }
+  setBannerData(prev => ({
+    ...prev,
+    heading: content.bannerHeading || prev.heading,
+    headingColor: content.bannerHeadingColor || "#ffffff",
+    description: content.bannerDescription || "",
+    descriptionColor: content.bannerDescriptionColor || "#ffffff",
+    image: content.bg_image || prev.image,
+  }));
+}
+      } catch (error) {
+        console.error("Failed to load CMS data, falling back to static data.");
+      }
+    };
+    fetchCmsData();
+  }, []);
+
+  useEffect(() => {
+    if (dynamicSteps.length > 0 && window.location.hash) {
+      const id = window.location.hash.replace('#', '');
+      
+      // Fires the exact millisecond the new CMS cards are painted to the DOM
+      requestAnimationFrame(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+  }, [dynamicSteps]);
+
+  // Determine which data to map: CMS data if it exists, otherwise the fallback stepsData
+  const displaySteps = dynamicSteps.length > 0 ? dynamicSteps : stepsData;
+
   return (
-    <div>
-      <head>
-        <title >We make home interiors a breeze!</title>
-        <meta name="description" content="We make home interiors a breeze!" />
-        <link rel="canonical" href="https://hcinterior.in/how-its-works" />
-      </head>
+
 
       <MainLayout>
         <style dangerouslySetInnerHTML={{ __html: `
@@ -196,11 +248,22 @@ const HowItsWork = () => {
             transform: translateY(-10px);
           }
 
-          .force-white-heading {
-            color: #ffffff !important;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.4);
-          }
+          .how-it-works-section .force-white-heading {
+  color: var(--hiw-heading-color, #ffffff) !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 3px 12px rgba(0, 0, 0, 0.75);
+}
 
+.how-it-works-section .text-center.bg-transparent {
+  color: var(--hiw-description-color, #ffffff) !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 3px 12px rgba(0, 0, 0, 0.75);
+  font-size: 1.25rem;
+}
+
+.how-it-works-section.hiw-custom-bg .contact_wrapper.services {
+  background-image: var(--hiw-bg-image) !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
           /* Mobile Adjustments */
           @media (max-width: 767px) {
             .step-row-wrapper { padding: 3rem 0; }
@@ -211,24 +274,40 @@ const HowItsWork = () => {
           }
         `}} />
 
-        <main className="how-it-works-section">
+        <main
+  className={`how-it-works-section ${bannerData.image && bannerData.image !== "contact_wrapper services" ? "hiw-custom-bg" : ""}`}
+  style={{
+    "--hiw-heading-color": bannerData.headingColor || "#ffffff",
+    "--hiw-description-color": bannerData.descriptionColor || "#ffffff",
+    ...(bannerData.image && bannerData.image !== "contact_wrapper services"
+      ? { "--hiw-bg-image": `url(${bannerData.image})` }
+      : {}),
+  }}
+>
           <BackgroundImageWithHeading
-            sectionBgImages={"contact_wrapper services"}
-            sectionBgHeading="We make home interiors a breeze!"
-            secBgHeadingClass="sec_bgheading_lass force-white-heading" 
-            sectionBgDescription=""
-            secBgDesClass={"text-center bg-transparent"}
-          />
+  sectionBgImages={"contact_wrapper services"}
+  sectionBgHeading={bannerData.heading} 
+  secBgHeadingClass="sec_bgheading_lass force-white-heading" 
+  sectionBgDescription={bannerData.description}
+  secBgDesClass={"text-center bg-transparent"}
+/>
 
-          {stepsData.map((step, index) => {
-            const isImageLeft = step.align === "left";
-            
-            // 🌟 LOGIC: If it's an even index (0, 2, 4), use Light Theme. 
-            // If it's an odd index (1, 3 - which are Steps 2 & 4), use Dark Theme!
+          {displaySteps.map((step, index) => {
+            const isImageLeft = index % 2 === 0
             const isDarkTheme = index % 2 !== 0; 
+
+            // Formats CMS text block into list items, or uses fallback points array
+            const pointsToRender = step.points 
+              ? step.points 
+              : (step.description ? step.description.split('\n').filter(p => p.trim() !== '') : []);
             
+            // Generates Step Number safely (01, 02...) if not provided by CMS
+            const stepNumDisplay = step.stepNumber || (index + 1 < 10 ? '0' + (index + 1) : index + 1);
+
+            const targetId = step.id || `step-${index + 1}`;
+
             return (
-              <div className={`step-row-wrapper ${isDarkTheme ? 'step-row-dark' : 'step-row-light'}`} id={step.id} key={step.id}>
+              <div className={`step-row-wrapper ${isDarkTheme ? 'step-row-dark' : 'step-row-light'}`} id={targetId} key={index}>
                 <div className="container">
                   <div className="row align-items-center">
                     
@@ -236,9 +315,10 @@ const HowItsWork = () => {
                     <div className={`col-12 col-md-5 ${isImageLeft ? 'order-1 order-md-1' : 'order-1 order-md-2'}`}>
                       <div className="step-img-container">
                         <img 
-                          src={step.img} 
+                          src={step.img || step.image} 
                           alt={step.title} 
                           className="step-img"
+                          style={{ width: step.image_size ? step.image_size + '%' : '100%' }}
                           loading="lazy" 
                         />
                       </div>
@@ -250,15 +330,14 @@ const HowItsWork = () => {
                     {/* TEXT COLUMN */}
                     <div className={`col-12 col-md-6 mt-4 mt-md-0 ${isImageLeft ? 'order-2 order-md-2' : 'order-2 order-md-1'}`}>
                       <div className="step-content px-2 px-md-0">
-                        <span className="step-badge">Step {step.stepNumber}</span>
+                        <span className="step-badge">Step {stepNumDisplay}</span>
                         
-                        {/* Simply use step-title. The CSS block above will force it to be white if it is inside .step-row-dark */}
                         <h2 className="step-title">
                           {step.title}
                         </h2>
                         
                         <ul className="step-list">
-                          {step.points.map((point, i) => (
+                          {pointsToRender.map((point, i) => (
                             <li key={i}>{point}</li>
                           ))}
                         </ul>
@@ -270,9 +349,9 @@ const HowItsWork = () => {
               </div>
             );
           })}
+
         </main>
       </MainLayout>
-    </div>
   );
 };
 

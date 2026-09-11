@@ -59,6 +59,23 @@ async function getSeoData() {
     return null;
   }
 }
+async function getHeadingDescriptionData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-content/manage_heading_description`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) return null;
+
+    const record = await res.json();
+    const data = Array.isArray(record) ? record[0] : record;
+    return data?.json_content?.sections?.furniture || null;
+  } catch (err) {
+    console.error("Heading/Description Fetch Error:", err);
+    return null;
+  }
+}
 
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
@@ -90,17 +107,39 @@ export default async function Furniture() {
   // Strictly ensure it's an array so .map() never triggers a TypeError
   const exclusiveDesignData = Array.isArray(rawData) ? rawData : (rawData?.data || []);
 
+  const headingData = await getHeadingDescriptionData();
+
+  const HeadingTag = headingData?.headingTag || "h1";
+const headingText = headingData?.headingText || "Furniture";
+const headingStyle = {
+  textShadow: "none",
+  fontFamily: "inherit",
+  ...(headingData?.headingColor && { color: headingData.headingColor }),
+};
+
+const descriptionText =
+  headingData?.descriptionText ||
+  "Why settle for ordinary when your home can be one of a kind? Our customized furniture is designed around your space, your style, and your story. Thoughtfully crafted for a flawless fit, every piece transforms everyday living into a personalized experience of comfort, elegance, and functionality."
+const descriptionStyle = {
+  ...(headingData?.descriptionColor && { color: headingData.descriptionColor }),
+};
+
   return (
     <MainLayout>
       <main>
         <section className="container my-5">
           <div className="text-center mb-5 row mx-0">
-            <h1 className="wallpaperHeading">Furniture</h1>
-            <p className="px-lg-5">
-            Why settle for ordinary when your home can be one of a kind? Our customized furniture is designed around your space, your style, and your story. Thoughtfully crafted for a flawless fit, every piece transforms everyday living into a personalized experience of comfort, elegance, and functionality.  
-
-
-            </p>
+            <HeadingTag id="furniture-heading" className="wallpaperHeading" style={headingStyle}>
+  {headingText}
+</HeadingTag>
+<p id="furniture-description" className="px-lg-5 fs-6 text-muted" style={descriptionStyle}>
+  {descriptionText}
+</p>
+<style>{`
+  ${headingData?.headingColor ? `#furniture-heading { color: ${headingData.headingColor} !important; }` : ""}
+  ${headingData?.descriptionColor ? `#furniture-description { color: ${headingData.descriptionColor} !important; }` : ""}
+  ${headingData?.descriptionFontSize ? `#furniture-description { font-size: ${headingData.descriptionFontSize}px !important; }` : ""}
+`}</style>
           </div>
           <div className="row g-4 mx-0">
             {exclusiveDesignData.length > 0 ? (

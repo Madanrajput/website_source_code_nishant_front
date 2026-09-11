@@ -16,3 +16,4 @@ export const getBackendImageUrl = (path) => {
 
     return `${API_BASE}/uploads${path}`;
 };
+export const defaultAltText = "High Creation Interior Image";

@@ -15,7 +15,11 @@ const EstimateBannerCms = () => {
         heading: "Calculate the cost of your",
         rotating_words: "Kitchen, Wardrobe, Full Home, Living Room",
         description: "Select your floor plan to get a personalized, transparent estimate in seconds.",
-        button_text: "Get Free Estimate"
+        button_text: "Get Free Estimate",
+        button_url: "/estimator", // NEW
+        font_color: "#000000", // NEW
+        bg_image: null, // NEW
+        remove_bg: false
     });
 
     const fetchContent = useCallback(async () => {
@@ -34,7 +38,11 @@ const EstimateBannerCms = () => {
                         heading: record.json_content.heading || "",
                         rotating_words: record.json_content.rotating_words || "",
                         description: record.json_content.description || "",
-                        button_text: record.json_content.button_text || ""
+                        button_text: record.json_content.button_text || "",
+                        button_url: record.json_content.button_url || "", // NEW
+                        font_color: record.json_content.font_color || "#000000", // NEW
+                        bg_image: record.json_content.bg_image || null, // NEW
+                        remove_bg: false
                     });
                 }
             }
@@ -51,28 +59,43 @@ const EstimateBannerCms = () => {
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData((prevData) => ({ 
-            ...prevData, 
-            [name]: type === 'checkbox' ? checked : value 
+        if (type === 'file' && files && files.length > 0) {
+            setFormData((prev) => ({ ...prev, [name]: files[0], remove_bg: false }));
+        } else {
+            setFormData((prevData) => ({ 
+                ...prevData, 
+                [name]: type === 'checkbox' ? checked : value
         }));
+    }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
+        const formDataToSend = new FormData();
+    Object.keys(formData).forEach(key => {
+        if (formData[key] !== null) formDataToSend.append(key, formData[key]);
+    });
+
         try {
             if (selectedId) {
-                await api.patch(`/cms-content/${selectedId}`, {
-                    json_content: formData
-                }, { headers: { Authorization: `Bearer ${authToken}` } });
-                toast.success("Calculator Settings updated successfully!");
+                await api.patch(`/cms-content/${selectedId}`, formDataToSend, { 
+                headers: { 
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${authToken}` 
+                } 
+            });
+            toast.success("Calculator Settings updated successfully!");
             } else {
-                await api.post(`/cms-content/home_page_estimate_banner`, formData, {
-                    headers: { Authorization: `Bearer ${authToken}` }
-                });
-                toast.success("Calculator Settings created successfully!");
-                fetchContent();
+                await api.post(`/cms-content/home_page_estimate_banner`, formDataToSend, {
+                headers: { 
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${authToken}` 
+                }
+            });
+            toast.success("Calculator Settings created successfully!");
+            fetchContent();
             }
         } catch (error) {
             toast.error(error.message ?? "Error saving data. Please try again.");
@@ -99,6 +122,32 @@ const EstimateBannerCms = () => {
                         ) : (
                             <form onSubmit={handleSubmit}>
                                 <div className="row g-4">
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-bold">Button URL</label>
+                                        <input type="text" className="form-control" name="button_url" value={formData.button_url} onChange={handleInputChange} placeholder="e.g. /estimator" required />
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-bold">Font Color</label>
+                                        <input type="color" className="form-control form-control-color" name="font_color" value={formData.font_color} onChange={handleInputChange} title="Choose your color" />
+                                    </div>
+
+                                    <div className="col-md-12 border rounded p-3 mt-3">
+                                        <label className="form-label fw-bold">Background Image</label>
+                                        <input type="file" className="form-control mb-2" name="bg_image" accept="image/*" onChange={handleInputChange} />
+                                        
+                                        {/* Delete Background Button */}
+                                        <div className="d-flex align-items-center mt-2">
+                                            <button 
+                                                type="button" 
+                                                className="btn btn-outline-danger btn-sm"
+                                                onClick={() => setFormData(prev => ({ ...prev, bg_image: null, remove_bg: true }))}
+                                            >
+                                                Delete Background (Set to White)
+                                            </button>
+                                            {formData.remove_bg && <span className="ms-3 text-danger small">Background will be removed on save.</span>}
+                                        </div>
+                                    </div>
                                     <div className="col-md-6">
                                         <label className="form-label fw-bold">Static Heading</label>
                                         <input type="text" className="form-control" name="heading" value={formData.heading} onChange={handleInputChange} placeholder="e.g. Calculate the cost of your" required />

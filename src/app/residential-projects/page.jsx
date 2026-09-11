@@ -67,6 +67,24 @@ async function getSeoData() {
   }
 }
 
+async function getHeadingDescriptionData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-content/manage_heading_description`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) return null;
+
+    const record = await res.json();
+    const data = Array.isArray(record) ? record[0] : record;
+    return data?.json_content?.sections?.residential_projects || null;
+  } catch (err) {
+    console.error("Heading/Description Fetch Error:", err);
+    return null;
+  }
+}
+
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
   const seoData = await getSeoData();
@@ -100,22 +118,40 @@ export default async function ResidentialProjects({ searchParams }) {
   const { data: projects, meta } = await getResidentialProjects(currentPage);
   const totalPages = meta?.totalPages || 1;
 
+  const headingData = await getHeadingDescriptionData();
+
+  const HeadingTag = headingData?.headingTag || "h1";
+const headingText = headingData?.headingText || "Residential Projects";
+const headingStyle = {
+  textShadow: "none",
+  fontFamily: "inherit",
+  ...(headingData?.headingColor && { color: headingData.headingColor }),
+};
+
+const descriptionText =
+  headingData?.descriptionText ||
+  "Explore a curated selection of premium living room interior designs and décor ideas at High Creation. We offer customizable, functional, and stylish solutions to elevate your living space. From modular TV units to wall art and innovative wall designs, find all the inspiration you need to transform your living room. Start browsing today to discover designs that perfectly reflect your personal style."
+const descriptionStyle = {
+  ...(headingData?.descriptionColor && { color: headingData.descriptionColor }),
+};
+
   return (
     <MainLayout>
       <main>
         {/* EXACT ORIGINAL HERO SECTION RESTORED */}
         <section className="container my-5">
           <div className="text-center mb-5">
-            <h1 className="wallpaperHeading">Residential Projects</h1>
-            <p className="px-lg-5 team_description">
-              Explore a curated selection of premium living room interior
-              designs and décor ideas at High Creation. We offer customizable,
-              functional, and stylish solutions to elevate your living space.
-              From modular TV units to wall art and innovative wall designs,
-              find all the inspiration you need to transform your living room.
-              Start browsing today to discover designs that perfectly reflect
-              your personal style.
-            </p>
+            <HeadingTag id="residential-projects-heading" className="wallpaperHeading" style={headingStyle}>
+  {headingText}
+</HeadingTag>
+<p id="residential-projects-description" className="px-lg-5 fs-6 text-muted" style={descriptionStyle}>
+  {descriptionText}
+</p>
+<style>{`
+  ${headingData?.headingColor ? `#residential-projects-heading { color: ${headingData.headingColor} !important; }` : ""}
+  ${headingData?.descriptionColor ? `#residential-projects-description { color: ${headingData.descriptionColor} !important; }` : ""}
+  ${headingData?.descriptionFontSize ? `#residential-projects-description { font-size: ${headingData.descriptionFontSize}px !important; }` : ""}
+`}</style>
           </div>
         </section>
 
@@ -134,7 +170,7 @@ export default async function ResidentialProjects({ searchParams }) {
                       resiImgClass={"resi_img"}
                       residentialTitle={project.title}
                       residentialTitleClass="product_heading h4"
-                      residentialDescriptiion={project.description}
+                      // residentialDescriptiion={project.description}
                       residentialClassCss="team_designation"
                       residentialButton="Explore Design"
                       residentialButtonUrl={`/residential-projects/project-gallery?id=${project.id}`}
@@ -154,8 +190,25 @@ export default async function ResidentialProjects({ searchParams }) {
             {/* Modern Pagination Controls */}
             {totalPages > 1 && (
               <nav aria-label="Project pagination" className="mt-5 pt-4">
-                <ul className="pagination pagination-lg justify-content-center gap-2">
-                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                <style>{`
+                  @media (max-width: 768px) {
+                    .mobile-wrap-pagination {
+                      flex-wrap: wrap !important;
+                    }
+                    .mobile-full-width {
+                      flex: 0 0 100%;
+                      display: flex;
+                      justify-content: center;
+                      margin-bottom: 15px;
+                    }
+                    .mobile-full-width:last-child {
+                      margin-bottom: 0;
+                      margin-top: 15px;
+                    }
+                  }
+                `}</style>
+                <ul className="pagination pagination-lg justify-content-center gap-2 mobile-wrap-pagination">
+                  <li className={`page-item mobile-full-width ${currentPage === 1 ? "disabled" : ""}`}>
                     <a
                       className="page-link rounded-pill px-4 border-0 shadow-sm"
                       href={currentPage > 1 ? `/residential-projects?page=${currentPage - 1}` : "#"}
@@ -180,7 +233,7 @@ export default async function ResidentialProjects({ searchParams }) {
                     );
                   })}
 
-                  <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <li className={`page-item mobile-full-width ${currentPage === totalPages ? "disabled" : ""}`}>
                     <a
                       className="page-link rounded-pill px-4 border-0 shadow-sm"
                       href={currentPage < totalPages ? `/residential-projects?page=${currentPage + 1}` : "#"}

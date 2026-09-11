@@ -207,8 +207,8 @@ function AuthSidebar() {
                     <div className="sub-menu">
                         <Link href="/cms/pages" className={`sub-menu-link ${isActive('/cms/pages')}`}>Create Custom Page</Link>
                         <Link href="/cms/city" className={`sub-menu-link ${isActive('/cms/city')}`}>City Management</Link>
-                        <Link href="/cms/look_menu" className={`sub-menu-link ${isActive('/cms/look_menu')}`}>Look Menu Links</Link>
-                        <Link href="/cms/footer_link" className={`sub-menu-link ${isActive('/cms/footer_link')}`}>Footer Links</Link>
+                        {/* <Link href="/cms/look_menu" className={`sub-menu-link ${isActive('/cms/look_menu')}`}>Look Menu Links</Link>
+                        <Link href="/cms/footer_link" className={`sub-menu-link ${isActive('/cms/footer_link')}`}>Footer Links</Link> */}
                         <Link href="/cms/media-library" className={`sub-menu-link ${isActive('/cms/media-library')}`}>Media Library</Link>
                         <Link href="/cms/redirects" className={`sub-menu-link ${isActive('/cms/redirects')}`}>Redirects</Link>
                         
@@ -230,11 +230,16 @@ function AuthSidebar() {
                 {openGroups.homepage && (
                     <div className="sub-menu">
                         <Link href="/cms/homepage-banner" className={`sub-menu-link ${isActive('/cms/homepage-banner')}`}>Hero Banner</Link>
+                        <Link href="/cms/homePage-heading-management" className={`sub-menu-link ${isActive('/cms/homePage-heading-management')}`}>Home Page Headings</Link>
                         <Link href="/cms/home-about-video" className={`sub-menu-link ${isActive('/cms/home-about-video')}`}>Home Page About Us</Link>
                         <Link href="/cms/home-page-estimate-cards" className={`sub-menu-link ${isActive('/cms/home-page-estimate-cards')}`}>Estimate Cards</Link>
                         <Link href="/cms/home-page-content" className={`sub-menu-link ${isActive('/cms/home-page-content')}`}>Static Content Blocks</Link>
                         <Link href="/cms/manage-why-choose-us" className={`sub-menu-link ${isActive('/cms/manage-why-choose-us')}`}>Why Choose Us</Link>
                         <Link href="/cms/creating-the-home-of-your-dreams" className={`sub-menu-link ${isActive('/cms/creating-the-home-of-your-dreams')}`}>Creating Dreams</Link>
+                        <Link href="/cms/manage-the-way-we-work" className={`sub-menu-link ${isActive('/cms/manage-the-way-we-work')}`}>The Way We Work</Link>
+                        <Link href="/cms/manage-what-we-offer" className={`sub-menu-link ${isActive('/cms/manage-what-we-offer')}`}>Explore What We Offer</Link>
+                        <Link href="/cms/manage-footer" className={`sub-menu-link ${isActive('/cms/manage-footer')}`}>Manage Footer</Link>
+                        <Link href="/cms/manage-navbar-serving-area" className={`sub-menu-link ${isActive('/cms/manage-navbar-serving-area')}`}>Serving Areas NavBar</Link>
                     </div>
                 )}
 
@@ -245,6 +250,7 @@ function AuthSidebar() {
                 </div>
                 {openGroups.galleries && (
                     <div className="sub-menu">
+                        <Link href="/cms/manage-banner" className={`sub-menu-link ${isActive('/cms/manage-banner')}`}>Manage Banner</Link>
                         <Link href="/cms/design-gallery" className={`sub-menu-link ${isActive('/cms/design-gallery')}`}>Design Gallery</Link>
                         <Link href="/cms/3d-gallery" className={`sub-menu-link ${isActive('/cms/3d-gallery')}`}>3D Gallery</Link>
                         <Link href="/cms/award-gallery" className={`sub-menu-link ${isActive('/cms/award-gallery')}`}>Award Gallery</Link>
@@ -261,6 +267,7 @@ function AuthSidebar() {
                 </div>
                 {openGroups.products && (
                     <div className="sub-menu">
+                        <Link href="/cms/manage-heading-and-description" className={`sub-menu-link ${isActive('/cms/manage-heading-and-description')}`}>Heading & Description Management</Link>
                         <Link href="/cms/product" className={`sub-menu-link ${isActive('/cms/product')}`}>Main Products</Link>
                         <Link href="/cms/designer-choice" className={`sub-menu-link ${isActive('/cms/designer-choice')}`}>{`Designer's Choice`}</Link>
                         <Link href="/cms/exclusive-design/furniture" className={`sub-menu-link ${isActive('/cms/exclusive-design/furniture')}`}>Furniture</Link>
@@ -280,11 +287,15 @@ function AuthSidebar() {
                 {openGroups.company && (
                     <div className="sub-menu">
                         <Link href="/cms/about-us" className={`sub-menu-link ${isActive('/cms/about-us')}`}>About Us</Link>
-                        <Link href="/cms/about-us-slider" className={`sub-menu-link ${isActive('/cms/about-us-slider')}`}>About Us Slider</Link>
+                        {/* <Link href="/cms/about-us-slider" className={`sub-menu-link ${isActive('/cms/about-us-slider')}`}>About Us Slider</Link> */}
                         <Link href="/cms/team" className={`sub-menu-link ${isActive('/cms/team')}`}>Team Members</Link>
                         <Link href="/cms/blog" className={`sub-menu-link ${isActive('/cms/blog')}`}>Blogs</Link>
+                        <Link href="/cms/what-we-offer" className={`sub-menu-link ${isActive('/cms/what-we-offer')}`}>Redirects What We Offer</Link>
                         <Link href="/cms/how-its-works" className={`sub-menu-link ${isActive('/cms/how-its-works')}`}>How It Works</Link>
+                        <Link href="/cms/manage-services" className={`sub-menu-link ${isActive('/cms/manage-services')}`}>Serving Areas</Link>
                         <Link href="/cms/refer-and-earn" className={`sub-menu-link ${isActive('/cms/refer-and-earn')}`}>Refer & Earn</Link>
+                        <Link href="/cms/contact-us" className={`sub-menu-link ${isActive('/cms/contact-us')}`}>Contact Us</Link>
+                        <Link href="/cms/manage-faicons" className={`sub-menu-link ${isActive('/cms/manage-faicons')}`}>Fav-Icons</Link>
                         <Link href="/cms/faqs" className={`sub-menu-link ${isActive('/cms/faqs')}`}>FAQs</Link>
                     </div>
                 )}

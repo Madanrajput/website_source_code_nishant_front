@@ -107,7 +107,7 @@ const CmsExperienceCenter = () => {
        useEffect(() => {
            fetchContentManagerPages();
            fetchContentManagerPagesVideo();
-       }, [fetchContentManagerPages], [fetchContentManagerPagesVideo]);
+       }, [fetchContentManagerPages, fetchContentManagerPagesVideo]);
      
     // Handle input change for text fields and image
     const handleInputChange = (e) => {

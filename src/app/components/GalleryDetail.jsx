@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FaTimes, FaChevronLeft, FaChevronRight, FaExpandArrowsAlt } from "react-icons/fa";
 
 const GalleryDetail = ({ imgGalUrl, imgGalAlt, imgGalImgClass, images = [] }) => {
@@ -12,19 +12,19 @@ const GalleryDetail = ({ imgGalUrl, imgGalAlt, imgGalImgClass, images = [] }) =>
     ? (images[currentIndex]?.image ?? imgGalUrl) 
     : imgGalUrl;
 
-  const handleNext = (e) => {
+  const handleNext = useCallback((e) => {
     if (e) e.stopPropagation();
     if (hasImages) {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
     }
-  };
+  }, [hasImages, images.length]);
 
-  const handlePrev = (e) => {
+  const handlePrev = useCallback((e) => {
     if (e) e.stopPropagation();
     if (hasImages) {
       setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
     }
-  };
+  }, [hasImages, images.length]);
 
   const handleClick = () => {
     const index = images.findIndex((img) => img.image === imgGalUrl);
@@ -36,11 +36,11 @@ const GalleryDetail = ({ imgGalUrl, imgGalAlt, imgGalImgClass, images = [] }) =>
     document.body.style.overflow = "hidden";
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsFullScreen(false);
     // Restore background scrolling
     document.body.style.overflow = "auto";
-  };
+  }, []);
 
   // Keyboard navigation
   useEffect(() => {
@@ -53,7 +53,7 @@ const GalleryDetail = ({ imgGalUrl, imgGalAlt, imgGalImgClass, images = [] }) =>
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isFullScreen]);
+  }, [isFullScreen, handleClose, handleNext, handlePrev]);
 
   return (
     <div className="gallery-item-wrapper h-100 position-relative rounded-4 overflow-hidden shadow-sm" style={{ backgroundColor: '#f8f9fa' }}>

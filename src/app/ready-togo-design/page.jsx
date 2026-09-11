@@ -60,6 +60,23 @@ async function getSeoData() {
   }
 }
 
+async function getHeadingDescriptionData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-content/manage_heading_description`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) return null;
+
+    const record = await res.json();
+    const data = Array.isArray(record) ? record[0] : record;
+    return data?.json_content?.sections?.ready_to_go_design || null;
+  } catch (err) {
+    console.error("Heading/Description Fetch Error:", err);
+    return null;
+  }
+}
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
   const seoData = await getSeoData();
@@ -87,6 +104,23 @@ export async function generateMetadata() {
 // --- MAIN SERVER COMPONENT ---
 export default async function ReadyToGoDesign() {
   const exclusiveDesignData = await getReadyToGoDesignData();
+
+  const headingData = await getHeadingDescriptionData();
+
+  const HeadingTag = headingData?.headingTag || "h1";
+const headingText = headingData?.headingText || "Ready To Go Design";
+const headingStyle = {
+  textShadow: "none",
+  fontFamily: "inherit",
+  ...(headingData?.headingColor && { color: headingData.headingColor }),
+};
+
+const descriptionText =
+  headingData?.descriptionText ||
+  "Why wait to create your dream space? Our ready-to-go interior design solutions deliver thoughtfully crafted interiors that combine stunning aesthetics with smart functionality. Designed for effortless living, every space is ready to elevate your home with style and comfort."
+const descriptionStyle = {
+  ...(headingData?.descriptionColor && { color: headingData.descriptionColor }),
+};
 
   return (
     <MainLayout>
@@ -167,12 +201,17 @@ export default async function ReadyToGoDesign() {
         {/* --- PREMIUM HEADER SECTION --- */}
         <section className="py-5 bg-white border-bottom shadow-sm mb-5">
           <div className="container text-center">
-            <h1 className="font-outfit fw-bold text-dark mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
-              Ready To Go Design
-            </h1>
-            <p className="font-poppins rtd-header-text">
-            Why wait to create your dream space? Our ready-to-go interior design solutions deliver thoughtfully crafted interiors that combine stunning aesthetics with smart functionality. Designed for effortless living, every space is ready to elevate your home with style and comfort. 
-            </p>
+            <HeadingTag id="ready-to-go-design-heading" className="wallpaperHeading" style={headingStyle}>
+  {headingText}
+</HeadingTag>
+<p id="ready-to-go-design-description" className="rtd-header-text fs-6 text-muted mx-auto" style={descriptionStyle}>
+  {descriptionText}
+</p>
+<style>{`
+  ${headingData?.headingColor ? `#ready-to-go-design-heading { color: ${headingData.headingColor} !important; }` : ""}
+  ${headingData?.descriptionColor ? `#ready-to-go-design-description { color: ${headingData.descriptionColor} !important; }` : ""}
+  ${headingData?.descriptionFontSize ? `#ready-to-go-design-description { font-size: ${headingData.descriptionFontSize}px !important; }` : ""}
+`}</style>
           </div>
         </section>
 

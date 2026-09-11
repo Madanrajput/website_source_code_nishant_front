@@ -13,7 +13,10 @@ const EstimateCardsCms = () => {
     const [selectedId, setSelectedId] = useState(null);
 
     const [formData, setFormData] = useState({
-        title: "", link: "/estimator-for-home", image: null, item_index: null, action: "add", is_active: true
+        title: "", link: "/estimator-for-home", image: null, item_index: null, action: "add", is_active: true,
+        description: "", // NEW
+        icon_bg_color: "#ffffff", // NEW
+        font_color: "#000000" // NEW
     });
     
     const fetchContent = useCallback(async () => {
@@ -137,11 +140,21 @@ const EstimateCardsCms = () => {
     };
 
     const handleEditClick = (item, index) => {
-        setFormData({ ...item, item_index: index, action: "update", image: null, is_active: item.is_active !== false });
+        setFormData({ ...item, item_index: index, action: "update", image: null, is_active: item.is_active !== false,
+        description: item.description || "", // NEW
+        icon_bg_color: item.icon_bg_color || "#ffffff", // NEW
+        font_color: item.font_color || "#000000" // NEW
+
+         });
     };
 
     const handleAddNewClick = () => {
-        setFormData({ title: "", link: "/estimator-for-home", image: null, item_index: pagesList.length || 0, action: "add", is_active: true });
+        setFormData({ title: "", link: "/estimator-for-home", image: null, item_index: pagesList.length || 0, action: "add", is_active: true,
+        description: "", // NEW
+        icon_bg_color: "#ffffff", // NEW
+        font_color: "#000000" // NEW
+
+         });
     };
 
     return (
@@ -213,12 +226,35 @@ const EstimateCardsCms = () => {
                                     <input type="text" className="form-control" name="title" value={formData.title} onChange={handleInputChange} placeholder="e.g. 2 BHK, Villa, etc." required />
                                 </div>
                                 <div className="col-12">
+                                    <label className="form-label fw-bold">Card Description</label>
+                                    <textarea className="form-control" name="description" rows="2" value={formData.description} onChange={handleInputChange} placeholder="Enter card description..."></textarea>
+                                </div>
+                                <div className="col-12">
                                     <label className="form-label fw-bold">Redirect Link</label>
                                     <input type="text" className="form-control" name="link" value={formData.link} onChange={handleInputChange} placeholder="/estimator-for-home" required />
                                 </div>
                                 <div className="col-12">
-                                    <label className="form-label fw-bold">Card Image</label>
-                                    <input type="file" className="form-control" name="image" accept="image/*" onChange={handleInputChange} required={formData.action === 'add'} />
+                                    <label className="form-label fw-bold">
+                                        Card Icon (SVG)
+                                    </label>
+
+                                    <input
+                                        type="file"
+                                        className="form-control"
+                                        name="image"
+                                        accept=".svg,image/svg+xml"
+                                        onChange={handleInputChange}
+                                        required={formData.action === 'add'}
+                                    />
+                                </div>
+                                <div className="col-md-6">
+                                    <label className="form-label fw-bold">Icon Background Color</label>
+                                    <input type="color" className="form-control form-control-color w-100" name="icon_bg_color" value={formData.icon_bg_color} onChange={handleInputChange} />
+                                </div>
+
+                                <div className="col-md-6">
+                                    <label className="form-label fw-bold">Font Color</label>
+                                    <input type="color" className="form-control form-control-color w-100" name="font_color" value={formData.font_color} onChange={handleInputChange} />
                                 </div>
                                 <div className="col-12 mt-4 text-center">
                                     <button className="px-5 py-2 fw-bold btn btn-primary" type="submit" style={{ backgroundColor: '#ff914d', borderColor: '#ff914d' }}>Save Card</button>

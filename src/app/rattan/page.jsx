@@ -338,6 +338,24 @@ async function getSeoData() {
   }
 }
 
+async function getHeadingDescriptionData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-content/manage_heading_description`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) return null;
+
+    const record = await res.json();
+    const data = Array.isArray(record) ? record[0] : record;
+    return data?.json_content?.sections?.rattan || null;
+  } catch (err) {
+    console.error("Heading/Description Fetch Error:", err);
+    return null;
+  }
+}
+
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
   const seoData = await getSeoData();
@@ -367,25 +385,39 @@ export async function generateMetadata() {
 export default async function SustainableFurniture() {
   const exclusiveDesignData = await getRattanData();
 
+   const headingData = await getHeadingDescriptionData();
+
+  const HeadingTag = headingData?.headingTag || "h1";
+const headingText = headingData?.headingText || "Rattan";
+const headingStyle = {
+  textShadow: "none",
+  fontFamily: "inherit",
+  ...(headingData?.headingColor && { color: headingData.headingColor }),
+};
+
+const descriptionText =
+  headingData?.descriptionText ||
+  "Upgrade your home with High Creation Interior's custom rattan furniture, beautifully handcrafted to bring timeless elegance and durability to your space. Each piece is made with care, blending natural materials and expert craftsmanship to create furniture that’s both stylish and functional. Whether you’re looking for a cozy chair, a statement table, or unique storage solutions, our rattan designs can be tailored to match your personal taste and needs. Perfect for any room, these pieces add warmth and character while standing the test of time. Experience the charm of rattan furniture designed just for you, combining beauty and practicality seamlessly."
+const descriptionStyle = {
+  ...(headingData?.descriptionColor && { color: headingData.descriptionColor }),
+};
+
   return (
     <MainLayout>
       <main>
         <section className="container my-5 rattan_wrapper">
           <div className="text-center mb-5">
-            <h1 className="wallpaperHeading">Rattan</h1>
-            <p className="px-lg-5 team_description">
-              Upgrade your home with High Creation Interior&apos;s custom rattan
-              furniture, beautifully handcrafted to bring timeless elegance and
-              durability to your space. Each piece is made with care, blending
-              natural materials and expert craftsmanship to create furniture
-              that’s both stylish and functional. Whether you’re looking for a
-              cozy chair, a statement table, or unique storage solutions, our
-              rattan designs can be tailored to match your personal taste and
-              needs. Perfect for any room, these pieces add warmth and character
-              while standing the test of time. Experience the charm of rattan
-              furniture designed just for you, combining beauty and practicality
-              seamlessly.
-            </p>
+            <HeadingTag id="rattan-heading" className="wallpaperHeading" style={headingStyle}>
+  {headingText}
+</HeadingTag>
+<p id="rattan-description" className="px-lg-5 fs-6 text-muted" style={descriptionStyle}>
+  {descriptionText}
+</p>
+<style>{`
+  ${headingData?.headingColor ? `#rattan-heading { color: ${headingData.headingColor} !important; }` : ""}
+  ${headingData?.descriptionColor ? `#rattan-description { color: ${headingData.descriptionColor} !important; }` : ""}
+  ${headingData?.descriptionFontSize ? `#rattan-description { font-size: ${headingData.descriptionFontSize}px !important; }` : ""}
+`}</style>
           </div>
 
           <div className="row g-4 mx-0">

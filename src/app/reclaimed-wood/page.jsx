@@ -334,6 +334,24 @@ async function getSeoData() {
   }
 }
 
+async function getHeadingDescriptionData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-content/manage_heading_description`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) return null;
+
+    const record = await res.json();
+    const data = Array.isArray(record) ? record[0] : record;
+    return data?.json_content?.sections?.reclaimed_wood || null;
+  } catch (err) {
+    console.error("Heading/Description Fetch Error:", err);
+    return null;
+  }
+}
+
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
   const seoData = await getSeoData();
@@ -363,23 +381,39 @@ export async function generateMetadata() {
 export default async function ReclaimedWood() {
   const exclusiveDesignData = await getReclaimedWoodData();
 
+  const headingData = await getHeadingDescriptionData();
+
+  const HeadingTag = headingData?.headingTag || "h1";
+const headingText = headingData?.headingText || "Reclaimed Wood";
+const headingStyle = {
+  textShadow: "none",
+  fontFamily: "inherit",
+  ...(headingData?.headingColor && { color: headingData.headingColor }),
+};
+
+const descriptionText =
+  headingData?.descriptionText ||
+  "High Creation Interior's custom reclaimed wood furniture. Each piece is crafted with care, using sustainable wood to create unique designs that stand out. By choosing reclaimed materials, you’re not only helping the environment but also bringing history and charm into your living space. Our furniture combines timeless craftsmanship with modern style, ensuring that every item is both durable and beautiful. From rustic tables to custom storage pieces, our reclaimed wood furniture brings a touch of nature and individuality to your home, making it a truly special place to live."
+const descriptionStyle = {
+  ...(headingData?.descriptionColor && { color: headingData.descriptionColor }),
+};
+
   return (
     <MainLayout>
       <main>
         <section className="container my-5 rattan_wrapper">
           <div className="text-center my-5">
-            <h1 className="wallpaperHeading">Reclaimed Wood</h1>
-            <p className="px-lg-5 team_description">
-              High Creation Interior&apos;s custom reclaimed wood furniture. Each
-              piece is crafted with care, using sustainable wood to create unique
-              designs that stand out. By choosing reclaimed materials, you’re not
-              only helping the environment but also bringing history and charm
-              into your living space. Our furniture combines timeless
-              craftsmanship with modern style, ensuring that every item is both
-              durable and beautiful. From rustic tables to custom storage pieces,
-              our reclaimed wood furniture brings a touch of nature and
-              individuality to your home, making it a truly special place to live.
-            </p>
+            <HeadingTag id="reclaimed-wood-heading" className="wallpaperHeading" style={headingStyle}>
+  {headingText}
+</HeadingTag>
+<p id="reclaimed-wood-description" className="px-lg-5 fs-6 text-muted" style={descriptionStyle}>
+  {descriptionText}
+</p>
+<style>{`
+  ${headingData?.headingColor ? `#reclaimed-wood-heading { color: ${headingData.headingColor} !important; }` : ""}
+  ${headingData?.descriptionColor ? `#reclaimed-wood-description { color: ${headingData.descriptionColor} !important; }` : ""}
+  ${headingData?.descriptionFontSize ? `#reclaimed-wood-description { font-size: ${headingData.descriptionFontSize}px !important; }` : ""}
+`}</style>
           </div>
           <div className="row g-4 mx-0">
             {exclusiveDesignData && exclusiveDesignData.length > 0 ? (

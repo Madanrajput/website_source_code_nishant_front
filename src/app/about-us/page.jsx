@@ -90,37 +90,58 @@ export async function generateMetadata() {
 export default async function AboutUs() {
   const formData = await getAboutUsContent();
 
+        const TopTitleTag = formData?.top_title_tag || "h2";
+        const SubTitleTag = formData?.mid_sub_title_tag || "h3";
+        const SubSpanTitleTag = formData?.mid_sub_span_title_tag || "h4";
+
   return (
     <MainLayout>
       <main>
         {/* Background Section */}
-        <BackgroundImageRow
+        {/* <BackgroundImageRow
           sectionBgImages="contact_wrapper about_us_banner"
           sectionBgHeading="About Us"
           secBgHeadingClass="sec_bgheading_lass about_mob"
           sectionBgDescription="Get A Place Designed Exactly How You Wished"
           secBgDesClass="text-center bg-transparent text-white"
+        /> */}
+        <BackgroundImageRow
+          sectionBgImages="contact_wrapper about_us_banner"
+          sectionBgHeading={formData?.banner_heading || "About Us"}
+          secBgHeadingClass="sec_bgheading_lass about_mob"
+          sectionBgDescription={formData?.banner_description || "Get A Place Designed Exactly How You Wished"}
+          secBgDesClass="text-center bg-transparent text-white"
+          headingTag={formData?.banner_heading_tag || "h1"}
+          descriptionFontSize={formData?.banner_description_font_size ? `${formData.banner_description_font_size}px` : undefined}
+          bgImageUrl={formData?.banner_image}
+          sectionBgHeadingStyle={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
+  sectionBgDescriptionStyle={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
         />
-
         {/* About High Creation Section */}
         <section className="my-5 container">
           <div className="row mx-0">
             <center>
-              <h2 className="pb-4 wallpaperHeading">
+              <TopTitleTag className="pb-4 wallpaperHeading" style={{ textShadow: "none" }}>
                 {formData?.top_title || "About High Creation"}
-              </h2>
+              </TopTitleTag>
               <div className="row justify-content-center">
-                <div className="col-lg-6">
+                <div className="col-6 d-flex justify-content-center">
                   {formData?.mid_image && (
                     <img
                       src={formData.mid_image}
-                      className="w-100"
+                      className="d-block"
+                      style={{ 
+    width: formData?.mid_image_size ? `${formData.mid_image_size}%` : '100%', 
+    maxWidth: 'none', 
+    height: 'auto' 
+  }}
                       alt={formData?.top_title || "About Us"}
                     decoding="async"  loading="lazy" />
                   )}
                 </div>
               </div>
-              <p className="px-lg-5 pt-4 team_description">
+              <p className="px-lg-5 pt-4 team_description"
+              style={{ fontSize: formData?.top_description_font_size ? `${formData.top_description_font_size}px` : undefined }}>
                 {formData?.top_description}
               </p>
             </center>
@@ -133,14 +154,14 @@ export default async function AboutUs() {
             <div className="row mx-0">
               <div className="col-lg-7 d-flex align-items-center">
                 <div>
-                  <h3 className="text-white">{formData?.mid_sub_title}</h3>
+                  <SubTitleTag className="text-white">{formData?.mid_sub_title}</SubTitleTag>
                   <div className="team_description text-white pe-lg-5">
-                    <p>
-                      <span className="font_stylish text-white">
-                        Interior designing Company?
-                      </span>
-                    </p>
-                    <p style={{color:"#FFF"}}>{formData?.mid_sub_description}</p>
+                    <div>
+                      <SubSpanTitleTag className="text-white">
+                        {formData?.mid_sub_span_title || "Interior designing Company?"}
+                      </SubSpanTitleTag>
+                    </div>
+                    <p style={{color:"#FFF", fontSize: formData?.mid_sub_description_font_size ? `${formData.mid_sub_description_font_size}px` : undefined}}>{formData?.mid_sub_description}</p>
                   </div>
                 </div>
               </div>

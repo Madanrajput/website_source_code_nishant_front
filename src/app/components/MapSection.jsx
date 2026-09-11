@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 
 // Store all your locations with dynamically generated Google Maps embed URLs
-const locations = [
+const DEFAULT_LOCATIONS = [
   // --- 1. Corporate Office ---
   {
     id: 1,
@@ -10,12 +10,12 @@ const locations = [
     address: "H-56, 1st Floor, Sector-63, Noida, Uttar Pradesh- 201301",
     mapSrc: "https://www.google.com/maps?q=H-56,+1st+Floor,+Sector-63,+Noida,+Uttar+Pradesh-+201301&output=embed",
   },
-  {
-    id: 2,
-    type: "Corporate Office",
-    address: "DDC Arcade, 1st Floor, Plot No 1 Main, Sector 48 Road, Badshahpur Sohna Rd, Opposite Vipul Business Park, Gurugram, Haryana 122018",
-    mapSrc: "https://www.google.com/maps?q=DDC+Arcade,+Badshahpur+Sohna+Rd,+Gurugram,+Haryana&output=embed",
-  },
+  // {
+  //   id: 2,
+  //   type: "Corporate Office",
+  //   address: "DDC Arcade, 1st Floor, Plot No 1 Main, Sector 48 Road, Badshahpur Sohna Rd, Opposite Vipul Business Park, Gurugram, Haryana 122018",
+  //   mapSrc: "https://www.google.com/maps?q=DDC+Arcade,+Badshahpur+Sohna+Rd,+Gurugram,+Haryana&output=embed",
+  // },
 
   // --- 2. Experience Center ---
   {
@@ -24,11 +24,17 @@ const locations = [
     address: "H101, LGF, Sector-63, Noida, Uttar Pradesh- 201301",
     mapSrc: "https://www.google.com/maps?q=H101,+LGF,+Sector-63,+Noida,+Uttar+Pradesh-+201301&output=embed",
   },
+  // {
+  //   id: 4,
+  //   type: "Experience Center",
+  //   address: "4th Floor, Jmd Galleria Mall, Unit Nos. 402, Sector-47 & 48, Sohna - Gurgaon Rd, Gurugram, Haryana 122001",
+  //   mapSrc: "https://www.google.com/maps?q=Jmd+Galleria+Mall,+Sector-47,+Gurugram,+Haryana&output=embed",
+  // },
   {
     id: 4,
     type: "Experience Center",
-    address: "4th Floor, Jmd Galleria Mall, Unit Nos. 402, Sector-47 & 48, Sohna - Gurgaon Rd, Gurugram, Haryana 122001",
-    mapSrc: "https://www.google.com/maps?q=Jmd+Galleria+Mall,+Sector-47,+Gurugram,+Haryana&output=embed",
+    address: "DDC Arcade, 1st Floor, Plot No 1 Main, Sector 48 Road, Badshahpur Sohna Rd, Opposite Vipul Business Park, Gurugram, Haryana 122018",
+    mapSrc: "https://www.google.com/maps?q=DDC+Arcade,+Badshahpur+Sohna+Rd,+Gurugram,+Haryana&output=embed",
   },
   {
     id: 5,
@@ -41,12 +47,15 @@ const locations = [
   {
     id: 6,
     type: "Workshop",
-    address: "Plot No-3, Sorkha Village, Sector-115, Noida, Uttar Pradesh- 201301",
-    mapSrc: "https://www.google.com/maps?q=Sorkha+Village,+Sector-115,+Noida,+Uttar+Pradesh&output=embed",
+    address: "Gata No - 336, Village - Upeda, Hapur, Uttar Pradesh 245201",
+    mapSrc: "https://www.google.com/maps?q=Upeda,+Hapur,+Uttar+Pradesh+245201&output=embed"
+    // mapSrc: "https://www.google.com/maps?q=Sorkha+Village,+Sector-115,+Noida,+Uttar+Pradesh&output=embed",
   },
 ];
 
-export default function MapSection() {
+export default function MapSection({ locations: locationsProp, heading: headingProp }) {
+  const locations = locationsProp && locationsProp.length ? locationsProp : DEFAULT_LOCATIONS;
+  const heading = headingProp || "Explore us on Map";
   // Set the first location as the default active map
   const [activeLocation, setActiveLocation] = useState(locations[0]);
 
@@ -54,7 +63,7 @@ export default function MapSection() {
     <section className="container my-5 map">
       <div className="row mx-0">
         <div className="col-lg-6 pe-lg-4">
-          <h2 className="pb-4">Explore us on Map</h2>
+          <h2 className="pb-4">{heading}</h2>
           
           {/* Render Locations List */}
           {locations.map((loc, index) => {

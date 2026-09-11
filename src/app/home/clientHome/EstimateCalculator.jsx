@@ -6,16 +6,6 @@ export default function EstimateCalculator({ estimateSectionData }) {
     const router = useRouter();
     const [submittingId, setSubmittingId] = useState(null);
 
-    const rotatingWords = ["2BHK", "3BHK", "4BHK", "Villa"];
-    const [currentWordIndex, setCurrentWordIndex] = useState(0);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentWordIndex((prevIndex) => (prevIndex + 1) % rotatingWords.length);
-        }, 4000); 
-        return () => clearInterval(interval);
-    }, []);
-
     const handleCalculateClick = async (propertyType) => {
         setSubmittingId(propertyType);
         await new Promise(resolve => setTimeout(resolve, 600));
@@ -26,7 +16,7 @@ export default function EstimateCalculator({ estimateSectionData }) {
     const headingBase = estimateSectionData?.heading || "Get an estimate for your";
     const subHeading = estimateSectionData?.sub_heading || "Select your property type to calculate the cost of your interiors.";
 
-    const propertyCards = [
+    const defaultPropertyCards = [
         {
             id: '2BHK', title: '2 BHK', description: 'Perfect for small families. Get a tailored estimate for your cozy space.',
             icon: (
@@ -61,6 +51,34 @@ export default function EstimateCalculator({ estimateSectionData }) {
         }
     ];
 
+    const cmsCards = Array.isArray(estimateSectionData?.cards)
+    ? estimateSectionData.cards.filter(card => card?.is_active !== false)
+    : [];
+
+    const propertyCards =
+    cmsCards.length > 0
+        ? cmsCards
+        : defaultPropertyCards;
+
+    const rotatingWords =
+    propertyCards.length > 0
+        ? propertyCards.map(card => card?.title).filter(Boolean)
+        : [];
+    const [currentWordIndex, setCurrentWordIndex] = useState(0);
+
+    useEffect(() => {
+    if (rotatingWords.length <= 1) return;
+
+    const interval = setInterval(() => {
+        setCurrentWordIndex(
+            prevIndex =>
+                (prevIndex + 1) % rotatingWords.length
+        );
+    }, 4000);
+
+    return () => clearInterval(interval);
+}, [rotatingWords.length]);
+
     return (
         <section className="estimate-wrapper w-100 position-relative">
             <style dangerouslySetInnerHTML={{
@@ -68,7 +86,7 @@ export default function EstimateCalculator({ estimateSectionData }) {
                 .estimate-wrapper { background-color: #fafafa; padding: 5rem 0; font-family: var(--font-poppins), sans-serif; }
                 .estimate-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; text-align: center; }
                 
-                .estimate-section-title { font-family: var(--font-outfit), sans-serif; font-size: 2.8rem; font-weight: 800; color: #111; margin-bottom: 0.5rem; }
+                .estimate-section-title { font-family: var(--font-outfit), sans-serif; font-size: 2.8rem; font-weight: 600; color: #111; margin-bottom: 0.5rem; }
                 .estimate-subheading { font-size: 1.1rem; color: #666; margin-bottom: 3.5rem; font-weight: 400; }
 
                 .rotating-text-wrapper { display: inline-block; min-width: 120px; text-align: left; vertical-align: bottom; overflow: hidden; height: 1.2em; position: relative; top: 5px; }
@@ -76,7 +94,7 @@ export default function EstimateCalculator({ estimateSectionData }) {
                 .rotating-text { 
                     color: #ff914d; 
                     display: block; 
-                    font-weight: 800;
+                    font-weight: 600;
                     animation: slideUp 4s infinite cubic-bezier(0.25, 1, 0.5, 1); 
                 }
 
@@ -90,9 +108,12 @@ export default function EstimateCalculator({ estimateSectionData }) {
                 .property-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
                 .property-card { background: #ffffff; border: 1px solid #eaeaea; border-radius: 16px; padding: 35px 25px; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
                 .property-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.08); border-color: #ffc099; }
-                .card-icon-wrapper { width: 80px; height: 80px; border-radius: 50%; background: #fff6f0; color: #ff914d; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; transition: all 0.3s ease; }
+                .card-icon-wrapper { width: 80px; height: 80px; border-radius: 50%; background: var(--icon-bg-color, #fff6f0); color: #ff914d; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; transition: all 0.3s ease; }
                 .property-card:hover .card-icon-wrapper { background: #ff914d; color: #ffffff; transform: scale(1.05); }
                 .card-title { font-family: var(--font-outfit), sans-serif; font-size: 1.5rem; font-weight: 700; color: #222; margin-bottom: 0.75rem; }
+                .property-card:hover .card-icon-wrapper img {
+                    filter: brightness(0) invert(1);
+                }
                 .card-description { font-size: 0.9rem; color: #666; line-height: 1.5; margin-bottom: 2rem; flex-grow: 1; }
                 .btn-card-action { width: 100%; background: transparent; color: #ff914d; border: 2px solid #ff914d; padding: 12px 20px; border-radius: 8px; font-family: var(--font-outfit), sans-serif; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; }
                 .property-card:hover .btn-card-action { background: #ff914d; color: #ffffff; }
@@ -103,6 +124,7 @@ export default function EstimateCalculator({ estimateSectionData }) {
                 /* 🌟 FIX: Mobile Slider CSS matches HomeContent safe-zones */
                 @media (max-width: 768px) { 
                     .estimate-section-title { font-size: 2.2rem; } 
+                    .estimate-container { padding: 0 15px !important; overflow: hidden; }
                     .property-grid { 
                         display: flex !important; 
                         flex-wrap: nowrap !important; 
@@ -110,20 +132,21 @@ export default function EstimateCalculator({ estimateSectionData }) {
                         overflow-y: visible !important; 
                         scroll-snap-type: x mandatory; 
                         padding-top: 10px !important; /* Added slight top buffer for shadows */
-                        padding-bottom: 20px !important; 
+                        padding-bottom: 25px !important; 
                         -webkit-overflow-scrolling: touch; 
                         scrollbar-width: none; 
-                        scroll-padding-left: 15px;
-                        padding-left: 15px; 
-                        padding-right: 40px !important; /* Buffer to prevent cropped edges */
+                        scroll-padding-left: 20px;
+                        scroll-padding-left: 20px;
+                        padding-left: 20px !important; 
+                        padding-right: 20px !important; /* Buffer to prevent cropped edges */
                         margin-left: -20px; /* Bleed edge to edge of the screen */
                         margin-right: -20px; 
                         gap: 15px;
                     }
                     .property-grid::-webkit-scrollbar { display: none; }
                     .property-card { 
-                        flex: 0 0 85% !important; 
-                        max-width: 85% !important; 
+                        flex: 0 0 100% !important; 
+                        max-width: 100% !important; 
                         scroll-snap-align: start !important; /* Ensures clean snapping to the left */
                         padding: 30px 20px;
                     }
@@ -146,7 +169,26 @@ export default function EstimateCalculator({ estimateSectionData }) {
                         const isThisCardLoading = submittingId === card.id;
                         return (
                             <div key={card.id} className="property-card">
-                                <div className="card-icon-wrapper">{card.icon}</div>
+                                <div
+    className="card-icon-wrapper"
+    style={{
+        "--icon-bg-color": card?.icon_bg_color || "#fff6f0"
+    }}
+>
+    {card?.image ? (
+        <img
+            src={card.image}
+            alt={card?.title || "Estimate icon"}
+            style={{
+                width: "48px",
+                height: "48px",
+                objectFit: "contain"
+            }}
+        />
+    ) : (
+        card?.icon
+    )}
+</div>
                                 <h3 className="card-title">{card.title}</h3>
                                 <p className="card-description">{card.description}</p>
                                 

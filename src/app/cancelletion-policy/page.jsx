@@ -34,6 +34,21 @@ async function getSeoData() {
   }
 }
 
+async function getBannerData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-gallery-design/manage-banner?key=cancellation_policy`, {
+      cache: "no-store",
+      headers: { Connection: "close" },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.error("Banner Fetch Error:", err);
+    return null;
+  }
+}
+
 export async function generateMetadata() {
   const seoData = await getSeoData();
   const defaultTitle = "Cancellation Policy - High Creation Interior";
@@ -49,15 +64,32 @@ export async function generateMetadata() {
 }
 
 export default async function CancelletionPolicy() {
+
+  const bannerRecord = await getBannerData();
+  const bgHeading = bannerRecord?.banner_heading || "Cancellation Policy";
+const bgDescription = bannerRecord?.banner_description || "Transparent policies for a trusted partnership";
   return (
     <MainLayout>
-      <BackgroundImageWithHeading
+      {/* <BackgroundImageWithHeading
         sectionBgImages={"contact_wrapper cancelation_policy_banner"}
         sectionBgHeading="Cancellation Policy"
         secBgHeadingClass="sec_bgheading_lass"
         sectionBgDescription="Transparent policies for a trusted partnership"
         secBgDesClass={"text-center text-white"}
-      />
+      /> */}
+
+      <BackgroundImageWithHeading
+  sectionBgImages={"contact_wrapper cancelation_policy_banner"}
+  sectionBgHeading={bgHeading}
+  secBgHeadingClass="sec_bgheading_lass force-white-heading"
+  sectionBgDescription={bgDescription}
+  secBgDesClass={"text-center bg-transparent text-white"}
+  bgImageUrl={bannerRecord?.banner_image}
+  headingTag={bannerRecord?.banner_heading_tag || "h1"}
+  descriptionFontSize={bannerRecord?.banner_description_font_size || 16}
+  sectionBgHeadingStyle={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
+  sectionBgDescriptionStyle={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
+/>
 
       <section className="policy-content my-5 py-4">
         <div className="container">
@@ -106,7 +138,7 @@ export default async function CancelletionPolicy() {
                 <tbody>
                   <tr>
                     <td className="fw-bold">Case 1: Cancellation requested within seven (7) days of booking amount receipt.</td>
-                    <td>Cancellation request is received within 7 days of booking (Only Applicable if designer and operation team does not aligned for Project)</td>
+                    <td>Cancellation request is received within 7 days of booking (Only Applicable if designer and operation team is not aligned for Project)</td>
                     <td>A full (100%) refund of the amount paid will be refund.</td>
                   </tr>
                   <tr>

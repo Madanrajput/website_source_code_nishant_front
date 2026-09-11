@@ -95,7 +95,7 @@ export default function HeroCarousel({ bannerData }) {
             align-items: center;      
             padding-bottom: 4rem;      
             pointer-events: none;
-            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0) 80%);
+            background: transparent;
             text-align: center;
         }
         
@@ -192,7 +192,7 @@ export default function HeroCarousel({ bannerData }) {
             .desktop-banner { display: block !important; }
             .mobile-banner { display: none !important; }
 
-            .banner-overlay { padding-bottom: 6rem; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0) 100%); }
+            .banner-overlay { padding-bottom: 6rem; background: transparent; }
             .banner-content-wrapper { width: 90%; max-width: 1200px; padding: 0 20px; }
             .banner-top-slogan { font-size: 1.1rem; margin-bottom: 1rem !important; }
             
@@ -265,16 +265,16 @@ export default function HeroCarousel({ bannerData }) {
 
                 <div className="banner-overlay">
                   <div className="banner-content-wrapper">
-                    {banner?.top_slogan && <div className="banner-top-slogan" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>{banner.top_slogan}</div>}
+                    {banner?.top_slogan && <div className="banner-top-slogan" style={{ textShadow: '0px 4px 12px rgba(0,0,0,0.9), 0px 1px 3px rgba(0,0,0,0.8)' }}>{banner.top_slogan}</div>}
                     
                     {isFirstSlide ? (
-                      <h1 className="home_banner_heading" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>{banner?.title}</h1>
+                      <h1 className="home_banner_heading" style={{ textShadow: '0px 4px 12px rgba(0,0,0,0.9), 0px 1px 3px rgba(0,0,0,0.8)' }}>{banner?.title}</h1>
                     ) : (
-                      <h2 className="home_banner_heading" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>{banner?.title}</h2>
+                      <h2 className="home_banner_heading" style={{ textShadow: '0px 4px 12px rgba(0,0,0,0.9), 0px 1px 3px rgba(0,0,0,0.8)' }}>{banner?.title}</h2>
                     )}
                     
-                    {banner?.sub_title && <div className="font_stylish_home" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>{banner.sub_title}</div>}
-                    {banner?.description && <p className="banner-desc" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{banner.description}</p>}
+                    {banner?.sub_title && <div className="font_stylish_home" style={{ textShadow: '0px 4px 12px rgba(0,0,0,0.9), 0px 1px 3px rgba(0,0,0,0.8)' }}>{banner.sub_title}</div>}
+                    {banner?.description && <p className="banner-desc" style={{ textShadow: '0px 4px 12px rgba(0,0,0,0.9), 0px 1px 3px rgba(0,0,0,0.8)' }}>{banner.description}</p>}
                     
                     {banner?.button_text && banner?.button_link && (
                        <div className="mt-2 w-100">

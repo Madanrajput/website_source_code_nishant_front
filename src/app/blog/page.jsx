@@ -45,6 +45,23 @@ async function getBlogsData(page) {
   }
 }
 
+async function getHeadingDescriptionData() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/cms-content/manage_heading_description`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) return null;
+
+    const record = await res.json();
+    const data = Array.isArray(record) ? record[0] : record;
+    return data?.json_content?.sections?.blogs || null;
+  } catch (err) {
+    console.error("Heading/Description Fetch Error:", err);
+    return null;
+  }
+}
+
 // --- MAIN SERVER COMPONENT ---
 export default async function Blog({ searchParams }) {
   const page = searchParams?.page || "1";
@@ -61,6 +78,29 @@ export default async function Blog({ searchParams }) {
   const isPageOne = page === "1";
   const featuredBlog = (isPageOne && allBlogs.length > 0) ? allBlogs[0] : null;
   const regularBlogs = featuredBlog ? allBlogs.slice(1) : allBlogs;
+
+    const headingData = await getHeadingDescriptionData();
+
+const HeadingTag = headingData?.headingTag || "h1";
+const headingText = headingData?.headingText || "Latest News & Updates";
+const headingStyle = {
+  ...(headingData?.headingColor && { color: headingData.headingColor }),
+};
+
+const descriptionText =
+  headingData?.descriptionText ||
+  "Explore our curated library of interior design trends, expert advice, and home styling tips.";
+const descriptionStyle = {
+  ...(headingData?.descriptionColor && { color: headingData.descriptionColor }),
+  ...(headingData?.descriptionFontSize && { fontSize: `${headingData.descriptionFontSize}px` }),
+};
+
+const badgeText = headingData?.badgeText || (isPageOne ? "Design Insights" : `Page ${page}`);
+const badgeStyle = {
+  ...(headingData?.badgeTextColor && { color: headingData.badgeTextColor }),
+  ...(headingData?.badgeBgColor && { backgroundColor: headingData.badgeBgColor }),
+  ...(headingData?.badgeFontSize && { fontSize: `${headingData.badgeFontSize}px` }),
+};
 
   // SEO Content for the bottom of the page
   const seoPageDescription = `
@@ -125,7 +165,7 @@ export default async function Blog({ searchParams }) {
         .card-img-wrapper {
           position: relative;
           width: 100%;
-          aspect-ratio: 16/10;
+          aspect-ratio: 22/12;
           overflow: hidden;
         }
         .card-img-wrapper img {
@@ -133,7 +173,7 @@ export default async function Blog({ searchParams }) {
         }
         .modern-blog-card:hover .card-img-wrapper img,
         .featured-blog-card:hover .card-img-wrapper img {
-          transform: scale(1.05);
+          transform: scale(1.02);
         }
 
         .line-clamp-2 {
@@ -183,18 +223,38 @@ export default async function Blog({ searchParams }) {
         
         {/* --- HERO SECTION --- */}
         <section className="blog-hero-section">
-          <div className="container">
-            <span className="badge bg-dark px-3 py-2 rounded-pill mb-3 font-poppins text-uppercase tracking-wider">
-              {isPageOne ? "Design Insights" : `Page ${page}`}
-            </span>
-            <h1 className="font-outfit fw-bold text-dark mb-3" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.02em' }}>
-              Latest News & Updates
-            </h1>
-            <p className="font-poppins text-muted mx-auto fs-5" style={{ maxWidth: '600px' }}>
-              Explore our curated library of interior design trends, expert advice, and home styling tips.
-            </p>
-          </div>
-        </section>
+  <div className="container">
+    <span
+      id="blog-hero-badge"
+      className="badge bg-dark px-3 py-2 rounded-pill mb-3 font-poppins text-uppercase tracking-wider"
+      style={badgeStyle}
+    >
+      {badgeText}
+    </span>
+    <HeadingTag
+      id="blog-hero-heading"
+      className="font-outfit fw-bold text-dark mb-3"
+      style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', letterSpacing: '-0.02em', ...headingStyle }}
+    >
+      {headingText}
+    </HeadingTag>
+    <p
+      id="blog-hero-description"
+      className="font-poppins text-muted mx-auto fs-5"
+      style={{ maxWidth: '600px', ...descriptionStyle }}
+    >
+      {descriptionText}
+    </p>
+    <style>{`
+      ${headingData?.headingColor ? `#blog-hero-heading { color: ${headingData.headingColor} !important; }` : ""}
+      ${headingData?.descriptionColor ? `#blog-hero-description { color: ${headingData.descriptionColor} !important; }` : ""}
+      ${headingData?.descriptionFontSize ? `#blog-hero-description { font-size: ${headingData.descriptionFontSize}px !important; }` : ""}
+      ${headingData?.badgeTextColor ? `#blog-hero-badge { color: ${headingData.badgeTextColor} !important; }` : ""}
+      ${headingData?.badgeBgColor ? `#blog-hero-badge { background-color: ${headingData.badgeBgColor} !important; }` : ""}
+      ${headingData?.badgeFontSize ? `#blog-hero-badge { font-size: ${headingData.badgeFontSize}px !important; }` : ""}
+    `}</style>
+  </div>
+</section>
 
         <div className="container py-5">
           {allBlogs.length === 0 ? (
@@ -211,7 +271,7 @@ export default async function Blog({ searchParams }) {
                     <Link href={`/${featuredBlog.seo_content?.slug || `blog-detail?id=${featuredBlog.id}`}`} className="text-decoration-none">
                       <div className="featured-blog-card row g-0 align-items-center">
                         <div className="col-lg-7">
-                          <div className="card-img-wrapper" style={{ aspectRatio: '16/10' }}>
+                          <div className="card-img-wrapper" style={{ aspectRatio: '10/6' }}>
                             <Image 
                               src={featuredBlog.image || "/images/Blog/blo_img1.webp"} 
                               alt={featuredBlog.image_alt || featuredBlog.title || defaultAltText}
@@ -315,15 +375,15 @@ export default async function Blog({ searchParams }) {
         </div>
 
         {/* --- SEO CONTENT SECTION UTILIZING ExpandableRichText --- */}
-        <div className="container mt-5 pt-4">
+        {/* <div className="container mt-5 pt-4">
           <div className="bg-white p-4 p-lg-5 rounded-4 border shadow-sm">
             <div className="d-flex align-items-center gap-3 mb-4">
               <h2 className="font-outfit fw-bold m-0">About High Creation Blog</h2>
-            </div>
+            </div> */}
             {/* 🌟 THIS IS WHERE WE USE THE GOD TIER EXPANDABLE PARAGRAPH COMPONENT 🌟 */}
-            <ExpandableRichText htmlContent={seoPageDescription} maxHeight={160} className="rich-text-content font-poppins text-muted" />
+            {/* <ExpandableRichText htmlContent={seoPageDescription} maxHeight={160} className="rich-text-content font-poppins text-muted" />
           </div>
-        </div>
+        </div> */}
 
       </main>
       <hr className="m-0" />

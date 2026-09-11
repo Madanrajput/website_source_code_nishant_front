@@ -4,12 +4,14 @@ import PortfolioCard from "../components/PortfolioCard";
 import BackgroundImageRow from "../components/BackgroundImageRow";
 import { useEffect, useState } from "react";
 import api from "@/utils/api";
+import Head from "next/head";
 
 const Designidea = () => {
   const [designIdea, setDesignIdea] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [seoData, setSeoData] = useState({});
+  const [bannerRecord, setBannerRecord] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -41,6 +43,21 @@ const Designidea = () => {
     fetchSeoData();
   }, []);
 
+  useEffect(() => {
+  const fetchBanner = async () => {
+    try {
+      const response = await api.get("/cms-gallery-design/manage-banner?key=award_galleries");
+      setBannerRecord(response.data);
+    } catch (err) {
+      console.error("Banner Fetch Error:", err);
+    }
+  };
+  fetchBanner();
+}, []);
+
+const bgHeading = bannerRecord?.banner_heading || "Design Gallery";
+const bgDescription = bannerRecord?.banner_description || "Designs That Speak Before Words Do—Explore Our Most Inspiring Creations, spaces that blend beauty, functionality, and timeless design.";
+
   // Sort records by ID in descending order (newest first)
   const sortedDesignIdea = [...designIdea].sort((a, b) => b.id - a.id);
 
@@ -52,7 +69,7 @@ const Designidea = () => {
  console.log('latestRecords',latestRecords);
   return (
     <div>
-      <head>
+      <Head>
         <title>{seoData?.title ?? "High Creation Interior - Interior Design Gallery"}</title>
         <meta name="title" content={seoData?.metaTitle ?? "High Creation Interior - Interior Design Gallery"} />
         <meta
@@ -63,16 +80,37 @@ const Designidea = () => {
           name="keywords"
           content={seoData?.metaKeywords ?? "design idea, living room interior, living room design, living room decor"}
         />
-      </head>
+      </Head>
       <MainLayout>
         <main>
-          <BackgroundImageRow
+          {/* <BackgroundImageRow
             sectionBgImages={"contact_wrapper design_gallery_banner"}
             sectionBgHeading="Design Gallery"
             secBgHeadingClass="sec_bgheading_lass"
             sectionBgDescription="Designs That Speak Before Words Do—Explore Our Most Inspiring Creations, spaces that blend beauty, functionality, and timeless design."
             secBgDesClass="secbgbesclass"
-          />
+          /> */}
+          {/* <BackgroundImageRow
+  sectionBgImages={"contact_wrapper design_gallery_banner"}
+  sectionBgHeading={bgHeading} 
+  secBgHeadingClass="sec_bgheading_lass"
+  sectionBgDescription={bgDescription} 
+  secBgDesClass="secbgbesclass"
+  bgImageUrl={bannerRecord?.banner_image} 
+/> */}
+
+<BackgroundImageRow
+  sectionBgImages={"contact_wrapper design_gallery_banner"}
+  sectionBgHeading={bgHeading}
+  secBgHeadingClass="sec_bgheading_lass"
+  sectionBgDescription={bgDescription}
+  secBgDesClass="secbgbesclass"
+  bgImageUrl={bannerRecord?.banner_image}
+  headingTag={bannerRecord?.banner_heading_tag || "h1"}
+  descriptionFontSize={bannerRecord?.banner_description_font_size || 16}
+  sectionBgHeadingStyle={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
+  sectionBgDescriptionStyle={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
+/>
 
           {loading ? (
             <div className="text-center">Loading...</div>

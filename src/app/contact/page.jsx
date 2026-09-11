@@ -1,7 +1,45 @@
+import React from "react";
 import MainLayout from "../layouts/MainLayout";
 import ContactForm from "./ContactForm";
 import MapSection from "../components/MapSection";
-import { FaPhoneAlt, FaEnvelope, FaBuilding, FaStore, FaTools } from "react-icons/fa";
+import { FaPhoneAlt, FaEnvelope, FaBuilding, FaStore, FaTools, FaMapMarkerAlt, FaWhatsapp, FaClock, FaFax, FaGlobe, FaUser, FaHome, FaWarehouse, FaIndustry } from "react-icons/fa";
+
+const ICON_MAP = { FaPhoneAlt, FaEnvelope, FaBuilding, FaStore, FaTools, FaMapMarkerAlt, FaWhatsapp, FaClock, FaFax, FaGlobe, FaUser, FaHome, FaWarehouse, FaIndustry };
+const RenderIcon = ({ name }) => { const Cmp = ICON_MAP[name] || FaPhoneAlt; return <Cmp />; };
+
+const DEFAULT_CONTACT_CONTENT = {
+  banner: {
+    headingTag: "h1", heading: "Let's Design Your Dream Space", headingColor: "#ffffff",
+    eyebrow: "Get in Touch",
+    description: "For inquiries regarding any interior design service or expert advice, our team is ready to help you bring your vision to life.",
+    descriptionColor: "#ffffff", descriptionFontSize: 18,
+    bgColorStart: "#0f172a", bgColorEnd: "#1e293b",
+  },
+  cards: [
+    { id: "1", icon: "FaPhoneAlt", title: "Call Us", rows: [
+      { label: "General Inquiry", value: "+91 7070701373", link: "tel:7070701373" },
+      { label: "Toll Free", value: "1800-1200-532", link: "tel:18001200532" } ] },
+    { id: "2", icon: "FaEnvelope", title: "Email Us", rows: [
+      { label: "General Info", value: "info@hcinterior.in", link: "mailto:info@hcinterior.in" },
+      { label: "Customer Care", value: "care@hcinterior.in", link: "mailto:care@hcinterior.in" } ] },
+    { id: "3", icon: "FaBuilding", title: "Corporate Office", rows: [
+      { label: "", value: "H-56, 1st Floor, Sector-63, Noida, Uttar Pradesh - 201301", link: "" } ] },
+    { id: "4", icon: "FaTools", title: "Workshop", rows: [
+      { label: "", value: "Gata No - 336, Village - Upeda, Hapur, Uttar Pradesh 245201", link: "" } ] },
+  ],
+  experienceCenters: {
+    heading: "Experience Centers", icon: "FaStore",
+    centers: [
+      { id: "1", heading: "Noida", address: "H101, LGF, Sector-63, Noida, Uttar Pradesh - 201301" },
+      { id: "2", heading: "Gurugram (DDC Arcade)", address: "1st Floor, Plot No 1 Main, Sector 48 Road, Badshahpur Sohna Rd, Haryana - 122018" },
+      { id: "3", heading: "Faridabad", address: "1st Floor, Plot No 24, near old Faridabad Metro Station, Sector 20A, Haryana - 121002" },
+    ],
+  },
+    mapSection: {
+    heading: "Find Us Here",
+    locations: [],
+  },
+};
 
 // --- CONFIGURATION ---
 export const revalidate = 60; 
@@ -39,6 +77,25 @@ async function getSeoData() {
   }
 }
 
+async function getContactPageContent() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-content/contact_page`, { next: { revalidate: 60 } });
+    if (!res.ok) return DEFAULT_CONTACT_CONTENT;
+    const data = await res.json();
+    const row = Array.isArray(data) ? data[0] : data;
+    let parsed = row?.json_content;
+    if (typeof parsed === "string") parsed = JSON.parse(parsed);
+    return parsed && typeof parsed === "object"
+  ? { ...DEFAULT_CONTACT_CONTENT, ...parsed }
+  : DEFAULT_CONTACT_CONTENT;
+  } catch (err) {
+    console.error("Contact CMS Fetch Error:", err);
+    return DEFAULT_CONTACT_CONTENT;
+  }
+}
+
+
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
   const seoData = await getSeoData();
@@ -64,7 +121,14 @@ export async function generateMetadata() {
 }
 
 // --- MAIN SERVER COMPONENT ---
-export default function Contact() {
+// export default function Contact() {
+export default async function Contact() {
+  const {
+  banner = DEFAULT_CONTACT_CONTENT.banner,
+  cards = DEFAULT_CONTACT_CONTENT.cards,
+  experienceCenters = DEFAULT_CONTACT_CONTENT.experienceCenters,
+  mapSection = DEFAULT_CONTACT_CONTENT.mapSection,
+} = await getContactPageContent();
   return (
     <MainLayout>
       <style dangerouslySetInnerHTML={{__html: `
@@ -152,22 +216,40 @@ export default function Contact() {
           box-shadow: 0 20px 40px rgba(0,0,0,0.06);
           border: 1px solid rgba(0,0,0,0.02);
         }
+
+        .hero-dynamic-text {
+  color: var(--hero-text-color) !important;
+}
+  main {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
       `}} />
 
-      <main className="bg-light pb-0">
+      <main className="bg-light pb-0 overflow-hidden">
         
         {/* --- PREMIUM HERO SECTION --- */}
-        <section className="contact-hero text-center text-lg-start">
+        <section className="contact-hero text-center text-lg-start"
+        style={{ background: `linear-gradient(135deg, ${banner?.bgColorStart || "#0f172a"} 0%, ${banner?.bgColorEnd || "#1e293b"} 100%)` }}>
           <div className="container">
             <div className="row align-items-center">
               <div className="col-lg-8 mx-auto text-center">
-                <span className="font_stylish text-white" style={{ opacity: 0.9 }}>Get in Touch</span>
+                {/* <span className="font_stylish text-white" style={{ opacity: 0.9 }}>Get in Touch</span>
                 <h1 className="font-outfit fw-bold text-white mb-3" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)' }}>
                   {`Let's Design Your Dream Space`}
                 </h1>
                 <p className="font-poppins text-white-50 mx-auto" style={{ maxWidth: '600px', fontSize: '1.1rem' }}>
                   For inquiries regarding any interior design service or expert advice, our team is ready to help you bring your vision to life.
-                </p>
+                </p> */}
+                <span className="font_stylish hero-dynamic-text" style={{ opacity: 0.9, "--hero-text-color": banner.headingColor || "#ffffff" }}>{banner.eyebrow}</span>
+{React.createElement(
+  banner.headingTag || "h1",
+  { className: "font-outfit fw-bold mb-3 hero-dynamic-text", style: { fontSize: 'clamp(2.5rem, 5vw, 4rem)', "--hero-text-color": banner.headingColor || "#ffffff" } },
+  banner.heading
+)}
+<p className="font-poppins mx-auto" style={{ maxWidth: '600px', fontSize: `${banner.descriptionFontSize || 18}px`, color: banner.descriptionColor || "#ffffff" }}>
+  {banner.description}
+</p>
               </div>
             </div>
           </div>
@@ -183,7 +265,7 @@ export default function Contact() {
                 <div className="row g-4">
                   
                   {/* Call Us Card (Merged General & Toll Free to save space) */}
-                  <div className="col-md-6">
+                  {/* <div className="col-md-6">
                     <div className="contact-info-card flex-column align-items-start gap-3">
                       <div className="contact-icon-wrapper">
                         <FaPhoneAlt />
@@ -200,10 +282,10 @@ export default function Contact() {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Email Card */}
-                  <div className="col-md-6">
+                  {/* <div className="col-md-6">
                     <div className="contact-info-card flex-column align-items-start gap-3">
                       <div className="contact-icon-wrapper">
                         <FaEnvelope />
@@ -220,10 +302,10 @@ export default function Contact() {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Corporate Office Card */}
-                  <div className="col-md-6">
+                  {/* <div className="col-md-6">
                     <div className="contact-info-card flex-column align-items-start gap-3">
                       <div className="contact-icon-wrapper">
                         <FaBuilding />
@@ -236,69 +318,117 @@ export default function Contact() {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Workshop Card */}
-                  <div className="col-md-6">
+                  {/* <div className="col-md-6">
                     <div className="contact-info-card flex-column align-items-start gap-3">
                       <div className="contact-icon-wrapper">
                         <FaTools />
                       </div>
                       <div>
-                        <h4 className="contact-card-title">Workshop</h4>
-                        <p className="contact-card-text small fw-medium">
+                        <h4 className="contact-card-title">Workshop</h4> */}
+                        {/* <p className="contact-card-text small fw-medium">
                           Plot No-3, Sorkha Village, <br/>
                           Sector-115, Noida, UP - 201301
+                        </p> */}
+                        {/* <p className="contact-card-text small fw-medium">
+                          Gata No - 336, Village - Upeda, Hapur, <br/>
+                          Uttar Pradesh 245201
+
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
+
+                  {(Array.isArray(cards) ? cards : []).map((card) => (
+  <div className="col-md-6" key={card.id}>
+    <div className="contact-info-card flex-column align-items-start gap-3">
+      <div className="contact-icon-wrapper"><RenderIcon name={card.icon} /></div>
+      <div className="w-100">
+        <h4 className="contact-card-title">{card.title}</h4>
+        {card.rows.map((row, i) => row.label ? (
+          <div key={i} className={`d-flex justify-content-between align-items-center w-100 ${i < card.rows.length - 1 ? "border-bottom pb-2 mb-2" : ""}`}>
+            <span className="contact-card-text small">{row.label}</span>
+            {row.link ? <a href={row.link} className="contact-card-link fw-bold text-dark">{row.value}</a> : <span className="fw-bold text-dark">{row.value}</span>}
+          </div>
+        ) : (
+          <p key={i} className="contact-card-text small fw-medium">{row.value}</p>
+        ))}
+      </div>
+    </div>
+  </div>
+))}
 
                   {/* Experience Centers Card (Full Width) */}
-                  <div className="col-md-12">
+                  {/* <div className="col-md-12">
                     <div className="contact-info-card flex-column align-items-start gap-3">
-                      <div className="d-flex align-items-center gap-3 w-100 border-bottom pb-3">
-                         <div className="contact-icon-wrapper">
+                      <div className="d-flex align-items-center gap-3 w-100 border-bottom pb-3"> */}
+                         {/* <div className="contact-icon-wrapper">
                            <FaStore />
                          </div>
                          <h4 className="contact-card-title mb-0 fs-4">Experience Centers</h4>
                       </div>
                       
                       <div className="row g-4 w-100 pt-2">
-                        {/* Noida */}
                         <div className="col-md-6">
                           <h6 className="font-outfit fw-bold mb-1" style={{color: '#ff914d', fontSize: '15px'}}>Noida</h6>
                           <p className="contact-card-text small">
                             H101, LGF, Sector-63, Noida, Uttar Pradesh - 201301
                           </p>
-                        </div>
+                        </div> */}
                         
-                        {/* Gurugram 1 */}
+                        {/* Gurugram 1
                         <div className="col-md-6">
                           <h6 className="font-outfit fw-bold mb-1" style={{color: '#ff914d', fontSize: '15px'}}>Gurugram (JMD Galleria)</h6>
                           <p className="contact-card-text small">
                             4th Floor, Unit Nos. 402, Sector-47 & 48, Sohna - Gurgaon Rd, Haryana - 122001
                           </p>
-                        </div>
+                        </div> */}
                         
                         {/* Gurugram 2 */}
-                        <div className="col-md-6">
+                        {/* <div className="col-md-6">
                           <h6 className="font-outfit fw-bold mb-1" style={{color: '#ff914d', fontSize: '15px'}}>Gurugram (DDC Arcade)</h6>
                           <p className="contact-card-text small">
                             1st Floor, Plot No 1 Main, Sector 48 Road, Badshahpur Sohna Rd, Haryana - 122018
                           </p>
                         </div>
                         
-                        {/* Faridabad */}
+                        
                         <div className="col-md-6">
                           <h6 className="font-outfit fw-bold mb-1" style={{color: '#ff914d', fontSize: '15px'}}>Faridabad</h6>
                           <p className="contact-card-text small">
                             1st Floor, Plot No 24, near old Faridabad Metro Station, Sector 20A, Haryana - 121002
                           </p>
-                        </div>
-                      </div>
+                        </div> */}
+
+                        {/* Experience Centers Card (Full Width) */}
+<div className="col-md-12">
+  <div className="contact-info-card flex-column align-items-start gap-3">
+    <div className="d-flex align-items-center gap-3 w-100 border-bottom pb-3">
+       <div className="contact-icon-wrapper">
+         <RenderIcon name={experienceCenters.icon} />
+       </div>
+       <h4 className="contact-card-title mb-0 fs-4">{experienceCenters.heading}</h4>
+    </div>
+
+    <div className="row g-4 w-100 mx-0 pt-2">
+      {experienceCenters.centers.map((center) => (
+        <div className="col-md-6" key={center.id}>
+          <h6 className="font-outfit fw-bold mb-1" style={{color: '#ff914d', fontSize: '15px'}}>
+            {center.heading}
+          </h6>
+          <p className="contact-card-text small">
+            {center.address}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+                      {/* </div>
                     </div>
-                  </div>
+                  </div> */}
 
                 </div>
               </div>
@@ -317,7 +447,7 @@ export default function Contact() {
 
         {/* --- MAP SECTION --- */}
         <div className="mt-5">
-          <MapSection />
+          <MapSection locations={mapSection?.locations ?? []} heading={mapSection?.heading} />
         </div>
         
       </main>

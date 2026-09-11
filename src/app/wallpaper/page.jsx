@@ -326,6 +326,23 @@ async function getSeoData() {
   }
 }
 
+async function getHeadingDescriptionData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-content/manage_heading_description`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) return null;
+
+    const record = await res.json();
+    const data = Array.isArray(record) ? record[0] : record;
+    return data?.json_content?.sections?.wallpaper || null;
+  } catch (err) {
+    console.error("Heading/Description Fetch Error:", err);
+    return null;
+  }
+}
 // --- DYNAMIC METADATA GENERATION ---
 export async function generateMetadata() {
   const seoData = await getSeoData();
@@ -355,15 +372,39 @@ export async function generateMetadata() {
 export default async function Wallpaper() {
   const exclusiveDesignData = await getWallpaperData();
 
+  const headingData = await getHeadingDescriptionData();
+
+  const HeadingTag = headingData?.headingTag || "h1";
+const headingText = headingData?.headingText || "Wallpaper";
+const headingStyle = {
+  textShadow: "none",
+  fontFamily: "inherit",
+  ...(headingData?.headingColor && { color: headingData.headingColor }),
+};
+
+const descriptionText =
+  headingData?.descriptionText ||
+  "Your walls deserve more than just paint—they deserve a statement. Discover our premium wallpaper collection, where striking designs meet timeless elegance. From bold textures to refined patterns, every wallpaper is crafted to transform ordinary spaces into unforgettable interiors."
+const descriptionStyle = {
+  ...(headingData?.descriptionColor && { color: headingData.descriptionColor }),
+};
+
   return (
     <MainLayout>
       <main>
         <section className="container my-5">
           <div className="text-center row mx-0 mb-3 mb-lg-5">
-            <h1 className="wallpaperHeading">Wallpaper</h1>
-            <p className="px-lg-5 team_designation">
-            Your walls deserve more than just paint—they deserve a statement. Discover our premium wallpaper collection, where striking designs meet timeless elegance. From bold textures to refined patterns, every wallpaper is crafted to transform ordinary spaces into unforgettable interiors.
-            </p>
+            <HeadingTag id="wallpaper-heading" className="wallpaperHeading" style={headingStyle}>
+  {headingText}
+</HeadingTag>
+<p id="wallpaper-description" className="px-lg-5 fs-6 text-muted" style={descriptionStyle}>
+  {descriptionText}
+</p>
+<style>{`
+  ${headingData?.headingColor ? `#wallpaper-heading { color: ${headingData.headingColor} !important; }` : ""}
+  ${headingData?.descriptionColor ? `#wallpaper-description { color: ${headingData.descriptionColor} !important; }` : ""}
+  ${headingData?.descriptionFontSize ? `#wallpaper-description { font-size: ${headingData.descriptionFontSize}px !important; }` : ""}
+`}</style>
           </div>
 
           <div className="row g-4 mx-0">

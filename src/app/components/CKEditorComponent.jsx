@@ -7,6 +7,7 @@ import {
     Bold,
     ClassicEditor,
     Essentials,
+    FontSize,
     GeneralHtmlSupport,
     Heading,
     HtmlEmbed,
@@ -35,7 +36,7 @@ import {
     TableToolbar,
     Undo
 } from 'ckeditor5';
-import CustomUploadAdapterPlugin, { getUploadedImageAlt, requireAltTextPrompt } from './CustomUploadAdapter';
+import CustomUploadAdapterPlugin, { requireAltTextPrompt } from './CustomUploadAdapter';
 import 'ckeditor5/ckeditor5.css';
 
 function MandatoryAltTextPlugin(editor) {
@@ -132,6 +133,7 @@ const editorConfig = {
         BlockQuote,
         Bold,
         Essentials,
+        FontSize,
         GeneralHtmlSupport,
         Heading,
         HtmlEmbed,
@@ -165,11 +167,17 @@ const editorConfig = {
         items: [
             'undo', 'redo', '|',
             'heading', '|',
+            'fontSize',
             'bold', 'italic', 'blockQuote', '|',
             'link', 'imageUpload', 'insertTable', 'mediaEmbed', 'htmlEmbed', 'sourceEditing', '|',
             'bulletedList', 'numberedList', 'outdent', 'indent'
         ],
         shouldNotGroupWhenFull: true
+    },
+    fontSize: {
+        options: [
+            10,11,12,13,14,15,'default',16,17,18,19,20,
+        ]
     },
     heading: {
         options: [
@@ -252,7 +260,8 @@ const editorConfig = {
         disallow: [
             {
                 name: 'script'
-            }
+            },
+            { styles: ['font-size'] }
         ]
     },
     htmlEmbed: {

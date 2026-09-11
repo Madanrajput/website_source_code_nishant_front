@@ -4,11 +4,25 @@ import { IoCloseCircleOutline } from "react-icons/io5";
 import { FaBars } from "react-icons/fa";
 import api from "@/utils/api";
 
+const DEFAULT_SERVING_AREAS = [
+  { label: "Interior Designers In Noida", href: "/interior-designers-in-noida" },
+  { label: "Interior Designers in Ghaziabad", href: "/interior-designers-in-ghaziabad" },
+  { label: "Interior Designers in Greater Noida", href: "/interior-designers-in-greater-noida" },
+  { label: "Interior Designers in Delhi", href: "/interior-designers-in-delhi" },
+  { label: "Interior Designers in Dwarka", href: "/interior-designers-in-dwarka" },
+  { label: "Interior Designers in Faridabad", href: "/interior-designers-in-faridabad" },
+  { label: "Interior Designers in Gurugram", href: "/interior-designers-in-gurgaon" },
+  { label: "Interior Designers In Manesar", href: "/interior-designers-in-manesar" },
+  { label: "Interior Designers in Sohna", href: "/interior-designer-in-sohna-gurgaon" },
+  { label: "Interior Designer in Noida Extension", href: "/interior-designer-in-noida-extension" }
+];
+
 const Toggle = () => {
   const [lookMenu, setLookMenu] = useState([]);
   const [error, setError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [servingAreaItems, setServingAreaItems] = useState(DEFAULT_SERVING_AREAS);
 
   const openSidebar = () => setIsOpen(true);
   const closeSidebar = () => setIsOpen(false);
@@ -29,6 +43,26 @@ const Toggle = () => {
 
     fetchLookMenu();
   }, []);
+
+  useEffect(() => {
+  const fetchServingArea = async () => {
+    try {
+      const res = await api.get("/cms-content/navbar_serving_area");
+      if (res.data) {
+        const record = Array.isArray(res.data) ? res.data[0] : res.data;
+        const content = record?.json_content || {};
+        if (content.items && content.items.length > 0) {
+          setServingAreaItems(content.items);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching serving area menu:", err);
+      // keep DEFAULT_SERVING_AREAS as fallback
+    }
+  };
+
+  fetchServingArea();
+}, []);
 
   return (
     <div>
@@ -145,11 +179,12 @@ const Toggle = () => {
 
       {/* Button to open sidebar */}
       <button 
-        className="btn border-0 d-block p-0 ms-3" 
+        className="btn border-0 p-0 d-flex flex-column align-items-center justify-content-center" 
         onClick={openSidebar} 
         aria-label="Open sidebar menu"
       >
-        <FaBars className="fs-2 mt-1 menu-toggle-btn" />
+        <FaBars className="fs-2 menu-toggle-btn" />
+        <span style={{ fontSize: "0.7rem" }}>Menu</span>
       </button>
 
       {/* Sidebar */}
@@ -215,15 +250,16 @@ const Toggle = () => {
                   <div className="col-lg-3 mobile-menu-column">
                     <h5 className="stylish-section-title">Experience Center</h5>
                     <ul className="list-unstyled mb-0 d-flex flex-column align-items-center align-items-lg-start">
-                      <li><a href="/experience-center/" className="offcanvas_anchor" onClick={closeSidebar}>Noida Center</a></li>
-                      <li><a href="/experience-center-gurugram/" className="offcanvas_anchor" onClick={closeSidebar}>Gurugram Center</a></li>
-                      <li><a href="/experience-center-faridabad/" className="offcanvas_anchor" onClick={closeSidebar}>Faridabad Center</a></li>
-                      <li><a href="/experience-center-noida-extension/" className="offcanvas_anchor" onClick={closeSidebar}>Noida Extension</a></li>
+                      <li><a href="/experience-center/" className="offcanvas_anchor" onClick={closeSidebar}>Noida Experience Center</a></li>
+                      <li><a href="/experience-center-gurugram/" className="offcanvas_anchor" onClick={closeSidebar}>Gurugram Experience Center</a></li>
+                      <li><a href="/experience-center-faridabad/" className="offcanvas_anchor" onClick={closeSidebar}>Faridabad Experience Center</a></li>
+                      <li><a href="/experience-center-noida-extension/" className="offcanvas_anchor" onClick={closeSidebar}>Noida Extension Experience Center</a></li>
+                      <li><a href="/experience-center-new-delhi" className="offcanvas_anchor" onClick={closeSidebar}>New Delhi Experience Center</a></li>
                     </ul>
                   </div>
 
                   {/* 3rd - Cities */}
-                  <div className="col-lg-3 mobile-menu-column">
+                  {/* <div className="col-lg-3 mobile-menu-column">
                     <h5 className="stylish-section-title">Cities</h5>
                     <ul className="list-unstyled mb-0 d-flex flex-column align-items-center align-items-lg-start">
                       <li><a href="/interior-designers-in-noida" className="offcanvas_anchor" onClick={closeSidebar}>Designers In Noida</a></li>
@@ -236,7 +272,20 @@ const Toggle = () => {
                       <li><a href="/interior-designers-in-manesar" className="offcanvas_anchor" onClick={closeSidebar}>Designers In Manesar</a></li>
                       <li><a href="/interior-designer-in-sohna-gurgaon" className="offcanvas_anchor" onClick={closeSidebar}>Designers In Sohna</a></li>
                     </ul>
-                  </div>
+                  </div> */}
+                  {/* 3rd - Cities */}
+<div className="col-lg-3 mobile-menu-column">
+  <h5 className="stylish-section-title">Cities</h5>
+  <ul className="list-unstyled mb-0 d-flex flex-column align-items-center align-items-lg-start">
+    {servingAreaItems.map((item, idx) => (
+      <li key={idx}>
+        <a href={item.href} className="offcanvas_anchor" onClick={closeSidebar}>
+          {item.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
 
                   {/* 4th - Design Ideas */}
                   <div className="col-lg-3 mobile-menu-column">

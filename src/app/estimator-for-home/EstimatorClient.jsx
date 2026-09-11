@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { CiCirclePlus, CiCircleMinus } from "react-icons/ci";
 import { useSearchParams } from "next/navigation";
 import TooltipComponent from "../components/TooltipComponent";
@@ -24,6 +24,21 @@ const RoomCounter = ({ title, count, onAdd, onRemove }) => (
     <h4 className="bedroomtext">{title}</h4>
   </>
 );
+
+const SIZE_TYPE_DATA = [
+    { id: 1, name: "1BHK Apartment" },
+    { id: 2, name: "2BHK Apartment" },
+    { id: 3, name: "3BHK Apartment" },
+    { id: 4, name: "4BHK Apartment" },
+    { id: 5, name: "1BHK Villa" },
+    { id: 6, name: "2BHK Villa" },
+    { id: 7, name: "3BHK Villa" },
+    { id: 8, name: "4BHK Villa" },
+    { id: 9, name: "1BHK Flat" },
+    { id: 10, name: "2BHK Flat" },
+    { id: 11, name: "3BHK Flat" },
+    { id: 12, name: "4BHK Flat" },
+  ];
 
 const EstimatorClient = () => {
   const searchParams = useSearchParams();
@@ -58,20 +73,20 @@ const EstimatorClient = () => {
   const [estimaterCalculationData, setEstimaterCalculationData] = useState({});
   const [packageName, setPackageName] = useState("");
 
-  const sizeTypeData = [
-    { id: 1, name: "1BHK Apartment" },
-    { id: 2, name: "2BHK Apartment" },
-    { id: 3, name: "3BHK Apartment" },
-    { id: 4, name: "4BHK Apartment" },
-    { id: 5, name: "1BHK Villa" },
-    { id: 6, name: "2BHK Villa" },
-    { id: 7, name: "3BHK Villa" },
-    { id: 8, name: "4BHK Villa" },
-    { id: 9, name: "1BHK Flat" },
-    { id: 10, name: "2BHK Flat" },
-    { id: 11, name: "3BHK Flat" },
-    { id: 12, name: "4BHK Flat" },
-  ];
+  // const sizeTypeData = [
+  //   { id: 1, name: "1BHK Apartment" },
+  //   { id: 2, name: "2BHK Apartment" },
+  //   { id: 3, name: "3BHK Apartment" },
+  //   { id: 4, name: "4BHK Apartment" },
+  //   { id: 5, name: "1BHK Villa" },
+  //   { id: 6, name: "2BHK Villa" },
+  //   { id: 7, name: "3BHK Villa" },
+  //   { id: 8, name: "4BHK Villa" },
+  //   { id: 9, name: "1BHK Flat" },
+  //   { id: 10, name: "2BHK Flat" },
+  //   { id: 11, name: "3BHK Flat" },
+  //   { id: 12, name: "4BHK Flat" },
+  // ];
 
   useEffect(() => {
     const urlHome = searchParams?.get('home');
@@ -339,15 +354,15 @@ const EstimatorClient = () => {
     }, 5000);
   };
 
-  const getSizeTypeId = (selectedBHK, home) => {
+  const getSizeTypeId = useCallback((selectedBHK, home) => {
     const name = `${selectedBHK} ${home}`.toLowerCase();
-    const sizeType = sizeTypeData.find(
+    const sizeType = SIZE_TYPE_DATA.find(
       (item) => item.name.toLowerCase() === name
     );
     return sizeType ? sizeType.id : null;
-  };
+  }, []);
 
-  const handleSubmitGetEstimate = async () => {
+  const handleSubmitGetEstimate = useCallback(async () => {
     const payload = {
       size_type: getSizeTypeId(selectedBHK, home),
       bedroom: bedrooms,
@@ -373,13 +388,13 @@ const EstimatorClient = () => {
       setSubmissionError("Error fetching estimation. Please try again.");
       console.error("Error during estimation fetch: ", error.message);
     }
-  };
+  }, [getSizeTypeId, selectedBHK, home, bedrooms, bathrooms, living, kitchen, movableFurniture, packageName]);
 
   useEffect(() => {
     if (step === 3) {
       handleSubmitGetEstimate();
     }
-  }, [step]);
+  }, [step, handleSubmitGetEstimate]);
 
   return (
     <main>

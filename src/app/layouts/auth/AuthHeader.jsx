@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { logout } from '../../../store/slices/authSlice';
@@ -11,10 +11,10 @@ const AuthHeader = ({ setIsSidebarOpen }) => {
     const router = useRouter();
     const [timeLeft, setTimeLeft] = useState(null);
 
-    const handleLogout = () => {
+    const handleLogout = useCallback(() => {
         dispatch(logout());
         router.push('/login');
-    };
+    }, [dispatch, router]);
 
     // 🧠 Generate initials (keep it simple and reliable)
     const getInitials = (name = "") => {
@@ -64,7 +64,7 @@ const AuthHeader = ({ setIsSidebarOpen }) => {
         const intervalId = setInterval(updateTimer, 1000); // Tick every second
 
         return () => clearInterval(intervalId);
-    }, [isLoggedIn, authToken]);
+    }, [isLoggedIn, authToken, handleLogout]);
 
     // Format milliseconds into HH:MM:SS
     const formatTime = (ms) => {

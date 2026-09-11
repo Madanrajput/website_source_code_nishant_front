@@ -1,30 +1,69 @@
 import BackgroundImageWithHeading from "../components/BackgroundImageWithHeading";
 import MainLayout from "../layouts/MainLayout";
 import BoxIcon from "../components/BoxIcon";
+
+const getBaseUrl = () => {
+  return process.env.NODE_ENV === "development"
+    ? process.env.NEXT_PUBLIC_API_DEV_URL
+    : process.env.NEXT_PUBLIC_API_BASE_URL;
+};
+
+async function getBannerData() {
+  try {
+    const baseURL = getBaseUrl();
+    const res = await fetch(`${baseURL}/cms-gallery-design/manage-banner?key=refer_and_earn`, {
+      cache: "no-store",
+      headers: { Connection: "close" },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.error("Banner Fetch Error:", err);
+    return null;
+  }
+}
+
 export const metadata = {
   title: "Refer & Earn - High Creation Interior",
   description:
     "Refer & Earn - High Creation Interior",
 };
-const ReferEarn = () => {
+// const ReferEarn = () => {
+export default async function ReferEarn() {
+  const bannerRecord = await getBannerData();
+  const bgHeading = bannerRecord?.banner_heading || "Refer & Earn";
+const bgDescription = bannerRecord?.banner_description || "Get all the information you need";
   return (
     <div>
-       <head>
+       {/* <head>
         <title>Refer & Earn - High Creation Interior	 </title>
         <meta
           name="description"
           content="Refer & Earn - High Creation Interior	"
         />
         <link rel="canonical" href="https://hcinterior.in/refer-and-earn" />	
-      </head>
+      </head> */}
       <MainLayout>
-        <BackgroundImageWithHeading
+        {/* <BackgroundImageWithHeading
           sectionBgImages={"  refer-and-earn refer_and_earn_banner  "}
           sectionBgHeading="Refer & Earn"
           secBgHeadingClass="sec_bgheading_lass"
           sectionBgDescription="Get all the information you need"
           secBgDesClass={"text-center text-white"}
-        />
+        /> */}
+
+        <BackgroundImageWithHeading
+  sectionBgImages={"contact_wrapper refer_and_earn_banner"}
+  sectionBgHeading={bgHeading}
+  secBgHeadingClass="sec_bgheading_lass force-white-heading"
+  sectionBgDescription={bgDescription}
+  secBgDesClass={"text-center bg-transparent text-white"}
+  bgImageUrl={bannerRecord?.banner_image}
+  headingTag={bannerRecord?.banner_heading_tag || "h1"}
+  descriptionFontSize={bannerRecord?.banner_description_font_size || 16}
+  sectionBgHeadingStyle={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
+  sectionBgDescriptionStyle={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}
+/>
         <section className="privacy my-5">
           <div className="container">
             <div className="text-center">
@@ -175,4 +214,4 @@ const ReferEarn = () => {
   );
 };
 
-export default ReferEarn;
+// export default ReferEarn;

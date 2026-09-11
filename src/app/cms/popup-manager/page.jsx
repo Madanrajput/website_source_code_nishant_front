@@ -204,14 +204,14 @@ const PopupManager = () => {
                                 <div className="col-md-6 mt-2">
                                     <label className="fw-bold">Desktop Banner Image (Portrait Ratio)</label>
                                     {formData.desktop_image && !desktopFile && (
-                                        <div className="mb-2"><img src={formData.desktop_image} style={{ height: "60px", borderRadius: "6px" }} /></div>
+                                        <div className="mb-2"><img src={formData.desktop_image} alt="Desktop preview" style={{ height: "60px", borderRadius: "6px" }} /></div>
                                     )}
                                     <input type="file" id="desktopImageInput" className="form-control" accept="image/*" onChange={handleDesktopFileChange} />
                                 </div>
                                 <div className="col-md-6 mt-2">
                                     <label className="fw-bold">Mobile Banner Image (Landscape Ratio)</label>
                                     {formData.mobile_image && !mobileFile && (
-                                        <div className="mb-2"><img src={formData.mobile_image} style={{ height: "60px", borderRadius: "6px" }} /></div>
+                                        <div className="mb-2"><img src={formData.mobile_image} alt="Mobile preview" style={{ height: "60px", borderRadius: "6px" }} /></div>
                                     )}
                                     <input type="file" id="mobileImageInput" className="form-control" accept="image/*" onChange={handleMobileFileChange} />
                                 </div>
