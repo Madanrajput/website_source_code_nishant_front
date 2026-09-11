@@ -311,6 +311,7 @@ function AuthSidebar() {
                         <Link href="/cms/experience-center-gurugram" className={`sub-menu-link ${isActive('/cms/experience-center-gurugram')}`}>Gurugram Center</Link>
                         <Link href="/cms/experience-center-faridabad" className={`sub-menu-link ${isActive('/cms/experience-center-faridabad')}`}>Faridabad Center</Link>
                         <Link href="/cms/experience-center-noida-extension" className={`sub-menu-link ${isActive('/cms/experience-center-noida-extension')}`}>Noida Extension Center</Link>
+                        <Link href="/cms/experience-center-new-delhi" className={`sub-menu-link ${isActive('/cms/experience-center-new-delhi')}`}>New Delhi Center</Link>
                     </div>
                 )}
 
